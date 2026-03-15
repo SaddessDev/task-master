@@ -11,7 +11,7 @@
 
 const DB = {
     VERSION: '1.2',
-    STORAGE_KEY: 'hero_os_v12',
+    STORAGE_KEY: 'task_manager',
     MAX_STORAGE_SIZE: 5 * 1024 * 1024, // 5MB max
     
     // Structure par défaut de la base de données
