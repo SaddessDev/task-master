@@ -1,0 +1,22 @@
+# Configuration GitHub Pages
+title: Task Master
+description: Application de gestion de tâches gamifiée - 100% client-side
+url: https://github.com
+baseurl: /task-master
+
+# Thème
+theme: jekyll-theme-minimal
+
+# Markdown
+markdown: kramdown
+
+# Exclude
+exclude:
+  - .gitignore
+  - README.md
+  - SECURITY.md
+  - PRIVACY.md
+  - DEPLOYMENT.md
+  - AUDIT_SECURITY_REPORT.md
+  - node_modules
+  - .git
