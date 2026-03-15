@@ -827,7 +827,7 @@ function toggleDaily(id) {
     const allDone = state.dailies.length > 0 && state.dailies.every(x => x.done);
 
     if (allDone && !state.dailyBonusClaimed) {
-        const bonus = 500 * getMultiplier();
+        const bonus = 350 * getMultiplier();
         const oldCoins = state.coins;
 
         state.coins += bonus;
