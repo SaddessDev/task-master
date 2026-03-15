@@ -40,6 +40,9 @@
                 <button onclick="openModal('modal-config')" class="glass py-1.5 px-3 rounded-xl hover:bg-slate-800 transition-colors border-white/10">
                     <i class="fa-solid fa-gear"></i>
                 </button>
+                <button onclick="openModal('modal-info')" class="glass py-1.5 px-3 rounded-xl hover:bg-slate-800 transition-colors border-white/10" title="Informations">
+                    <i class="fa-solid fa-info"></i>
+                </button>
             </div>
         </header>
 
@@ -113,6 +116,43 @@
             <div id="cat-manage-list" class="space-y-2 mb-6 max-h-80 overflow-y-auto pr-2 no-scrollbar"></div>
             
             <div id="cat-form-area"></div>
+
+            <div class="border-t border-white/10 mt-8 pt-8">
+                <h4 class="font-bold text-red-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-trash-alt"></i>
+                    Zone de danger
+                </h4>
+                <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4">
+                    <p class="text-sm text-slate-300 mb-3">Supprimer toutes vos données locales</p>
+                    <p class="text-xs text-slate-400 mb-4">Cette action est <strong>irréversible</strong>. Cela supprimera :</p>
+                    <ul class="text-xs text-slate-400 space-y-1 ml-4 mb-4">
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
+                            <span>Toutes vos tâches et objectifs</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
+                            <span>Votre progression et vos points</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
+                            <span>Vos rangs et récompenses</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
+                            <span>Vos catégories personnalisées</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
+                            <span>Vos tâches quotidiennes</span>
+                        </li>
+                    </ul>
+                    <button onclick="confirmClearData()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-sm uppercase transition-colors active:scale-95">
+                        <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+                        Supprimer toutes les données
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -131,6 +171,74 @@
             </div>
             
             <div id="shop-items-container"></div>
+        </div>
+    </div>
+
+    <div id="modal-info" class="modal">
+        <div class="glass p-8 rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-gaming text-xl font-black uppercase text-primary flex items-center gap-3">
+                    <i class="fa-solid fa-info-circle"></i>
+                    Informations
+                </h3>
+                <button onclick="closeModal('modal-info')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+            </div>
+            
+            <div class="space-y-6 text-slate-300 text-sm">
+                <div>
+                    <h4 class="font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye"></i>
+                        Objectif du site
+                    </h4>
+                    <p class="text-slate-400">Task Master est une application web de gestion de tâches gamifiée conçue pour vous aider à organiser vos objectifs et suivre votre progression. L'application utilise un système de points, de rangs et de récompenses pour rendre la productivité plus engageante et motivante.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-shield-alt"></i>
+                        Traitement des données
+                    </h4>
+                    <p class="text-slate-400 mb-3">Vos données sont traitées de manière sécurisée et respectueuse de votre vie privée :</p>
+                    <ul class="space-y-2 text-slate-400 ml-4">
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-primary flex-shrink-0 mt-0.5"></i>
+                            <span><strong>Stockage local :</strong> Toutes vos tâches et vos données de progression sont stockées localement dans votre navigateur (localStorage).</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-primary flex-shrink-0 mt-0.5"></i>
+                            <span><strong>Aucun serveur :</strong> Aucune donnée n'est envoyée à des serveurs externes. Vous avez le contrôle total de vos informations.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-primary flex-shrink-0 mt-0.5"></i>
+                            <span><strong>Pas de suivi :</strong> Nous ne collectons pas de données personnelles, d'adresses IP ou d'informations de suivi.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fa-solid fa-check text-primary flex-shrink-0 mt-0.5"></i>
+                            <span><strong>Suppression :</strong> Vous pouvez supprimer toutes vos données à tout moment via les paramètres de configuration.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-user-circle"></i>
+                        Auteur du projet
+                    </h4>
+                    <p class="text-slate-400">Task Master est un projet open-source créé par M3philes. Ce projet est fourni à titre gratuit et sans garantie.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-file-contract"></i>
+                        Licence
+                    </h4>
+                    <p class="text-slate-400">Ce projet est distribué sous une licence open-source. Vous êtes libre d'utiliser, de modifier et de distribuer ce logiciel conformément aux termes de la licence.</p>
+                </div>
+
+                <div class="bg-slate-900/50 border border-primary/20 rounded-xl p-4 mt-6">
+                    <p class="text-xs text-slate-500 italic">En utilisant Task Master, vous acceptez les conditions énoncées ci-dessus. Si vous avez des questions concernant la confidentialité ou l'utilisation de vos données, veuillez consulter la documentation du projet.</p>
+                </div>
+            </div>
         </div>
     </div>
 

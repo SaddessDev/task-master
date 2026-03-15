@@ -1236,6 +1236,64 @@ function initDragAndDrop() {
     });
 }
 
+// ===== GESTION DES DONNÉES =====
+
+function confirmClearData() {
+    const confirmed = confirm(
+        '⚠️ ATTENTION - Action irréversible ⚠️\n\n' +
+        'Cela supprimera définitivement :\n' +
+        '• Toutes vos tâches et objectifs\n' +
+        '• Votre progression et vos points\n' +
+        '• Vos rangs et récompenses\n' +
+        '• Vos catégories personnalisées\n' +
+        '• Vos tâches quotidiennes\n\n' +
+        'Êtes-vous absolument certain de vouloir continuer ?'
+    );
+
+    if (confirmed) {
+        const doubleConfirmed = confirm(
+            'Dernière confirmation :\n\n' +
+            'Tapez "SUPPRIMER" dans la prochaine boîte de dialogue pour confirmer la suppression définitive de toutes vos données.'
+        );
+
+        if (doubleConfirmed) {
+            const userInput = prompt('Tapez "SUPPRIMER" pour confirmer :');
+            if (userInput === 'SUPPRIMER') {
+                clearAllData();
+            } else {
+                alert('Suppression annulée. Vos données sont sûres.');
+            }
+        }
+    }
+}
+
+function clearAllData() {
+    try {
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Réinitialiser l'état en mémoire
+        state = {
+            quests: [],
+            ascensionPoints: 0,
+            coins: 0,
+            rebirths: 0,
+            categories: [],
+            dailies: [],
+            dailyBonusClaimed: false,
+            lastDailyReset: null,
+            filterOrder: []
+        };
+
+        // Recharger la page pour réinitialiser complètement
+        alert('✓ Toutes vos données ont été supprimées avec succès.\n\nLa page va se recharger.');
+        location.reload();
+    } catch (error) {
+        console.error('Erreur lors de la suppression des données :', error);
+        alert('Une erreur s\'est produite lors de la suppression des données.');
+    }
+}
+
 // ===== INITIALISATION =====
 
 function initFilterBarDrag() {
