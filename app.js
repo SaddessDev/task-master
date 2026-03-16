@@ -1047,9 +1047,24 @@ function saveCategory() {
         // Mode édition
         const cat = state.categories.find(c => c.id === editingCategory);
         if (cat) {
+            const oldName = cat.name;
             cat.name = name;
             cat.icon = selectedIcon;
             cat.color = selectedColor;
+            
+            // Mettre à jour tous les objectifs enfants
+            state.quests.forEach(quest => {
+                if (quest.cat === oldName) {
+                    quest.cat = name;
+                }
+            });
+            
+            // Mettre à jour toutes les tâches quotidiennes enfants
+            state.dailies.forEach(daily => {
+                if (daily.cat === oldName) {
+                    daily.cat = name;
+                }
+            });
         }
         editingCategory = null;
     } else {
