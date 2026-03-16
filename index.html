@@ -20,7 +20,7 @@
                 <div>
                     <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Task <span class="text-primary">Master</span></h1>
                     <div class="text-[10px] text-slate-500 font-bold tracking-widest flex items-center gap-2">
-                        Renaissances : <span id="rb-val">0</span> | v1.2
+                        <span id="rb-label">Renaissance</span> : <span id="rb-val">0</span> | v1.3
                     </div>
                 </div>
             </div>
@@ -171,6 +171,44 @@
             </div>
             
             <div id="shop-items-container"></div>
+        </div>
+    </div>
+
+    <div id="modal-reassign" class="modal">
+        <div class="glass p-8 rounded-[3rem] w-full max-w-4xl mx-4 border-white/10 max-h-[90vh] overflow-hidden flex flex-col relative">
+            <div class="flex justify-between items-center mb-6 relative z-10">
+                <div>
+                    <h3 class="font-gaming text-2xl font-black uppercase text-primary flex items-center gap-3">
+                        <i class="fa-solid fa-exchange-alt"></i>
+                        Réassigner les objectifs
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-2">
+                        <span id="reassign-count" class="font-bold text-primary">0</span> <span id="reassign-count-label">objectif à traiter</span>
+                    </p>
+                </div>
+                <button onclick="closeModal('modal-reassign')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl relative z-10">
+                <p class="text-sm text-slate-300 flex items-start gap-3">
+                    <i class="fa-solid fa-exclamation-triangle text-yellow-500 flex-shrink-0 mt-0.5"></i>
+                    <span>La catégorie <strong id="reassign-cat-name" class="text-yellow-400"></strong> va être supprimée. Réassignez ses objectifs à une autre catégorie ou supprimez-les.</span>
+                </p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto pr-2 no-scrollbar mb-6 relative z-0">
+                <div id="reassign-items-container" class="space-y-2"></div>
+            </div>
+
+            <div class="border-t border-white/10 pt-4 flex gap-3 justify-end relative z-10">
+                <button onclick="closeModal('modal-reassign')" class="glass px-6 py-2.5 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 font-semibold text-sm">
+                    Annuler
+                </button>
+                <button onclick="confirmReassignAndDelete()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg">
+                    <i class="fa-solid fa-trash-alt mr-2"></i>
+                    Supprimer la catégorie
+                </button>
+            </div>
         </div>
     </div>
 

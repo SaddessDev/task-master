@@ -38,6 +38,8 @@ let editingCategory = null;
 let activeConfigTab = 'categories'; // 'categories' ou 'dailies'
 let selectedCategoryForQuest = null; // Catégorie sélectionnée pour nouvelle quête
 let selectedCategoryForDaily = null; // Catégorie sélectionnée pour nouveau daily
+let categoryToDelete = null; // Catégorie en cours de suppression
+let reassignmentData = null; // Données de réassignation des objectifs
 
 // ===== UTILITAIRES =====
 
@@ -51,6 +53,14 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+// Fonction pour gérer le pluriel/singulier
+function pluralize(count, singular, plural = null) {
+    if (plural === null) {
+        plural = singular + 's';
+    }
+    return count <= 1 ? singular : plural;
 }
 
 // Valider une couleur hex
@@ -317,6 +327,7 @@ function render() {
     if (ascPtsHeaderEl) ascPtsHeaderEl.innerText = state.ascensionPoints;
 
     document.getElementById('rb-val').innerText = state.rebirths;
+    document.getElementById('rb-label').innerText = pluralize(state.rebirths, 'Renaissance');
 
     // Mise à jour du stage
     const cur = getCurrentStage();
@@ -353,7 +364,7 @@ function render() {
                     </div>
                     <div class="flex-1">
                         <div class="text-[11px] font-bold text-white">${nextStage.n}</div>
-                        <div class="text-[9px] text-slate-500 mb-2">Encore ${remaining} points</div>
+                        <div class="text-[9px] text-slate-500 mb-2">Encore ${remaining} ${pluralize(remaining, 'point')}</div>
                         <div class="h-2 bg-slate-900 rounded-full overflow-hidden shadow-inner">
                             <div class="h-full bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-1000" style="width: ${progress}%"></div>
                         </div>
@@ -619,7 +630,7 @@ function renderDailyCard() {
                 </div>
                 <div class="flex-1">
                     <h3 class="font-gaming text-sm font-black uppercase text-white">Objectifs réguliers</h3>
-                    <p class="text-[9px] text-slate-400 font-bold">${completedCount}/${totalCount} complétés ${allDone ? '🎉' : ''}</p>
+                    <p class="text-[9px] text-slate-400 font-bold">${completedCount}/${totalCount} ${pluralize(completedCount, 'complété')} ${allDone ? '🎉' : ''}</p>
                 </div>
             </div>
             
@@ -1100,12 +1111,242 @@ function cancelEditCategory() {
 }
 
 function removeCategory(id) {
-    if (confirm("Supprimer ce secteur ?")) {
-        state.categories = state.categories.filter(c => c.id !== id);
-        saveState();
-        render();
-        renderConfigModal();
+    const cat = state.categories.find(c => c.id === id);
+    if (!cat) return;
+
+    // Trouver tous les objectifs et tâches quotidiennes de cette catégorie
+    const affectedQuests = state.quests.filter(q => q.cat === cat.name);
+    const affectedDailies = state.dailies.filter(d => d.cat === cat.name);
+    const totalAffected = affectedQuests.length + affectedDailies.length;
+
+    // S'il n'y a pas d'objectifs affectés, supprimer directement
+    if (totalAffected === 0) {
+        if (confirm(`Supprimer la catégorie "${cat.name}" ?`)) {
+            state.categories = state.categories.filter(c => c.id !== id);
+            saveState();
+            render();
+            renderConfigModal();
+        }
+        return;
     }
+
+    // Sinon, ouvrir la modal de réassignation
+    categoryToDelete = { id, name: cat.name };
+    openReassignModal(affectedQuests, affectedDailies);
+}
+
+function openReassignModal(quests, dailies) {
+    // Stocker les objectifs à réassigner
+    reassignmentData = {
+        quests: quests.map(q => ({ ...q })),
+        dailies: dailies.map(d => ({ ...d })),
+        assignments: {}
+    };
+
+    // Initialiser les assignments
+    [...quests, ...dailies].forEach(item => {
+        reassignmentData.assignments[item.id] = null;
+    });
+
+    // Remplir le nom de la catégorie
+    document.getElementById('reassign-cat-name').textContent = categoryToDelete.name;
+
+    // Rendre les items
+    renderReassignItems();
+
+    // Ouvrir la modal
+    openModal('modal-reassign');
+}
+
+function renderReassignItems() {
+    const container = document.getElementById('reassign-items-container');
+    container.innerHTML = '';
+
+    const allItems = [...reassignmentData.quests, ...reassignmentData.dailies];
+
+    // Mettre à jour le compteur avec pluriel
+    const count = allItems.length;
+    document.getElementById('reassign-count').textContent = count;
+    document.getElementById('reassign-count-label').textContent = pluralize(count, 'objectif à traiter', 'objectifs à traiter');
+
+    allItems.forEach((item, index) => {
+        const isDaily = reassignmentData.dailies.some(d => d.id === item.id);
+        const itemType = isDaily ? 'Quotidien' : 'Objectif';
+        const currentAssignment = reassignmentData.assignments[item.id];
+        const selectedCat = state.categories.find(c => c.name === currentAssignment);
+
+        const div = document.createElement('div');
+        div.className = 'group bg-gradient-to-r from-slate-900/40 to-slate-800/40 border border-white/5 hover:border-primary/30 rounded-xl p-3 transition-all hover:shadow-lg hover:shadow-primary/10 reassign-item-row';
+        div.setAttribute('data-item-id', item.id);
+
+        const buttonId = `reassign-btn-${item.id}`;
+
+        div.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
+                            ${itemType}
+                        </span>
+                        ${isDaily ? '<i class="fa-solid fa-repeat text-primary text-xs"></i>' : '<i class="fa-solid fa-check-circle text-slate-500 text-xs"></i>'}
+                    </div>
+                    <p class="text-sm font-semibold text-white truncate">${escapeHtml(item.text)}</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button id="${buttonId}" onclick="toggleReassignDropdown(${item.id})" class="glass py-1.5 px-3 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-primary/30 text-xs font-semibold">
+                        <div class="w-4 h-4 rounded flex items-center justify-center flex-shrink-0"};">
+                            <i class="fa-solid ${selectedCat ? selectedCat.icon : 'fa-trash-alt'} text-xs" style="color: ${selectedCat ? selectedCat.color : '#f87171'};"></i>
+                        </div>
+                        <span class="text-white max-w-[100px] truncate">${selectedCat ? escapeHtml(selectedCat.name) : 'Supprimer'}</span>
+                        <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+
+
+function updateReassignment(itemId, newCategory) {
+    reassignmentData.assignments[itemId] = newCategory || null;
+}
+
+function toggleReassignDropdown(itemId) {
+    const button = document.getElementById(`reassign-btn-${itemId}`);
+    const chevron = button.querySelector('.fa-chevron-down');
+    
+    // Fermer tous les autres dropdowns
+    document.querySelectorAll('[id^="reassign-dropdown-"]').forEach(d => {
+        d.remove();
+    });
+    
+    // Vérifier si on doit ouvrir ou fermer
+    if (button.getAttribute('data-open') === 'true') {
+        button.setAttribute('data-open', 'false');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        return;
+    }
+    
+    // Créer le dropdown en fixed
+    const rect = button.getBoundingClientRect();
+    const dropdown = document.createElement('div');
+    dropdown.id = `reassign-dropdown-${itemId}`;
+    dropdown.className = 'glass rounded-xl border border-white/10 shadow-2xl min-w-[180px] animate-pop';
+    dropdown.style.cssText = `
+        position: fixed;
+        top: ${rect.bottom + 8}px;
+        right: ${window.innerWidth - rect.right}px;
+        z-index: 50000;
+    `;
+    
+    const currentAssignment = reassignmentData.assignments[itemId];
+    
+    dropdown.innerHTML = `
+        <div class="p-2 max-h-48 overflow-y-auto">
+            <button onclick="selectReassignCategory(${itemId}, null)" class="w-full text-left mb-2 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-trash-alt"></i>
+                Supprimer cet objectif
+            </button>
+            ${state.categories
+                .filter(c => c.name !== categoryToDelete.name)
+                .map(c => `
+                    <button onclick="selectReassignCategory(${itemId}, '${c.name}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-white hover:bg-slate-700/50 transition-colors flex items-center gap-2 ${currentAssignment === c.name ? 'bg-primary/20 border border-primary/30' : ''}">
+                        <div class="w-4 h-4 rounded flex items-center justify-center" style="background: ${c.color}33;">
+                            <i class="fa-solid ${c.icon} text-xs" style="color: ${c.color};"></i>
+                        </div>
+                        ${escapeHtml(c.name)}
+                    </button>
+                `)
+                .join('')}
+        </div>
+    `;
+    
+    document.body.appendChild(dropdown);
+    button.setAttribute('data-open', 'true');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    
+    // Fermer au clic en dehors
+    setTimeout(() => {
+        document.addEventListener('click', closeReassignDropdownOnClickOutside);
+    }, 0);
+}
+
+function closeReassignDropdownOnClickOutside(e) {
+    if (!e.target.closest('[id^="reassign-btn-"]') && !e.target.closest('[id^="reassign-dropdown-"]')) {
+        document.querySelectorAll('[id^="reassign-dropdown-"]').forEach(d => {
+            d.remove();
+        });
+        document.querySelectorAll('[id^="reassign-btn-"]').forEach(btn => {
+            btn.setAttribute('data-open', 'false');
+            const chevron = btn.querySelector('.fa-chevron-down');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        });
+        document.removeEventListener('click', closeReassignDropdownOnClickOutside);
+    }
+}
+
+function selectReassignCategory(itemId, categoryName) {
+    updateReassignment(itemId, categoryName);
+    document.querySelectorAll('[id^="reassign-dropdown-"]').forEach(d => {
+        d.remove();
+    });
+    document.querySelectorAll('[id^="reassign-btn-"]').forEach(btn => {
+        btn.setAttribute('data-open', 'false');
+        const chevron = btn.querySelector('.fa-chevron-down');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    });
+    document.removeEventListener('click', closeReassignDropdownOnClickOutside);
+    renderReassignItems();
+}
+
+function deleteReassignItem(itemId) {
+    // Marquer l'item pour suppression
+    reassignmentData.assignments[itemId] = 'DELETE';
+    renderReassignItems();
+}
+
+function confirmReassignAndDelete() {
+    // Appliquer les réassignations
+    Object.entries(reassignmentData.assignments).forEach(([itemId, newCategory]) => {
+        const questIndex = reassignmentData.quests.findIndex(q => q.id === parseInt(itemId));
+        const dailyIndex = reassignmentData.dailies.findIndex(d => d.id === parseInt(itemId));
+
+        if (newCategory === 'DELETE' || newCategory === null) {
+            // Supprimer l'objectif
+            if (questIndex !== -1) {
+                state.quests = state.quests.filter(q => q.id !== parseInt(itemId));
+            }
+            if (dailyIndex !== -1) {
+                state.dailies = state.dailies.filter(d => d.id !== parseInt(itemId));
+            }
+        } else if (newCategory) {
+            // Réassigner à la nouvelle catégorie
+            if (questIndex !== -1) {
+                const quest = state.quests.find(q => q.id === parseInt(itemId));
+                if (quest) quest.cat = newCategory;
+            }
+            if (dailyIndex !== -1) {
+                const daily = state.dailies.find(d => d.id === parseInt(itemId));
+                if (daily) daily.cat = newCategory;
+            }
+        }
+    });
+
+    // Supprimer la catégorie
+    state.categories = state.categories.filter(c => c.id !== categoryToDelete.id);
+
+    // Nettoyer
+    categoryToDelete = null;
+    reassignmentData = null;
+
+    // Sauvegarder et rafraîchir
+    saveState();
+    render();
+    renderConfigModal();
+    closeModal('modal-reassign');
 }
 
 function addDaily() {
