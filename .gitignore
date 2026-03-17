@@ -1,0 +1,30 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Éditeurs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node (si jamais utilisé)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Fichiers temporaires
+*.tmp
+*.temp
+.cache/
+
+# Logs
+*.log
+
+# Environnement
+.env
+.env.local
+.env.*.local
