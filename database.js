@@ -23,6 +23,17 @@ const DB = {
             ascensionPoints: 0,
             rebirths: 0,
             activeCat: 'Toutes',
+            streak: 0,
+            streakLastDate: null,
+            streakRequirement: 3,
+            notes: [],
+            unlockedAchievements: [],
+            questsCreated: 0,
+            questsCompleted: 0,
+            dailiesCreated: 0,
+            peaceFearsBurned: 0,
+            peaceFearAdded: 0,
+            dailyCompletions: 0,
             categories: [
                 { id: 1, name: 'Général', icon: 'fa-tag', color: '#06b6d4' },
                 { id: 2, name: 'Santé', icon: 'fa-heart', color: '#ec4899' },
@@ -32,7 +43,8 @@ const DB = {
             dailies: [],
             lastLoginDate: "",
             dailyBonusClaimed: false,
-            dailyBonusClaimedAt: null
+            dailyBonusClaimedAt: null,
+            lastAscensionPurchase: null
         };
     },
 

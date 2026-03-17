@@ -40,6 +40,9 @@ let selectedCategoryForQuest = null; // Catégorie sélectionnée pour nouvelle 
 let selectedCategoryForDaily = null; // Catégorie sélectionnée pour nouveau daily
 let categoryToDelete = null; // Catégorie en cours de suppression
 let reassignmentData = null; // Données de réassignation des objectifs
+let currentPage = 'dashboard'; // Page actuelle
+let peaceFears = []; // Peurs dans le sac d'apaisement
+let achievements = []; // Achievements chargés depuis le JSON
 
 // ===== UTILITAIRES =====
 
@@ -221,12 +224,71 @@ function loadState() {
 function checkDailiesReset() {
     const today = new Date().toLocaleDateString('fr-FR');
     if (state.lastLoginDate !== today) {
+        // Vérifier le streak avant de réinitialiser
+        checkAndUpdateStreak();
+        
         state.dailies.forEach(d => d.done = false);
         state.dailyBonusClaimed = false;
         state.dailyBonusClaimedAt = null;
         state.lastLoginDate = today;
         saveState();
     }
+}
+
+function checkAndUpdateStreak() {
+    const completedDailies = state.dailies.filter(d => d.done).length;
+    const totalDailies = state.dailies.length;
+    const requirement = state.streakRequirement || 3;
+    
+    // Si pas assez de dailies, ne pas compter le streak
+    if (totalDailies === 0) return;
+    
+    const oldStreak = state.streak || 0;
+    
+    // Si le nombre de dailies complétées est inférieur au requirement, réinitialiser le streak
+    if (completedDailies < requirement) {
+        if (state.streak > 0) {
+            // Afficher une notification de perte de streak
+            showStreakLostNotification(state.streak);
+        }
+        state.streak = 0;
+    } else {
+        // Augmenter le streak
+        state.streak = (state.streak || 0) + 1;
+        
+        // Animer le streak si augmenté
+        if (state.streak > oldStreak) {
+            const streakEl = document.getElementById('streak-val');
+            if (streakEl) {
+                streakEl.classList.remove('streak-pulse');
+                // Forcer le reflow pour relancer l'animation
+                void streakEl.offsetWidth;
+                streakEl.classList.add('streak-pulse');
+            }
+        }
+    }
+    
+    state.streakLastDate = new Date().toLocaleDateString('fr-FR');
+    saveState();
+}
+
+function showStreakLostNotification(streakCount) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 glass p-4 rounded-xl border border-red-500/30 bg-red-500/10 z-50 animate-bounce';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-fire text-2xl text-red-500"></i>
+            <div>
+                <p class="font-bold text-white">Streak perdu!</p>
+                <p class="text-xs text-slate-300">Vous aviez une série de ${streakCount} ${pluralize(streakCount, 'jour')}.</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
 }
 
 function getTimeUntilMidnight() {
@@ -326,6 +388,25 @@ function render() {
     const ascPtsHeaderEl = document.getElementById('asc-pts-header');
     if (ascPtsHeaderEl) ascPtsHeaderEl.innerText = state.ascensionPoints;
 
+    // Mise à jour du streak
+    const streakEl = document.getElementById('streak-val');
+    if (streakEl) streakEl.innerText = state.streak || 0;
+
+    // Sync valeurs menu mobile
+    const coinsMobile = document.getElementById('coins-mobile');
+    const streakMobile = document.getElementById('streak-mobile');
+    const ascMobile = document.getElementById('asc-mobile');
+    const coinsMobileHeader = document.getElementById('coins-mobile-header');
+    const streakMobileHeader = document.getElementById('streak-mobile-header');
+    const coinIconMobile = document.getElementById('coin-icon-mobile');
+    const coins = Math.floor(Math.max(0, state.coins));
+    const streak = state.streak || 0;
+    if (coinsMobile) coinsMobile.innerText = coins;
+    if (streakMobile) streakMobile.innerText = streak;
+    if (ascMobile) ascMobile.innerText = state.ascensionPoints;
+    if (coinsMobileHeader) coinsMobileHeader.innerText = coins;
+    if (streakMobileHeader) streakMobileHeader.innerText = streak;
+    if (coinIconMobile) coinIconMobile.innerHTML = getCreditIcon('sm', 'text-yellow-500');
     document.getElementById('rb-val').innerText = state.rebirths;
     document.getElementById('rb-label').innerText = pluralize(state.rebirths, 'Renaissance');
 
@@ -562,12 +643,19 @@ function renderQuests(mult) {
             const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
             const relativeTime = getRelativeTime(q.id);
             const fullDate = getFullDate(q.id);
+            const locked = isQuestLocked(q);
+
+            const toggleBtn = locked
+                ? `<div class="w-12 h-12 rounded-xl border-2 border-slate-700 flex items-center justify-center cursor-not-allowed opacity-60" title="Objectif verrouillé">
+                       <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
+                   </div>`
+                : `<div onclick="toggleQuest(${q.id})" class="w-12 h-12 rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all hover:scale-110 ${q.done ? 'border-primary' : 'border-slate-800 hover:border-primary'}" style="${q.done ? `background: ${catColor}; border-color: ${catColor};` : ''}">
+                       ${q.done ? '<i class="fa-solid fa-check text-white text-lg"></i>' : ''}
+                   </div>`;
 
             html += `
                 <div class="glass p-5 rounded-[2rem] flex items-center gap-4 quest-card border transition-all hover:scale-[1.02] ${q.done ? 'opacity-40 border-white/5' : 'border-white/10 hover:border-primary/50'}">
-                    <div onclick="toggleQuest(${q.id})" class="w-12 h-12 rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all hover:scale-110 ${q.done ? 'border-primary' : 'border-slate-800 hover:border-primary'}" style="${q.done ? `background: ${catColor}; border-color: ${catColor};` : ''}">
-                        ${q.done ? '<i class="fa-solid fa-check text-white text-lg"></i>' : ''}
-                    </div>
+                    ${toggleBtn}
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
                             <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}33;">
@@ -629,7 +717,7 @@ function renderDailyCard() {
                     <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-calendar-check'} text-white text-xl"></i>
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-gaming text-sm font-black uppercase text-white">Objectifs réguliers</h3>
+                    <h3 class="font-gaming text-sm font-black uppercase text-white">Objectifs quotidiens</h3>
                     <p class="text-[9px] text-slate-400 font-bold">${completedCount}/${totalCount} ${pluralize(completedCount, 'complété')} ${allDone ? '🎉' : ''}</p>
                 </div>
             </div>
@@ -709,7 +797,7 @@ function renderShop() {
     const items = [
         { n: 'Cellule Basique', g: 30, p: 300, i: 'fa-battery-half', desc: 'Amélioration génétique de base', color: 'from-cyan-500 to-blue-500' },
         { n: 'Module Avancé', g: 100, p: 900, i: 'fa-microchip', desc: 'Augmentation neuronale', color: 'from-blue-500 to-purple-500' },
-        { n: 'Noyau Quantique', g: 450, p: 3500, i: 'fa-atom', desc: 'Évolution transcendantale', color: 'from-purple-500 to-pink-500' }
+        { n: 'Noyau Quantique', g: 450, p: 3200, i: 'fa-atom', desc: 'Évolution transcendantale', color: 'from-purple-500 to-pink-500' }
     ];
 
     container.innerHTML = `
@@ -791,35 +879,79 @@ function addQuest() {
         done: false
     });
 
+    state.questsCreated++;
     input.value = "";
     fx('input-area', 'flash-win');
     saveState();
     render();
+    checkAchievements();
 }
 
 function toggleQuest(id) {
     const q = state.quests.find(x => x.id === id);
     if (!q) return;
 
+    // Vérifier si la quest est verrouillée (anti-abus)
+    if (q.done && isQuestLocked(q)) {
+        fx('coin-display', 'animate-shake');
+        showLockWarning();
+        return;
+    }
+
     q.done = !q.done;
     const val = 50 * getMultiplier();
 
     if (q.done) {
+        q.completedAt = Date.now();
         const oldCoins = state.coins;
         state.xp += val;
         state.coins += val;
+        state.questsCompleted++;
 
         // Animations de gain
         createCoinParticles(val, 'coin-display');
         animateNumberIncrement('coins', oldCoins, state.coins);
         fx('coin-display', 'animate-pop');
     } else {
+        delete q.completedAt;
         state.xp = Math.max(0, state.xp - val);
         state.coins = Math.max(0, state.coins - val);
+        state.questsCompleted = Math.max(0, state.questsCompleted - 1);
     }
 
     saveState();
     render();
+    checkAchievements();
+}
+
+// Retourne true si la quest complétée ne peut plus être décochée
+function isQuestLocked(q) {
+    if (!q.done || !q.completedAt) return false;
+    const LOCK_DELAY_MS = 5 * 60 * 1000; // 5 minutes
+    // Verrouillé si un achat ASC a eu lieu après la complétion
+    if (state.lastAscensionPurchase && state.lastAscensionPurchase > q.completedAt) return true;
+    // Verrouillé après 5 minutes
+    if (Date.now() - q.completedAt > LOCK_DELAY_MS) return true;
+    return false;
+}
+
+function showLockWarning() {
+    const existing = document.getElementById('lock-warning-toast');
+    if (existing) return;
+    const toast = document.createElement('div');
+    toast.id = 'lock-warning-toast';
+    toast.className = 'fixed top-4 right-4 glass p-4 rounded-xl border border-red-500/30 bg-red-500/10 z-50 max-w-xs';
+    toast.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-lock text-red-400 text-lg flex-shrink-0"></i>
+            <div>
+                <p class="font-bold text-white text-sm">Objectif verrouillé</p>
+                <p class="text-xs text-slate-300">Cet objectif ne peut plus être décoché.</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 
@@ -845,6 +977,7 @@ function toggleDaily(id) {
         state.xp += bonus;
         state.dailyBonusClaimed = true;
         state.dailyBonusClaimedAt = new Date().toISOString();
+        state.dailyCompletions = (state.dailyCompletions || 0) + 1;
 
         // Animations de célébration
         setTimeout(() => {
@@ -858,6 +991,7 @@ function toggleDaily(id) {
 
     saveState();
     render();
+    if (allDone) checkAchievements();
 }
 
 
@@ -878,6 +1012,7 @@ function buyAscension(cost, gain) {
     if (state.coins >= cost) {
         state.coins -= cost;
         state.ascensionPoints += gain;
+        state.lastAscensionPurchase = Date.now();
         fx('shop-card', 'flash-win');
         saveState();
         render();
@@ -893,6 +1028,7 @@ function performRebirth() {
     state.ascensionPoints = 0;
     saveState();
     render();
+    checkAchievements();
     closeModal('modal-shop');
 }
 
@@ -905,7 +1041,7 @@ function renderConfigModal() {
                 <i class="fa-solid fa-folder mr-2"></i>Catégories
             </button>
             <button onclick="switchConfigTab('dailies')" class="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase transition-all ${activeConfigTab === 'dailies' ? 'bg-primary text-white' : 'glass text-slate-400'}">
-                <i class="fa-solid fa-calendar-check mr-2"></i>Objectifs réguliers
+                <i class="fa-solid fa-calendar-check mr-2"></i>Objectifs quotidiens
             </button>
         </div>
     `;
@@ -1369,10 +1505,12 @@ function addDaily() {
         done: false
     });
 
+    state.dailiesCreated++;
     input.value = "";
     saveState();
     render();
     renderConfigModal();
+    checkAchievements();
 }
 
 function toggleDailyCategorySelector() {
@@ -1583,8 +1721,15 @@ function initFilterBarDrag() {
 
 window.addEventListener('DOMContentLoaded', () => {
     loadState();
+    loadAchievements();
     render();
     initFilterBarDrag();
+
+    // Vérification en temps réel du lock des quests (toutes les 30s)
+    setInterval(() => {
+        const hasLockable = state.quests.some(q => q.done && q.completedAt && !isQuestLocked(q));
+        if (hasLockable) renderQuests(getMultiplier());
+    }, 30000);
 
     // Gérer l'état du bouton d'ajout
     const questInput = document.getElementById('q-input');
@@ -1612,4 +1757,840 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     }, 1000);
+
+    // Re-synchroniser les boutons peace si on change de résolution
+    let peaceResizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(peaceResizeTimer);
+        peaceResizeTimer = setTimeout(() => {
+            const burnD = document.getElementById('peace-burn-btn-desktop');
+            const burnVisible = burnD && !burnD.classList.contains('hidden');
+            setPeaceBtnState(burnVisible ? 'burn' : (peaceFears.length > 0 ? 'send' : 'empty'));
+        }, 150);
+    });
 });
+
+
+// ===== NAVIGATION =====
+
+function toggleSidebar() {} // conservé pour compatibilité éventuelle
+
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('mobile-menu-btn');
+    if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    menu.classList.toggle('hidden');
+    btn.classList.toggle('bg-slate-700/50', isHidden);
+}
+
+function navigateTo(page) {
+    currentPage = page;
+
+    // Masquer toutes les pages
+    document.querySelectorAll('.page-content').forEach(p => {
+        p.classList.add('hidden');
+    });
+    
+    // Afficher la page sélectionnée
+    document.getElementById(`${page}-page`).classList.remove('hidden');
+    
+    // Charger les données spécifiques à la page
+    if (page === 'notes') {
+        renderNotes();
+        updateNotesCount();
+    } else if (page === 'achievements') {
+        renderAchievements();
+        updateAchievementsCount();
+    }
+    
+    // Mettre à jour la bottom nav + sidebar avec la couleur de la page
+    const pageColors = {
+        dashboard: '#06b6d4',
+        peace: '#ec4899',
+        notes: '#8b5cf6',
+        achievements: '#fbbf24'
+    };
+    const color = pageColors[page] || 'var(--c-primary)';
+
+    // Sidebar
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.classList.remove('active', 'border');
+        link.classList.add('text-slate-400');
+        link.style.color = '';
+        link.style.background = '';
+        link.style.borderColor = '';
+    });
+    const activeLink = document.querySelector(`.sidebar-link[onclick="navigateTo('${page}')"]`);
+    if (activeLink) {
+        activeLink.classList.remove('text-slate-400');
+        activeLink.classList.add('active', 'border');
+        activeLink.style.color = color;
+        activeLink.style.background = color + '18';
+        activeLink.style.borderColor = color + '55';
+    }
+
+    // Bottom nav
+    document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.color = '';
+    });
+    const activeBnBtn = document.getElementById(`bn-${page}`);
+    if (activeBnBtn) {
+        activeBnBtn.classList.add('active');
+        activeBnBtn.style.color = color;
+    }
+}
+
+// ===== SAC D'APAISEMENT =====
+
+function addPeaceFear() {
+    const input = document.getElementById('peace-input');
+    const typeEl = document.getElementById('peace-type-value');
+    const type = typeEl ? typeEl.value : 'anxiety';
+    const text = input.value.trim();
+    
+    if (!text) {
+        alert('Veuillez écrire votre peur ou angoisse');
+        return;
+    }
+    
+    const fear = {
+        id: Date.now(),
+        text: text,
+        type: type,
+        timestamp: new Date().toISOString()
+    };
+    
+    peaceFears.push(fear);
+    state.peaceFearAdded++;
+    input.value = '';
+    
+    renderPeaceFears();
+    updatePeaceBag();
+    saveState();
+    checkAchievements();
+}
+
+function togglePeaceTypeSelector() {
+    const dropdown = document.getElementById('peace-type-dropdown');
+    const btn = document.getElementById('peace-type-btn');
+    const isHidden = dropdown.classList.contains('hidden');
+    
+    if (isHidden) {
+        renderPeaceTypeList();
+        dropdown.classList.remove('hidden');
+        
+        // Position dropdown above button
+        const rect = btn.getBoundingClientRect();
+        
+        document.addEventListener('click', closePeaceTypeDropdownOnClickOutside);
+    } else {
+        dropdown.classList.add('hidden');
+        document.removeEventListener('click', closePeaceTypeDropdownOnClickOutside);
+    }
+}
+
+function closePeaceTypeDropdownOnClickOutside(e) {
+    const dropdown = document.getElementById('peace-type-dropdown');
+    const btn = document.getElementById('peace-type-btn');
+    
+    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        document.removeEventListener('click', closePeaceTypeDropdownOnClickOutside);
+    }
+}
+
+function renderPeaceTypeList() {
+    const typeList = document.getElementById('peace-type-list');
+    const types = [
+        { value: 'anxiety', label: 'Anxiété', icon: 'fa-heart', color: '#ec4899' },
+        { value: 'fear', label: 'Peur', icon: 'fa-face-flushed', color: '#ef4444' },
+        { value: 'stress', label: 'Stress', icon: 'fa-bolt', color: '#eab308' },
+        { value: 'sadness', label: 'Tristesse', icon: 'fa-cloud-rain', color: '#a855f7' },
+        { value: 'anger', label: 'Colère', icon: 'fa-fire', color: '#f97316' },
+        { value: 'doubt', label: 'Doute', icon: 'fa-question', color: '#64748b' },
+        { value: 'other', label: 'Autre', icon: 'fa-ellipsis', color: '#06b6d4' }
+    ];
+    
+    typeList.innerHTML = types.map(type => `
+        <button onclick="selectPeaceType('${type.value}', '${type.label}', '${type.icon}', '${type.color}')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800/50 transition-all text-left group">
+            <div class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style="background: ${type.color}33;">
+                <i class="fa-solid ${type.icon} text-xs" style="color: ${type.color};"></i>
+            </div>
+            <span class="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">${type.label}</span>
+        </button>
+    `).join('');
+}
+
+function selectPeaceType(value, label, icon, color) {
+    document.getElementById('peace-type-value').value = value;
+    document.getElementById('peace-type-name').textContent = label;
+    document.getElementById('peace-type-icon').style.background = color + '33';
+    document.getElementById('peace-type-icon').innerHTML = `<i class="fa-solid ${icon} text-xs" style="color: ${color};"></i>`;
+    document.getElementById('peace-type-dropdown').classList.add('hidden');
+}
+
+function renderPeaceFears() {
+    const container = document.getElementById('peace-list');
+    container.innerHTML = '';
+    
+    peaceFears.forEach(fear => {
+        const typeLabels = {
+            'anxiety': 'Anxiété',
+            'fear': 'Peur',
+            'stress': 'Stress',
+            'sadness': 'Tristesse',
+            'anger': 'Colère',
+            'doubt': 'Doute',
+            'other': 'Autre'
+        };
+        
+        const typeColors = {
+            'anxiety': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+            'fear': 'bg-red-500/10 text-red-400 border-red-500/30',
+            'stress': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+            'sadness': 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+            'anger': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
+            'doubt': 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+            'other': 'bg-pink-500/10 text-pink-400 border-pink-500/30'
+        };
+        
+        const div = document.createElement('div');
+        div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-pink-500/30 transition-all';
+        div.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-white truncate mb-1">${escapeHtml(fear.text)}</p>
+                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${typeColors[fear.type]}">
+                        ${typeLabels[fear.type]}
+                    </span>
+                </div>
+                <button onclick="removePeaceFear(${fear.id})" class="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0 p-1.5 hover:bg-red-500/10 rounded-lg lg:opacity-0 lg:group-hover:opacity-100">
+                    <i class="fa-solid fa-trash-alt text-sm"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removePeaceFear(id) {
+    peaceFears = peaceFears.filter(f => f.id !== id);
+    renderPeaceFears();
+    updatePeaceBag();
+}
+
+// 'send' = afficher envoyer, cacher brûler
+// 'burn' = cacher envoyer, afficher brûler
+// 'empty' = envoyer désactivé, brûler caché
+function setPeaceBtnState(mode) {
+    const sendM = document.getElementById('peace-send-btn');
+    const burnM = document.getElementById('peace-burn-btn');
+    const sendD = document.getElementById('peace-send-btn-desktop');
+    const burnD = document.getElementById('peace-burn-btn-desktop');
+
+    if (mode === 'send') {
+        [sendM, sendD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = false; } });
+        [burnM, burnD].forEach(b => { if (b) b.classList.add('hidden'); });
+    } else if (mode === 'burn') {
+        [sendM, sendD].forEach(b => { if (b) b.classList.add('hidden'); });
+        [burnM, burnD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = false; } });
+    } else { // 'empty'
+        [sendM, sendD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = true; } });
+        [burnM, burnD].forEach(b => { if (b) b.classList.add('hidden'); });
+    }
+}
+
+function updatePeaceBag() {
+    const count = peaceFears.length;
+    const countLabel = pluralize(count, 'peur', 'peurs');
+
+    ['peace-count', 'peace-count-desktop'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = `${count} ${countLabel}`;
+    });
+
+    const cloudContainer = document.getElementById('peace-words-cloud');
+
+    if (count === 0) {
+        if (cloudContainer) cloudContainer.innerHTML = '';
+        setPeaceBtnState('empty');
+    } else {
+        if (cloudContainer) {
+            cloudContainer.innerHTML = peaceFears.map((fear, index) => {
+                const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
+                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                const randomRotation = Math.random() * 20 - 10;
+                const randomOpacity = 0.6 + Math.random() * 0.4;
+                return `
+                    <div class="peace-cloud-word ${randomSize} font-bold px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/40 to-rose-500/40 text-pink-200 border border-pink-500/50 whitespace-nowrap cursor-default transition-all hover:from-pink-500/60 hover:to-rose-500/60" 
+                         style="transform: rotate(${randomRotation}deg); opacity: ${randomOpacity}; animation-delay: ${index * 0.05}s;">
+                        ${escapeHtml(fear.text.substring(0, 20))}${fear.text.length > 20 ? '...' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        // Ne pas écraser l'état 'burn' si le sac est déjà en attente de brûlage
+        const burnD = document.getElementById('peace-burn-btn-desktop');
+        if (!burnD || burnD.classList.contains('hidden')) {
+            setPeaceBtnState('send');
+        }
+    }
+}
+
+function sendFearsToSac() {
+    if (peaceFears.length === 0) return;
+
+    const isMobile = window.innerWidth < 1024;
+
+    // Message dans les deux versions
+    ['peace-message', 'peace-message-desktop'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '<i class="fa-solid fa-heart text-pink-500 mr-2"></i>Vos peurs sont en sécurité...';
+    });
+
+    if (isMobile) {
+        // --- MOBILE: ouvrir la modal d'animation ---
+        const modal = document.getElementById('peace-anim-modal');
+        const animCloud = document.getElementById('peace-anim-cloud');
+        const animBag = document.getElementById('peace-anim-bag-container');
+        const animMsg = document.getElementById('peace-anim-message');
+
+        // Peupler le nuage dans la modal
+        animCloud.innerHTML = peaceFears.map((fear, index) => {
+            const sizes = ['text-xs', 'text-sm', 'text-base'];
+            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+            const randomRotation = Math.random() * 20 - 10;
+            return `
+                <div class="peace-cloud-word ${randomSize} font-bold px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/40 to-rose-500/40 text-pink-200 border border-pink-500/50 whitespace-nowrap"
+                     style="transform: rotate(${randomRotation}deg); animation-delay: ${index * 0.05}s;">
+                    ${escapeHtml(fear.text.substring(0, 20))}${fear.text.length > 20 ? '...' : ''}
+                </div>
+            `;
+        }).join('');
+
+        animMsg.textContent = '';
+        animMsg.style.opacity = '0';
+
+        // Afficher la modal
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => { modal.style.opacity = '1'; });
+
+        // Lancer l'animation après un court délai
+        setTimeout(() => {
+            const cloudWords = animCloud.querySelectorAll('.peace-cloud-word');
+            const bagRect = animBag.getBoundingClientRect();
+            const bagCenterX = bagRect.left + bagRect.width / 2;
+            const bagCenterY = bagRect.top + bagRect.height / 2;
+
+            cloudWords.forEach((word, index) => {
+                setTimeout(() => {
+                    const wordRect = word.getBoundingClientRect();
+                    const deltaX = bagCenterX - (wordRect.left + wordRect.width / 2);
+                    const deltaY = bagCenterY - (wordRect.top + wordRect.height / 2);
+                    word.style.animation = `flyToBag 0.9s ease-in forwards`;
+                    word.style.setProperty('--deltaX', deltaX + 'px');
+                    word.style.setProperty('--deltaY', deltaY + 'px');
+                }, index * 80);
+            });
+
+            const totalDuration = peaceFears.length * 80 + 900;
+
+            setTimeout(() => {
+                // Message de confirmation
+                animMsg.textContent = '✨ Vos peurs sont en sécurité';
+                animMsg.style.opacity = '1';
+
+                // Basculer les boutons
+                setPeaceBtnState('burn');
+
+                // Fermer la modal après un délai
+                setTimeout(() => {
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        animCloud.innerHTML = '';
+                    }, 400);
+                }, 1200);
+            }, totalDuration);
+        }, 200);
+
+    } else {
+        // --- DESKTOP: animation originale nuage → sac ---
+        const bagContainer = document.getElementById('peace-bag-container');
+        if (bagContainer) {
+            const cloudWords = document.querySelectorAll('.peace-cloud-word');
+            cloudWords.forEach((word, index) => {
+                setTimeout(() => {
+                    const bagRect = bagContainer.getBoundingClientRect();
+                    const bagCenterX = bagRect.left + bagRect.width / 2;
+                    const bagCenterY = bagRect.top + bagRect.height / 2;
+                    const wordRect = word.getBoundingClientRect();
+                    const deltaX = bagCenterX - (wordRect.left + wordRect.width / 2);
+                    const deltaY = bagCenterY - (wordRect.top + wordRect.height / 2);
+                    word.style.animation = `flyToBag 1s ease-in forwards`;
+                    word.style.setProperty('--deltaX', deltaX + 'px');
+                    word.style.setProperty('--deltaY', deltaY + 'px');
+                }, index * 80);
+            });
+        }
+
+        setTimeout(() => {
+            const cloudContainer = document.getElementById('peace-words-cloud');
+            if (cloudContainer) cloudContainer.innerHTML = '';
+            const bagWords = document.getElementById('peace-bag-words');
+            if (bagWords) bagWords.innerHTML = '';
+
+            setPeaceBtnState('burn');
+        }, peaceFears.length * 80 + 1000);
+    }
+}
+
+function burnFears() {
+    if (peaceFears.length === 0) return;
+
+    const isMobile = window.innerWidth < 1024;
+
+    if (isMobile) {
+        // --- MOBILE: ouvrir la modal pour l'animation de brûlage ---
+        const modal = document.getElementById('peace-anim-modal');
+        const animBag = document.getElementById('peace-anim-bag-container');
+        const animBagImage = document.getElementById('peace-anim-bag-image');
+        const animMsg = document.getElementById('peace-anim-message');
+        const animCloud = document.getElementById('peace-anim-cloud');
+
+        animCloud.innerHTML = '';
+        animMsg.textContent = '';
+        animMsg.style.opacity = '0';
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => { modal.style.opacity = '1'; });
+
+        setTimeout(() => {
+            const bagRect = animBag.getBoundingClientRect();
+            const bagCenterX = bagRect.left + bagRect.width / 2;
+            const bagCenterY = bagRect.top + bagRect.height / 2;
+
+            for (let wave = 0; wave < 3; wave++) {
+                setTimeout(() => createFireParticlesFromPoint(bagCenterX, bagCenterY), wave * 300);
+            }
+
+            const flameOverlay = document.createElement('div');
+            flameOverlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+            flameOverlay.innerHTML = `
+                <div class="relative w-32 h-32 flex items-center justify-center">
+                    <i class="fa-solid fa-fire text-6xl text-orange-500 absolute" style="animation: flameBurst 1.5s ease-out forwards;"></i>
+                    <i class="fa-solid fa-fire text-5xl text-red-600 absolute" style="animation: flameBurst 1.5s ease-out 0.2s forwards;"></i>
+                    <i class="fa-solid fa-fire text-4xl text-yellow-500 absolute" style="animation: flameBurst 1.5s ease-out 0.4s forwards;"></i>
+                </div>
+            `;
+            animBag.appendChild(flameOverlay);
+
+            if (animBagImage) setTimeout(() => { animBagImage.style.animation = 'burnBag 1s ease-out forwards'; }, 300);
+
+            setTimeout(() => {
+                state.peaceFearsBurned += peaceFears.length;
+                peaceFears = [];
+                updatePeaceBag();
+                renderPeaceFears();
+
+                if (animBagImage) {
+                    animBagImage.style.animation = '';
+                    animBagImage.style.opacity = '1';
+                    animBagImage.style.transform = 'scale(1) rotate(0deg)';
+                    animBagImage.style.animation = 'bagReappear 0.8s ease-out forwards';
+                }
+
+                // Réinitialiser les boutons
+                setPeaceBtnState('empty');
+
+                animMsg.textContent = '🌟 Vous êtes libéré !';
+                animMsg.style.opacity = '1';
+
+                flameOverlay.remove();
+                saveState();
+                checkAchievements();
+
+                // Fermer la modal
+                setTimeout(() => {
+                    modal.style.opacity = '0';
+                    setTimeout(() => { modal.style.display = 'none'; }, 400);
+                }, 1400);
+            }, 1500);
+        }, 200);
+
+    } else {
+        // --- DESKTOP: animation originale ---
+        const bagContainer = document.getElementById('peace-bag-container');
+        const bagImage = document.getElementById('peace-bag-image-desktop');
+
+        const bagRect = bagContainer.getBoundingClientRect();
+        const bagCenterX = bagRect.left + bagRect.width / 2;
+        const bagCenterY = bagRect.top + bagRect.height / 2;
+
+        for (let wave = 0; wave < 3; wave++) {
+            setTimeout(() => createFireParticlesFromPoint(bagCenterX, bagCenterY), wave * 300);
+        }
+
+        const flameOverlay = document.createElement('div');
+        flameOverlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+        flameOverlay.innerHTML = `
+            <div class="relative w-32 h-32 flex items-center justify-center">
+                <i class="fa-solid fa-fire text-6xl text-orange-500 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out forwards;"></i>
+                <i class="fa-solid fa-fire text-5xl text-red-600 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out 0.2s forwards;"></i>
+                <i class="fa-solid fa-fire text-4xl text-yellow-500 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out 0.4s forwards;"></i>
+            </div>
+        `;
+        bagContainer.appendChild(flameOverlay);
+
+        if (bagImage) setTimeout(() => { bagImage.style.animation = 'burnBag 1s ease-out forwards'; }, 300);
+
+        setTimeout(() => {
+            state.peaceFearsBurned += peaceFears.length;
+            peaceFears = [];
+            updatePeaceBag();
+            renderPeaceFears();
+
+            if (bagImage) {
+                bagImage.style.animation = '';
+                bagImage.style.opacity = '1';
+                bagImage.style.transform = 'scale(1) rotate(0deg)';
+                bagImage.style.animation = 'bagReappear 0.8s ease-out forwards';
+            }
+
+            setPeaceBtnState('empty');
+
+            ['peace-message', 'peace-message-desktop'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = '<i class="fa-solid fa-fire text-orange-500 mr-2"></i>Vous êtes libéré! 🌟';
+                    setTimeout(() => { el.innerHTML = ''; }, 3000);
+                }
+            });
+
+            flameOverlay.remove();
+            saveState();
+            checkAchievements();
+        }, 1500);
+    }
+}
+
+
+
+
+function createFireParticles(element) {
+    const rect = element.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    
+    for (let i = 0; i < 8; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'fire-particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        
+        const angle = (Math.PI * 2 * i) / 8;
+        const velocity = 3 + Math.random() * 3;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 2;
+        
+        particle.style.setProperty('--vx', vx);
+        particle.style.setProperty('--vy', vy);
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => particle.remove(), 1500);
+    }
+}
+
+function createFireParticlesFromPoint(x, y) {
+    for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'fire-particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        
+        const angle = (Math.PI * 2 * i) / 12;
+        const velocity = 4 + Math.random() * 4;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 3;
+        
+        particle.style.setProperty('--vx', vx);
+        particle.style.setProperty('--vy', vy);
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => particle.remove(), 1500);
+    }
+}
+
+
+// ===== NOTES PERSONNELLES =====
+
+function addNote() {
+    const contentEl = document.getElementById('note-content');
+    const content = contentEl.value.trim();
+    
+    if (!content) {
+        alert('Veuillez écrire une note');
+        return;
+    }
+    
+    const note = {
+        id: Date.now(),
+        content: content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    state.notes.push(note);
+    contentEl.value = '';
+    
+    renderNotes();
+    updateNotesCount();
+    saveState();
+    checkAchievements();
+}
+
+function renderNotes() {
+    const container = document.getElementById('notes-list');
+    container.innerHTML = '';
+    
+    if (state.notes.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-inbox text-3xl mb-3 block opacity-50"></i><p class="text-sm">Aucune note pour le moment</p></div>';
+        return;
+    }
+    
+    const sortedNotes = [...state.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    
+    sortedNotes.forEach(note => {
+        const div = document.createElement('div');
+        div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-purple-500/30 transition-all cursor-pointer';
+        
+        const updatedDate = new Date(note.updatedAt);
+        const dateStr = updatedDate.toLocaleDateString('fr-FR', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        div.innerHTML = `
+            <div class="flex items-start justify-between gap-2 mb-1.5">
+                <p class="text-sm text-white flex-1 leading-relaxed">${escapeHtml(note.content)}</p>
+                <button onclick="deleteNote(${note.id})" class="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0 p-1.5 hover:bg-red-500/10 rounded-lg lg:opacity-0 lg:group-hover:opacity-100">
+                    <i class="fa-solid fa-trash-alt text-xs"></i>
+                </button>
+            </div>
+            <div class="text-[10px] text-slate-500 flex items-center gap-1.5">
+                <i class="fa-solid fa-clock"></i>
+                <span>${dateStr}</span>
+                <span class="text-slate-600 ml-1">— appuyer pour modifier</span>
+            </div>
+        `;
+        
+        div.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) editNote(note.id);
+        });
+        
+        container.appendChild(div);
+    });
+}
+
+let _editingNoteId = null;
+
+function editNote(id) {
+    const note = state.notes.find(n => n.id === id);
+    if (!note) return;
+    _editingNoteId = id;
+    const textarea = document.getElementById('note-edit-content');
+    if (textarea) textarea.value = note.content;
+    openModal('modal-note-edit');
+    setTimeout(() => { if (textarea) { textarea.focus(); textarea.setSelectionRange(textarea.value.length, textarea.value.length); } }, 100);
+}
+
+function saveNoteEdit() {
+    const note = state.notes.find(n => n.id === _editingNoteId);
+    if (!note) return;
+    const textarea = document.getElementById('note-edit-content');
+    const newContent = textarea ? textarea.value.trim() : '';
+    if (newContent) {
+        note.content = newContent;
+        note.updatedAt = new Date().toISOString();
+        renderNotes();
+        saveState();
+    }
+    closeModal('modal-note-edit');
+    _editingNoteId = null;
+}
+
+function deleteNote(id) {
+    state.notes = state.notes.filter(n => n.id !== id);
+    renderNotes();
+    updateNotesCount();
+    saveState();
+}
+
+function updateNotesCount() {
+    const count = state.notes.length;
+    const countLabel = pluralize(count, 'note', 'notes');
+    const text = `${count} ${countLabel}`;
+    ['notes-count', 'notes-count-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    });
+}
+
+
+// ===== ACHIEVEMENTS =====
+
+async function loadAchievements() {
+    try {
+        const response = await fetch('achievements.json');
+        const data = await response.json();
+        achievements = data.achievements;
+        checkAchievements();
+    } catch (error) {
+        console.error('Erreur lors du chargement des achievements:', error);
+    }
+}
+
+function checkAchievements() {
+    achievements.forEach(achievement => {
+        // Vérifier si l'achievement est déjà débloqué
+        if (state.unlockedAchievements.includes(achievement.id)) {
+            return;
+        }
+        
+        // Vérifier les conditions
+        let isUnlocked = false;
+        
+        switch (achievement.condition.type) {
+            case 'quests_created':
+                isUnlocked = state.questsCreated >= achievement.condition.value;
+                break;
+            case 'quests_completed':
+                isUnlocked = state.questsCompleted >= achievement.condition.value;
+                break;
+            case 'dailies_created':
+                isUnlocked = state.dailiesCreated >= achievement.condition.value;
+                break;
+            case 'streak':
+                isUnlocked = state.streak >= achievement.condition.value;
+                break;
+            case 'peace_fears_added':
+                isUnlocked = state.peaceFearAdded >= achievement.condition.value;
+                break;
+            case 'notes_created':
+                isUnlocked = state.notes.length >= achievement.condition.value;
+                break;
+            case 'rebirths':
+                isUnlocked = state.rebirths >= achievement.condition.value;
+                break;
+            case 'daily_completions':
+                isUnlocked = (state.dailyCompletions || 0) >= achievement.condition.value;
+                break;
+            case 'all_achievements':
+                // Vérifier si tous les autres achievements sont débloqués
+                const otherAchievements = achievements.filter(a => a.id !== achievement.id);
+                isUnlocked = otherAchievements.every(a => state.unlockedAchievements.includes(a.id));
+                break;
+        }
+        
+        if (isUnlocked) {
+            unlockAchievement(achievement);
+        }
+    });
+}
+
+function unlockAchievement(achievement) {
+    state.unlockedAchievements.push(achievement.id);
+    saveState();
+    
+    // Afficher une notification
+    showAchievementNotification(achievement);
+}
+
+function showAchievementNotification(achievement) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 left-4 glass p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 z-50 animate-bounce max-w-sm';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${achievement.color}33;">
+                <i class="fa-solid ${achievement.icon} text-lg" style="color: ${achievement.color};"></i>
+            </div>
+            <div>
+                <p class="font-bold text-white text-sm">🏆 ${achievement.name}</p>
+                <p class="text-xs text-slate-300">${achievement.description}</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+function renderAchievements() {
+    const container = document.getElementById('achievements-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (achievements.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-slate-400"><p class="text-sm">Chargement des achievements...</p></div>';
+        return;
+    }
+
+    achievements.forEach(achievement => {
+        const isUnlocked = state.unlockedAchievements.includes(achievement.id);
+        const shouldObscure = achievement.obscuration && !isUnlocked;
+        const displayDescription = shouldObscure ? '????' : achievement.description;
+
+        // Icône de difficulté évolutive
+        const difficultyIcons = {
+            1: { icon: 'fa-leaf', color: '#10b981' },
+            2: { icon: 'fa-fire', color: '#f97316' },
+            3: { icon: 'fa-bolt', color: '#eab308' },
+            4: { icon: 'fa-skull', color: '#ef4444' },
+            5: { icon: 'fa-crown', color: '#a855f7' }
+        };
+        
+        const diffIcon = difficultyIcons[achievement.difficulty] || difficultyIcons[1];
+
+        const div = document.createElement('div');
+        div.className = `glass p-4 rounded-xl border transition-all ${isUnlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-white/10 opacity-50'}`;
+
+        div.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${isUnlocked ? achievement.color + '33' : 'rgba(30,41,59,0.6)'};">
+                    <i class="fa-solid ${isUnlocked ? achievement.icon : 'fa-lock'} text-lg" style="color: ${isUnlocked ? achievement.color : '#475569'};"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fa-solid ${diffIcon.icon} text-xs" style="color: ${diffIcon.color};"></i>
+                        <h3 class="text-sm font-bold text-white">${achievement.name}</h3>
+                    </div>
+                    <p class="text-xs text-slate-400">${displayDescription}</p>
+                </div>
+                ${isUnlocked ? '<i class="fa-solid fa-check text-yellow-500 text-lg flex-shrink-0"></i>' : ''}
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+
+function updateAchievementsCount() {
+    const count = state.unlockedAchievements.length;
+    const countLabel = pluralize(count, 'succès obtenu', 'succès obtenus');
+    const countEl = document.getElementById('achievements-count');
+    if (countEl) {
+        countEl.textContent = `${count} ${countLabel}`;
+    }
+}
