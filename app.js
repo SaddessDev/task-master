@@ -238,15 +238,20 @@ function checkDailiesReset() {
 function checkAndUpdateStreak() {
     const completedDailies = state.dailies.filter(d => d.done).length;
     const totalDailies = state.dailies.length;
-    const requirement = state.streakRequirement || 3;
-    
+    // Le requirement ne peut pas dépasser le nombre de dailies disponibles
+    const requirement = Math.min(state.streakRequirement || 3, totalDailies);
+
     // Si pas assez de dailies, ne pas compter le streak
     if (totalDailies === 0) return;
-    
+
+    const today = new Date().toLocaleDateString('fr-FR');
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('fr-FR');
     const oldStreak = state.streak || 0;
-    
-    // Si le nombre de dailies complétées est inférieur au requirement, réinitialiser le streak
-    if (completedDailies < requirement) {
+
+    // Vérifier la continuité : le dernier streak doit dater d'hier
+    const isConsecutive = !state.streakLastDate || state.streakLastDate === yesterday;
+
+    if (completedDailies < requirement || !isConsecutive) {
         if (state.streak > 0) {
             // Afficher une notification de perte de streak
             showStreakLostNotification(state.streak);
@@ -254,8 +259,8 @@ function checkAndUpdateStreak() {
         state.streak = 0;
     } else {
         // Augmenter le streak
-        state.streak = (state.streak || 0) + 1;
-        
+        state.streak = oldStreak + 1;
+
         // Animer le streak si augmenté
         if (state.streak > oldStreak) {
             const streakEl = document.getElementById('streak-val');
@@ -267,8 +272,8 @@ function checkAndUpdateStreak() {
             }
         }
     }
-    
-    state.streakLastDate = new Date().toLocaleDateString('fr-FR');
+
+    state.streakLastDate = today;
     saveState();
 }
 
