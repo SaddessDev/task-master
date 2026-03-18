@@ -511,14 +511,15 @@ button:active {
 .sidebar-link.active::after {
     content: '';
     position: absolute;
-    right: 0;
+    left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 3px;
-    height: 60%;
+    width: 5px;
+    height: 100%;
     background: currentColor;
-    border-radius: 3px 0 0 3px;
+    border-radius: 0px 3px 3px 0px;
 }
+
 #input-area {
     position: relative;
     z-index: 10;

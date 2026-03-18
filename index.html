@@ -1,453 +1,556 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personnal Heaven</title>
+    <title>Ascendora</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
 </head>
 
 <body class="px-0 py-4 md:py-6">
     <div class="flex gap-0 xl:gap-4 items-start min-h-screen">
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="hidden xl:flex flex-col select-none w-56 xl:w-64 flex-shrink-0 sticky top-4 self-start h-[calc(100vh-2rem)] bg-gradient-to-b from-slate-900/80 to-slate-950/80 backdrop-blur-xl border border-white/10 rounded-r-3xl xl:rounded-3xl xl:ml-4 p-6 overflow-y-auto no-scrollbar z-30">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-rocket text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-gaming text-sm font-black uppercase text-white">Personnal</h2>
-                        <p class="text-[10px] text-slate-500">Heaven</p>
-                    </div>
+        <aside id="sidebar"
+            class="hidden xl:flex flex-col select-none w-56 xl:w-64 flex-shrink-0 sticky top-4 self-start h-[calc(100vh-2rem)] bg-gradient-to-b from-slate-900/80 to-slate-950/80 backdrop-blur-xl border border-white/10 rounded-r-3xl xl:rounded-3xl xl:ml-4 p-6 overflow-y-auto no-scrollbar z-30">
+            <div class="flex items-end border-b border-white/10 pb-6 space-y-2 gap-1 mb-8">
+                <div class="w-12 flex items-center justify-center">
+                    <img src="assets/dark_Logo.png" alt="Ascendora logo">
                 </div>
-
-                <nav class="space-y-2 flex-1">
-                    <a onclick="navigateTo('dashboard')" class="cursor-pointer sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all border" style="color: #06b6d4; background: #06b6d418; border-color: #06b6d455;">
-                        <i class="fa-solid fa-list-check text-lg"></i>
-                        <span>Objectifs</span>
-                    </a>
-                    <a onclick="navigateTo('peace')" class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                        <i class="fa-solid fa-heart text-lg"></i>
-                        <span>Sac d'apaisement</span>
-                    </a>
-                    <a onclick="navigateTo('notes')" class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                        <i class="fa-solid fa-sticky-note text-lg"></i>
-                        <span>Notes personnelles</span>
-                    </a>
-                    <a onclick="navigateTo('achievements')" class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                        <i class="fa-solid fa-trophy text-lg"></i>
-                        <span>Succès</span>
-                    </a>
-                </nav>
-
-                <div class="border-t border-white/10 pt-4 space-y-2">
-                    <a onclick="openModal('modal-info')" class="sidebar-link flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                        <i class="fa-solid fa-question-circle text-lg"></i>
-                        <span>Informations</span>
-                    </a>
+                <div>
+                    <h2 class="font-gaming text-xl font-black uppercase text-white">Ascendora</h2>
                 </div>
-            </aside>
+            </div>
+
+            <nav class="space-y-2 flex-1">
+                <a onclick="navigateTo('dashboard')"
+                    class="cursor-pointer sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all border hover:bg-slate-800/50"
+                    style="color: #06b6d4; background: #06b6d418; border-color: #06b6d455;">
+                    <i class="fa-solid fa-list-check text-lg"></i>
+                    <span>Objectifs</span>
+                </a>
+                <a onclick="navigateTo('peace')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-heart text-lg"></i>
+                    <span>Sac d'apaisement</span>
+                </a>
+                <a onclick="navigateTo('notes')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-sticky-note text-lg"></i>
+                    <span>Notes personnelles</span>
+                </a>
+                <a onclick="navigateTo('achievements')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-trophy text-lg"></i>
+                    <span>Succès</span>
+                </a>
+            </nav>
+
+            <div class="border-t border-white/10 pt-4 space-y-2">
+                <a onclick="openModal('modal-info')"
+                    class="sidebar-link flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-question-circle text-lg"></i>
+                    <span>Informations</span>
+                </a>
+            </div>
+        </aside>
 
         <!-- Main content -->
         <div class="flex-1 min-w-0 px-4 lg:px-6 xl:px-8 py-0" id="main-content">
-                <!-- Dashboard Page -->
-                <div id="dashboard-page" class="page-content">
-        <header class="flex flex-wrap justify-between items-center gap-4 mb-10">
-            <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
-                        <i class="fa-solid fa-list-check text-3xl text-primary"></i>
-                    </div>
-                <div>
-                    <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Objectifs <span class="text-primary">à compléter</span></h1>
-                    <div class="text-[10px] text-slate-500 font-bold tracking-widest flex items-center gap-2">
-                        <span id="rb-label">Renaissance</span> : <span id="rb-val">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Desktop header actions -->
-            <div class="hidden xl:flex items-center gap-3">
-                <div id="asc-display" class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-primary/20 transition-all">
-                    <span id="asc-pts-header" class="font-gaming text-primary font-bold text-lg">0</span>
-                    <i class="fa-solid fa-star text-primary text-xs"></i>
-                </div>
-                <div id="coin-display" class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20 transition-all">
-                    <span id="coins" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
-                    <span id="coin-icon"></span>
-                </div>
-                <div id="streak-display" class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-orange-500/20 transition-all">
-                    <span id="streak-val" class="font-gaming text-orange-500 font-bold text-lg">0</span>
-                    <i class="fa-solid fa-fire text-orange-500 text-xs"></i>
-                </div>
-                <button onclick="openModal('modal-shop')" class="bg-yellow-500 inline-flex gap-1 items-center content-center text-slate-900 px-5 py-2.5 rounded-xl font-black text-xs uppercase transition-all active:scale-95">
-                    <i class="fa fa-star"></i>
-                    <span>Évolution</span>
-                </button>
-                <button onclick="openModal('modal-config')" class="glass py-1.5 px-3 rounded-xl hover:bg-slate-800 transition-colors border-white/10">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
-            </div>
-
-            <!-- Mobile header actions -->
-            <div class="flex xl:hidden items-center gap-2">
-                <!-- Stats rapides -->
-                <div class="glass px-2 py-1 rounded-lg flex items-center gap-1.5 border-yellow-500/20">
-                    <span id="coins-mobile-header" class="font-gaming text-yellow-500 font-bold text-sm">0</span>
-                    <span id="coin-icon-mobile"></span>
-                </div>
-                <div class="glass px-2 py-1 rounded-lg flex items-center gap-1.5 border-orange-500/20">
-                    <span id="streak-mobile-header" class="font-gaming text-orange-500 font-bold text-sm">0</span>
-                    <i class="fa-solid fa-fire text-orange-500 text-xs"></i>
-                </div>
-                <!-- Bouton menu -->
-                <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="glass px-3 py-1 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 relative">
-                    <i class="fa-solid fa-ellipsis-vertical text-slate-300"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- Mobile dropdown menu -->
-        <div id="mobile-menu" class="hidden xl:hidden glass rounded-2xl border border-white/10 p-4 mb-6 space-y-3">
-            <div class="grid grid-cols-3 gap-3">
-                <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-primary/20">
-                    <span class="font-gaming text-primary font-bold text-base" id="asc-mobile">0</span>
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Ascension</span>
-                </div>
-                <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-yellow-500/20">
-                    <span class="font-gaming text-yellow-500 font-bold text-base" id="coins-mobile">0</span>
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Crédits</span>
-                </div>
-                <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-orange-500/20">
-                    <span class="font-gaming text-orange-500 font-bold text-base" id="streak-mobile">0</span>
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Streak</span>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="openModal('modal-shop'); toggleMobileMenu()" class="bg-yellow-500 flex gap-2 items-center justify-center text-slate-900 px-4 py-2.5 rounded-xl font-black text-xs uppercase transition-all active:scale-95">
-                    <i class="fa fa-star"></i>
-                    <span>Évolution</span>
-                </button>
-                <button onclick="openModal('modal-config'); toggleMobileMenu()" class="glass flex gap-2 items-center justify-center py-2.5 px-4 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 text-sm font-bold text-slate-300">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Paramètres</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            <main class="xl:col-span-8 space-y-6">
-                <div id="input-area" class="glass p-3 rounded-3xl flex flex-wrap items-center gap-3 border-white/10 transition-all hover:border-primary/30">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-                        <i class="fa-solid text-slate-500 fa-plus text-lg"></i>
-                    </div>
-                    <input type="text" id="q-input" placeholder="Nouvel objectif..." class="flex-1  bg-transparent border-none px-2 text-base font-semibold outline-none text-white min-w-[200px] placeholder:text-slate-600">
-                    
-                    <div class="relative" style="z-index: 9999;">
-                        <button id="cat-selector-btn" onclick="toggleCategorySelector()" class="glass py-3 px-5 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-primary/30">
-                            <div id="selected-cat-icon" class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: #06b6d433;">
-                                <i class="fa-solid fa-tag text-xs" style="color: #06b6d4;"></i>
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
+                            <i class="fa-solid fa-list-check text-3xl text-primary"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Objectifs <span
+                                    class="text-primary">à compléter</span></h1>
+                            <div class="text-[10px] text-slate-500 font-bold tracking-widest flex items-center gap-2">
+                                <span id="rb-label">Renaissance</span> : <span id="rb-val">0</span>
                             </div>
-                            <span id="selected-cat-name" class="text-xs font-black uppercase text-white">Général</span>
-                            <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                        </div>
+                    </div>
+
+                    <!-- Desktop header actions -->
+                    <div class="hidden xl:flex items-center gap-3">
+                        <div id="asc-display"
+                            class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-primary/20 transition-all">
+                            <span id="asc-pts-header" class="font-gaming text-primary font-bold text-lg">0</span>
+                            <i class="fa-solid fa-star text-primary text-xs"></i>
+                        </div>
+                        <div id="coin-display"
+                            class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20 transition-all">
+                            <span id="coins" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
+                            <span id="coin-icon"></span>
+                        </div>
+                        <div id="streak-display"
+                            class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-orange-500/20 transition-all">
+                            <span id="streak-val" class="font-gaming text-orange-500 font-bold text-lg">0</span>
+                            <i class="fa-solid fa-fire text-orange-500 text-xs"></i>
+                        </div>
+                        <button onclick="openModal('modal-shop')"
+                            class="bg-yellow-500 inline-flex gap-1 items-center content-center text-slate-900 px-5 py-2.5 rounded-xl font-black text-xs uppercase transition-all active:scale-95">
+                            <i class="fa fa-star"></i>
+                            <span>Évolution</span>
                         </button>
-                        
-                        <div id="cat-selector-dropdown" class="absolute top-full mt-2 right-0 glass rounded-2xl border border-white/10 shadow-2xl min-w-[200px] hidden" style="z-index: 10000;">
-                            <div id="cat-selector-list" class="p-2 max-h-64 overflow-y-auto"></div>
+                        <button onclick="openModal('modal-config')"
+                            class="glass py-1.5 px-3 rounded-xl hover:bg-slate-800 transition-colors border-white/10">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mobile header actions -->
+                    <div class="flex xl:hidden items-center gap-2">
+                        <!-- Stats rapides -->
+                        <div class="glass px-2 py-1 rounded-lg flex items-center gap-1.5 border-yellow-500/20">
+                            <span id="coins-mobile-header"
+                                class="font-gaming text-yellow-500 font-bold text-sm">0</span>
+                            <span id="coin-icon-mobile"></span>
+                        </div>
+                        <div class="glass px-2 py-1 rounded-lg flex items-center gap-1.5 border-orange-500/20">
+                            <span id="streak-mobile-header"
+                                class="font-gaming text-orange-500 font-bold text-sm">0</span>
+                            <i class="fa-solid fa-fire text-orange-500 text-xs"></i>
+                        </div>
+                        <!-- Bouton menu -->
+                        <button onclick="toggleMobileMenu()" id="mobile-menu-btn"
+                            class="glass px-3 py-1 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 relative">
+                            <i class="fa-solid fa-ellipsis-vertical text-slate-300"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Mobile dropdown menu -->
+                <div id="mobile-menu"
+                    class="hidden xl:hidden glass rounded-2xl border border-white/10 p-4 mb-6 space-y-3">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-primary/20">
+                            <span class="font-gaming text-primary font-bold text-base" id="asc-mobile">0</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Ascension</span>
+                        </div>
+                        <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-yellow-500/20">
+                            <span class="font-gaming text-yellow-500 font-bold text-base" id="coins-mobile">0</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Crédits</span>
+                        </div>
+                        <div class="glass px-3 py-2 rounded-xl flex flex-col items-center gap-1 border-orange-500/20">
+                            <span class="font-gaming text-orange-500 font-bold text-base" id="streak-mobile">0</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Streak</span>
                         </div>
                     </div>
-                    
-                    <button id="add-quest-btn" onclick="addQuest()" disabled class="bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-transform font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
-                        <i class="fa-solid fa-rocket mr-2"></i>Ajouter
-                    </button>
-                </div>
-                
-                
-                <div id="filter-bar" class="flex gap-3 overflow-x-auto py-2 no-scrollbar"></div>
-
-                <div id="quest-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </main>
-
-            <aside class="xl:col-span-4 space-y-6">
-                <div id="profile-card" class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-                    
-                    <div id="comp-icon-box" class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-full flex items-center justify-center border-2 border-primary/30 shadow-lg">
-                        <i id="comp-icon" class="fa-solid fa-robot text-3xl text-primary"></i>
-                    </div>
-                    
-                    <h2 id="comp-stage" class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 bg-gradient-to-r from-primary to-purple-500 bg-clip-text">...</h2>
-                    <div id="comp-rank" class="text-[11px] bg-primary/10 text-primary px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-2 inline-block border border-primary/30">RANG I</div>
-                    <p id="comp-desc" class="text-[10px] text-slate-400 italic mb-6">Le début de votre voyage</p>
-                    
-                    <div class="space-y-4 text-left">
-                        <div id="next-rank-info" class="bg-slate-900/60 p-4 rounded-xl border border-white/5"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="openModal('modal-shop'); toggleMobileMenu()"
+                            class="bg-yellow-500 flex gap-2 items-center justify-center text-slate-900 px-4 py-2.5 rounded-xl font-black text-xs uppercase transition-all active:scale-95">
+                            <i class="fa fa-star"></i>
+                            <span>Évolution</span>
+                        </button>
+                        <button onclick="openModal('modal-config'); toggleMobileMenu()"
+                            class="glass flex gap-2 items-center justify-center py-2.5 px-4 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 text-sm font-bold text-slate-300">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Paramètres</span>
+                        </button>
                     </div>
                 </div>
 
-                <div id="daily-card-sidebar"></div>
-            </aside>
-
-        </div>
-                </div>
-
-                <!-- Peace Page -->
-                <div id="peace-page" class="page-content hidden">
-                    <header class="flex flex-wrap justify-between items-center gap-4 mb-6 lg:mb-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
-                                <i class="fa-solid fa-heart text-3xl text-pink-500"></i>
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                    <main class="xl:col-span-8 space-y-6">
+                        <div id="input-area"
+                            class="glass p-3 select-none rounded-3xl flex flex-wrap items-center gap-3 border-white/10 transition-all hover:border-primary/30">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
+                                <i class="fa-solid text-slate-500 fa-plus text-lg"></i>
                             </div>
-                            <div>
-                                <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Sac d'<span class="text-pink-500">Apaisement</span></h1>
-                                <p class="text-[10px] text-slate-500 font-bold tracking-widest">Libérez-vous de vos angoisses</p>
+                            <input type="text" id="q-input" placeholder="Nouvel objectif..."
+                                class="flex-1  bg-transparent border-none px-2 text-base font-semibold outline-none text-white min-w-[200px] placeholder:text-slate-600">
+
+                            <div class="relative" style="z-index: 9999;">
+                                <button id="cat-selector-btn" onclick="toggleCategorySelector()"
+                                    class="glass py-3 px-5 rounded-2xl flex items-center gap-3 cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-primary/30">
+                                    <div id="selected-cat-icon"
+                                        class="w-6 h-6 rounded-lg flex items-center justify-center"
+                                        style="background: #06b6d433;">
+                                        <i class="fa-solid fa-tag text-xs" style="color: #06b6d4;"></i>
+                                    </div>
+                                    <span id="selected-cat-name"
+                                        class="text-xs font-black uppercase text-white">Général</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                                </button>
+
+                                <div id="cat-selector-dropdown"
+                                    class="absolute top-full mt-2 right-0 glass rounded-2xl border border-white/10 shadow-2xl min-w-[200px] hidden"
+                                    style="z-index: 10000;">
+                                    <div id="cat-selector-list" class="p-2 max-h-64 overflow-y-auto"></div>
+                                </div>
+                            </div>
+
+                            <button id="add-quest-btn" onclick="addQuest()" disabled
+                                class="bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-transform font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
+                                <i class="fa-solid fa-rocket mr-2"></i>Ajouter
+                            </button>
+                        </div>
+
+
+                        <div id="filter-bar" class="flex gap-3 overflow-x-auto py-2 no-scrollbar"></div>
+
+                        <div id="quest-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </main>
+
+                    <aside class="xl:col-span-4 space-y-6">
+                        <div id="profile-card"
+                            class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50">
+                            </div>
+
+                            <div id="comp-icon-box"
+                                class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-full flex items-center justify-center border-2 border-primary/30 shadow-lg">
+                                <i id="comp-icon" class="fa-solid fa-robot text-3xl text-primary"></i>
+                            </div>
+
+                            <h2 id="comp-stage"
+                                class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 bg-gradient-to-r from-primary to-purple-500 bg-clip-text">
+                                ...</h2>
+                            <div id="comp-rank"
+                                class="text-[11px] bg-primary/10 text-primary px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-2 inline-block border border-primary/30">
+                                RANG I</div>
+                            <p id="comp-desc" class="text-[10px] text-slate-400 italic mb-6">Le début de votre voyage
+                            </p>
+
+                            <div class="space-y-4 text-left">
+                                <div id="next-rank-info" class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+                                </div>
                             </div>
                         </div>
-                    </header>
 
-                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                        <main class="xl:col-span-8 space-y-4">
-                            <!-- Input Section -->
-                            <div class="glass p-4 xl:p-6 rounded-[2rem] border-white/10">
-                                <h2 class="font-gaming text-sm font-black uppercase text-white mb-3">Ajouter une peur</h2>
-                                
-                                <div class="space-y-2">
-                                    <textarea id="peace-input" placeholder="Écrivez ce qui vous angoisse..." class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 resize-none text-sm" rows="2"></textarea>
+                        <div id="daily-card-sidebar"></div>
+                    </aside>
 
-                                    <div class="flex gap-2">
-                                        <div class="relative flex-1">
-                                            <input type="hidden" id="peace-type-value" value="anxiety">
-                                            <button id="peace-type-btn" onclick="togglePeaceTypeSelector()" class="w-full glass py-2 px-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-pink-500/30">
-                                                <div class="flex items-center gap-2">
-                                                    <div id="peace-type-icon" class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style="background: #ec489920;">
-                                                        <i class="fa-solid fa-heart text-xs" style="color: #ec4899;"></i>
-                                                    </div>
-                                                    <span id="peace-type-name" class="text-xs font-black uppercase text-white">Anxiété</span>
+                </div>
+            </div>
+
+            <!-- Peace Page -->
+            <div id="peace-page" class="page-content hidden">
+                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-6 lg:mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
+                            <i class="fa-solid fa-heart text-3xl text-pink-500"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Sac d'<span
+                                    class="text-pink-500">Apaisement</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Libérez-vous de vos
+                                angoisses</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    <main class="xl:col-span-8 space-y-4">
+                        <!-- Input Section -->
+                        <div class="glass p-4 xl:p-6 rounded-[2rem] border-white/10">
+                            <h2 class="font-gaming text-sm font-black uppercase text-white mb-3">Ajouter une peur</h2>
+
+                            <div class="space-y-2">
+                                <textarea id="peace-input" placeholder="Écrivez ce qui vous angoisse..."
+                                    class="w-full bg-slate-800/50 select-none border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 resize-none text-sm"
+                                    rows="2"></textarea>
+
+                                <div class="flex gap-2">
+                                    <div class="relative flex-1">
+                                        <input type="hidden" id="peace-type-value" value="anxiety">
+                                        <button id="peace-type-btn" onclick="togglePeaceTypeSelector()"
+                                            class="w-full glass py-2 px-3 select-none rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-pink-500/30">
+                                            <div class="flex items-center gap-2">
+                                                <div id="peace-type-icon"
+                                                    class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+                                                    style="background: #ec489920;">
+                                                    <i class="fa-solid fa-heart text-xs" style="color: #ec4899;"></i>
                                                 </div>
-                                                <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
-                                            </button>
-                                            <div id="peace-type-dropdown" class="glass rounded-xl border border-white/10 shadow-2xl hidden" style="position: fixed; z-index: 10000;">
-                                                <div id="peace-type-list" class="p-2 max-h-48 overflow-y-auto"></div>
+                                                <span id="peace-type-name"
+                                                    class="text-xs font-black uppercase text-white">Anxiété</span>
                                             </div>
+                                            <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+                                        </button>
+                                        <div id="peace-type-dropdown"
+                                            class="glass rounded-xl border border-white/10 shadow-2xl hidden"
+                                            style="position: fixed; z-index: 10000;">
+                                            <div id="peace-type-list" class="p-2 max-h-48 overflow-y-auto"></div>
                                         </div>
-                                        <button onclick="addPeaceFear()" class="bg-gradient-to-r from-pink-600 to-rose-600 text-white px-4 py-2 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform whitespace-nowrap">
-                                            <i class="fa-solid fa-plus mr-1"></i>Ajouter
+                                    </div>
+                                    <button onclick="addPeaceFear()"
+                                        class="bg-gradient-to-r from-pink-600 to-rose-600 select-none text-white px-4 py-2 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform whitespace-nowrap">
+                                        <i class="fa-solid fa-plus mr-1"></i>Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bag Section (mobile only) -->
+                        <div class="xl:hidden glass p-3 rounded-2xl border-white/5 relative overflow-visible">
+                            <div class="flex items-center gap-3">
+                                <!-- Bag image compact -->
+                                <div id="peace-bag-container-mobile"
+                                    class="relative flex-shrink-0 flex items-center justify-center w-14 h-14">
+                                    <img src="assets/bag.png" id="peace-bag-image" class="w-12 h-auto">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <h2 class="font-gaming text-xs font-black uppercase text-pink-500">Votre Sac
+                                        </h2>
+                                        <p id="peace-count"
+                                            class="text-[9px] bg-pink-500/10 text-pink-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-pink-500/30">
+                                            0 peur</p>
+                                    </div>
+                                    <div id="peace-message" class="text-[10px] text-slate-400 mb-1.5 truncate"></div>
+                                    <div class="flex gap-1.5">
+                                        <button id="peace-send-btn" onclick="sendFearsToSac()" disabled
+                                            class="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                            <i class="fa-solid fa-arrow-down mr-1"></i>Envoyer
+                                        </button>
+                                        <button id="peace-burn-btn" onclick="burnFears()" disabled
+                                            class="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
+                                            <i class="fa-solid fa-fire mr-1"></i>Brûler
                                         </button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Bag Section (mobile only) -->
-                            <div class="xl:hidden glass p-3 rounded-2xl border-white/5 relative overflow-visible">
-                                <div class="flex items-center gap-3">
-                                    <!-- Bag image compact -->
-                                    <div id="peace-bag-container-mobile" class="relative flex-shrink-0 flex items-center justify-center w-14 h-14">
-                                        <img src="assets/bag.png" id="peace-bag-image" class="w-12 h-auto">
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 mb-1.5">
-                                            <h2 class="font-gaming text-xs font-black uppercase text-pink-500">Votre Sac</h2>
-                                            <p id="peace-count" class="text-[9px] bg-pink-500/10 text-pink-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-pink-500/30">0 peur</p>
-                                        </div>
-                                        <div id="peace-message" class="text-[10px] text-slate-400 mb-1.5 truncate"></div>
-                                        <div class="flex gap-1.5">
-                                            <button id="peace-send-btn" onclick="sendFearsToSac()" disabled class="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                                                <i class="fa-solid fa-arrow-down mr-1"></i>Envoyer
-                                            </button>
-                                            <button id="peace-burn-btn" onclick="burnFears()" disabled class="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
-                                                <i class="fa-solid fa-fire mr-1"></i>Brûler
-                                            </button>
-                                        </div>
-                                    </div>
+                        <!-- Fears List -->
+                        <div id="peace-list" class="space-y-2"></div>
+                    </main>
+
+                    <!-- Bag Section (desktop only) -->
+                    <aside class="hidden xl:block xl:col-span-4 space-y-6">
+                        <div
+                            class="glass p-8 rounded-[2.5rem] select-none border-white/5 text-center transition-all relative overflow-visible">
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent opacity-50">
+                            </div>
+
+                            <div id="peace-cloud" class="relative h-48 mb-8 flex items-center justify-center">
+                                <div id="peace-words-cloud"
+                                    class="relative w-full h-full flex flex-wrap content-center justify-center gap-2 p-4">
                                 </div>
                             </div>
 
-                            <!-- Fears List -->
-                            <div id="peace-list" class="space-y-2"></div>
-                        </main>
-
-                        <!-- Bag Section (desktop only) -->
-                        <aside class="hidden xl:block xl:col-span-4 space-y-6">
-                            <div class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-visible">
-                                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent opacity-50"></div>
-                                
-                                <div id="peace-cloud" class="relative h-48 mb-8 flex items-center justify-center">
-                                    <div id="peace-words-cloud" class="relative w-full h-full flex flex-wrap content-center justify-center gap-2 p-4"></div>
-                                </div>
-
-                                <div id="peace-bag-container" class="relative h-80 mb-6 flex items-center justify-center">
-                                    <img src="assets/bag.png" id="peace-bag-image-desktop" class="w-32 h-auto">
-                                    <div id="peace-bag-words" class="absolute w-32 h-64 flex flex-wrap content-start gap-1 overflow-hidden p-2"></div>
-                                </div>
-                                
-                                <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-pink-500">Votre Sac</h2>
-                                <p id="peace-count-desktop" class="text-[11px] bg-pink-500/10 text-pink-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-4 inline-block border border-pink-500/30">0 peur</p>
-                                <div id="peace-message-desktop" class="text-sm text-slate-400 mb-4 h-6"></div>
-
-                                <div class="space-y-2">
-                                    <button id="peace-send-btn-desktop" onclick="sendFearsToSac()" disabled class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                                        <i class="fa-solid fa-arrow-down mr-2"></i>Envoyer au sac
-                                    </button>
-                                    <button id="peace-burn-btn-desktop" onclick="burnFears()" disabled class="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
-                                        <i class="fa-solid fa-fire mr-2"></i>Brûler ses angoisses
-                                    </button>
+                            <div id="peace-bag-container" class="relative h-80 mb-6 flex items-center justify-center">
+                                <img src="assets/bag.png" id="peace-bag-image-desktop" class="w-32 h-auto">
+                                <div id="peace-bag-words"
+                                    class="absolute w-32 h-64 flex flex-wrap content-start gap-1 overflow-hidden p-2">
                                 </div>
                             </div>
-                        </aside>
-                    </div>
-                </div>
 
-                <!-- Notes Page -->
-                <div id="notes-page" class="page-content hidden">
-                    <header class="flex flex-wrap justify-between items-center gap-4 mb-6 lg:mb-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
-                                <i class="fa-solid fa-sticky-note text-3xl text-purple-500"></i>
-                            </div>
-                            <div>
-                                <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Notes <span class="text-purple-500">Personnelles</span></h1>
-                                <p class="text-[10px] text-slate-500 font-bold tracking-widest">Organisez vos pensées et idées</p>
+                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-pink-500">
+                                Votre Sac</h2>
+                            <p id="peace-count-desktop"
+                                class="text-[11px] bg-pink-500/10 text-pink-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-4 inline-block border border-pink-500/30">
+                                0 peur</p>
+                            <div id="peace-message-desktop" class="text-sm text-slate-400 mb-4 h-6"></div>
+
+                            <div class="space-y-2">
+                                <button id="peace-send-btn-desktop" onclick="sendFearsToSac()" disabled
+                                    class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <i class="fa-solid fa-arrow-down mr-2"></i>Envoyer au sac
+                                </button>
+                                <button id="peace-burn-btn-desktop" onclick="burnFears()" disabled
+                                    class="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
+                                    <i class="fa-solid fa-fire mr-2"></i>Brûler ses angoisses
+                                </button>
                             </div>
                         </div>
-                    </header>
-
-                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8">
-                        <main class="xl:col-span-8 space-y-4">
-                            <!-- Add Note Section -->
-                            <div class="glass p-4 xl:p-6 rounded-[2rem] border-white/10">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h2 class="font-gaming text-sm font-black uppercase text-white">Nouvelle note</h2>
-                                    <!-- Compteur mobile uniquement -->
-                                    <span id="notes-count-mobile" class="xl:hidden text-[9px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full font-bold uppercase border border-purple-500/30">0 note</span>
-                                </div>
-                                <div class="space-y-2">
-                                    <textarea id="note-content" placeholder="Écrivez votre note..." class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 resize-none text-sm" rows="3"></textarea>
-                                    <button onclick="addNote()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">
-                                        <i class="fa-solid fa-plus mr-2"></i>Ajouter la note
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Notes List -->
-                            <div id="notes-list" class="space-y-2"></div>
-                        </main>
-
-                        <!-- Notes Stats (desktop only) -->
-                        <aside class="hidden xl:block xl:col-span-4 space-y-6">
-                            <div class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
-                                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
-                                
-                                <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-900 to-purple-800 rounded-full flex items-center justify-center border-2 border-purple-500/30 shadow-lg">
-                                    <i class="fa-solid fa-book text-3xl text-purple-500"></i>
-                                </div>
-                                
-                                <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-purple-500">Vos Notes</h2>
-                                <p id="notes-count" class="text-[11px] bg-purple-500/10 text-purple-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-6 inline-block border border-purple-500/30">0 note</p>
-
-                                <div class="space-y-4 text-left">
-                                    <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                        <p class="text-xs text-slate-400 mb-2">
-                                            <i class="fa-solid fa-lightbulb text-purple-500 mr-2"></i>
-                                            <strong>Conseil :</strong> Utilisez vos notes pour capturer vos idées, vos pensées et vos réflexions importantes.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
+                    </aside>
                 </div>
+            </div>
 
-                <!-- Achievements Page -->
-                <div id="achievements-page" class="page-content hidden">
-                    <header class="flex flex-wrap justify-between items-center gap-4 mb-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
-                                <i class="fa-solid fa-trophy text-3xl text-yellow-500"></i>
+            <!-- Notes Page -->
+            <div id="notes-page" class="page-content hidden">
+                <header class="flex select-none flex-wrap justify-between items-center gap-4 mb-6 lg:mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
+                            <i class="fa-solid fa-sticky-note text-3xl text-purple-500"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Notes <span
+                                    class="text-purple-500">Personnelles</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Organisez vos pensées et
+                                idées</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8">
+                    <main class="xl:col-span-8 space-y-4">
+                        <!-- Add Note Section -->
+                        <div class="glass p-4 xl:p-6 rounded-[2rem] border-white/10">
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="font-gaming text-sm font-black uppercase text-white">Nouvelle note</h2>
+                                <!-- Compteur mobile uniquement -->
+                                <span id="notes-count-mobile"
+                                    class="xl:hidden text-[9px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full font-bold uppercase border border-purple-500/30">0
+                                    note</span>
                             </div>
-                            <div>
-                                <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Succès <span class="text-yellow-500">Débloqués</span></h1>
-                                <p class="text-[10px] text-slate-500 font-bold tracking-widest">Célébrez vos accomplissements</p>
+                            <div class="space-y-2">
+                                <textarea id="note-content" placeholder="Écrivez votre note..."
+                                    class="w-full bg-slate-800/50 select-none border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 resize-none text-sm"
+                                    rows="3"></textarea>
+                                <button onclick="addNote()"
+                                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 select-none text-white px-4 py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-plus mr-2"></i>Ajouter la note
+                                </button>
                             </div>
                         </div>
-                    </header>
 
-                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                        <main class="xl:col-span-8">
-                            <!-- Achievements Grid -->
-                            <div id="achievements-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                        </main>
+                        <!-- Notes List -->
+                        <div id="notes-list" class="space-y-2"></div>
+                    </main>
 
-                        <!-- Achievements Stats -->
-                        <aside class="xl:col-span-4 space-y-6">
-                            <div class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
-                                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
-                                
-                                <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-900 to-yellow-800 rounded-full flex items-center justify-center border-2 border-yellow-500/30 shadow-lg">
-                                    <i class="fa-solid fa-medal text-3xl text-yellow-500"></i>
+                    <!-- Notes Stats (desktop only) -->
+                    <aside class="hidden select-none xl:block xl:col-span-4 space-y-6">
+                        <div
+                            class="glass p-8 rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50">
+                            </div>
+
+                            <div
+                                class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-900 to-purple-800 rounded-full flex items-center justify-center border-2 border-purple-500/30 shadow-lg">
+                                <i class="fa-solid fa-book text-3xl text-purple-500"></i>
+                            </div>
+
+                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-purple-500">
+                                Vos Notes</h2>
+                            <p id="notes-count"
+                                class="text-[11px] bg-purple-500/10 text-purple-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-6 inline-block border border-purple-500/30">
+                                0 note</p>
+
+                            <div class="space-y-4 text-left">
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+                                    <p class="text-xs text-slate-400 mb-2">
+                                        <i class="fa-solid fa-lightbulb text-purple-500 mr-2"></i>
+                                        <strong>Conseil :</strong> Utilisez vos notes pour capturer vos idées, vos
+                                        pensées et vos réflexions importantes.
+                                    </p>
                                 </div>
-                                
-                                <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-yellow-500">Vos Trophées</h2>
-                                <p id="achievements-count" class="text-[11px] bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-6 inline-block border border-yellow-500/30">0 succès</p>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
 
-                                <div class="space-y-4 text-left">
-                                    <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                        <p class="text-xs text-slate-400 mb-2">
-                                            <i class="fa-solid fa-star text-yellow-500 mr-2"></i>
-                                            <strong>Conseil :</strong> Débloquez des achievements en complétant des objectifs, en maintenant des streaks et en utilisant les différents outils.
-                                        </p>
-                                    </div>
+            <!-- Achievements Page -->
+            <div id="achievements-page" class="page-content hidden">
+                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg transition-transform">
+                            <i class="fa-solid fa-trophy text-3xl text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Succès <span
+                                    class="text-yellow-500">Débloqués</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Célébrez vos
+                                accomplissements</p>
+                        </div>
+                    </div>
+                </header>
 
-                                    <!-- Légende des difficultés -->
-                                    <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                        <p class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Difficulté</p>
-                                        <div class="space-y-2">
-                                            <div class="flex items-center gap-3">
-                                                <i class="fa-solid fa-leaf text-sm w-4 text-center" style="color: #10b981;"></i>
-                                                <span class="text-xs text-slate-400">Facile</span>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <i class="fa-solid fa-fire text-sm w-4 text-center" style="color: #f97316;"></i>
-                                                <span class="text-xs text-slate-400">Moyen</span>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <i class="fa-solid fa-bolt text-sm w-4 text-center" style="color: #eab308;"></i>
-                                                <span class="text-xs text-slate-400">Difficile</span>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <i class="fa-solid fa-skull text-sm w-4 text-center" style="color: #ef4444;"></i>
-                                                <span class="text-xs text-slate-400">Très difficile</span>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <i class="fa-solid fa-crown text-sm w-4 text-center" style="color: #a855f7;"></i>
-                                                <span class="text-xs text-slate-400">Extrême</span>
-                                            </div>
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                    <main class="xl:col-span-8">
+                        <!-- Achievements Grid -->
+                        <div id="achievements-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </main>
+
+                    <!-- Achievements Stats -->
+                    <aside class="xl:col-span-4 space-y-6">
+                        <div
+                            class="glass p-8 select-none rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50">
+                            </div>
+
+                            <div
+                                class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-900 to-yellow-800 rounded-full flex items-center justify-center border-2 border-yellow-500/30 shadow-lg">
+                                <i class="fa-solid fa-award text-4xl text-yellow-500"></i>
+                            </div>
+
+                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-yellow-500">
+                                Vos succès</h2>
+                            <p id="achievements-count"
+                                class="text-[11px] bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-6 inline-block border border-yellow-500/30">
+                                0 succès</p>
+
+                            <div class="space-y-4 text-left">
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+                                    <p class="text-xs text-slate-400 mb-2">
+                                        <i class="fa-solid fa-star text-yellow-500 mr-2"></i>
+                                        <strong>Conseil :</strong> Débloquez des succès en complétant des objectifs, en
+                                        maintenant des streaks et en utilisant les différents outils.
+                                    </p>
+                                </div>
+
+                                <!-- Légende des difficultés -->
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+                                    <p class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Difficulté
+                                    </p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-leaf text-sm w-4 text-center"
+                                                style="color: #10b981;"></i>
+                                            <span class="text-xs text-slate-400">Facile</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-fire text-sm w-4 text-center"
+                                                style="color: #f97316;"></i>
+                                            <span class="text-xs text-slate-400">Moyen</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-bolt text-sm w-4 text-center"
+                                                style="color: #eab308;"></i>
+                                            <span class="text-xs text-slate-400">Difficile</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-skull text-sm w-4 text-center"
+                                                style="color: #ef4444;"></i>
+                                            <span class="text-xs text-slate-400">Très difficile</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <i class="fa-solid fa-crown text-sm w-4 text-center"
+                                                style="color: #a855f7;"></i>
+                                            <span class="text-xs text-slate-400">Extrême</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </aside>
-                    </div>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </div>
+    </div>
 
     <div id="modal-config" class="modal">
-        <div class="glass p-8 rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
+        <div class="glass p-8 select-none rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-gaming text-xl font-black uppercase text-primary flex items-center gap-3">
                     <i class="fa-solid fa-gear"></i>
                     Configuration
                 </h3>
-                <button onclick="closeModal('modal-config')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+                <button onclick="closeModal('modal-config')"
+                    class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
             </div>
-            
+
             <div id="config-tabs"></div>
-            
+
             <div id="cat-manage-list" class="space-y-2 mb-6 max-h-80 overflow-y-auto pr-2 no-scrollbar"></div>
-            
+
             <div id="cat-form-area"></div>
 
             <div class="border-t border-white/10 mt-8 pt-8">
@@ -457,7 +560,8 @@
                 </h4>
                 <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4">
                     <p class="text-sm text-slate-300 mb-3">Supprimer toutes vos données locales</p>
-                    <p class="text-xs text-slate-400 mb-4">Cette action est <strong>irréversible</strong>. Cela supprimera :</p>
+                    <p class="text-xs text-slate-400 mb-4">Cette action est <strong>irréversible</strong>. Cela
+                        supprimera :</p>
                     <ul class="text-xs text-slate-400 space-y-1 ml-4 mb-4">
                         <li class="flex gap-2">
                             <i class="fa-solid fa-times text-red-500 flex-shrink-0 mt-0.5"></i>
@@ -480,7 +584,8 @@
                             <span>Vos tâches quotidiennes</span>
                         </li>
                     </ul>
-                    <button onclick="confirmClearData()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-sm uppercase transition-colors active:scale-95">
+                    <button onclick="confirmClearData()"
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-sm uppercase transition-colors active:scale-95">
                         <i class="fa-solid fa-exclamation-triangle mr-2"></i>
                         Supprimer toutes les données
                     </button>
@@ -490,25 +595,30 @@
     </div>
 
     <div id="modal-shop" class="modal">
-        <div id="shop-card" class="glass p-10 rounded-[3rem] w-full max-w-4xl mx-4 border border-yellow-500/20 max-h-[90vh] overflow-y-auto">
+        <div id="shop-card"
+            class="glass p-10 select-none rounded-[3rem] w-full max-w-4xl mx-4 border border-yellow-500/20 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-xl">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-xl">
                         <i class="fa-solid fa-star text-white text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-gaming text-2xl font-black text-yellow-500 uppercase tracking-wider">Évolution du rang</h3>
+                        <h3 class="font-gaming text-2xl font-black text-yellow-500 uppercase tracking-wider">Évolution
+                            du rang</h3>
                     </div>
                 </div>
-                <button onclick="closeModal('modal-shop')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+                <button onclick="closeModal('modal-shop')"
+                    class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
             </div>
-            
+
             <div id="shop-items-container"></div>
         </div>
     </div>
 
     <div id="modal-reassign" class="modal">
-        <div class="glass p-8 rounded-[3rem] w-full max-w-4xl mx-4 border-white/10 max-h-[90vh] overflow-hidden flex flex-col relative">
+        <div
+            class="glass p-8 rounded-[3rem] w-full max-w-4xl mx-4 border-white/10 max-h-[90vh] overflow-hidden flex flex-col relative">
             <div class="flex justify-between items-center mb-6 relative z-10">
                 <div>
                     <h3 class="font-gaming text-2xl font-black uppercase text-primary flex items-center gap-3">
@@ -516,16 +626,20 @@
                         Réassigner les objectifs
                     </h3>
                     <p class="text-xs text-slate-500 mt-2">
-                        <span id="reassign-count" class="font-bold text-primary">0</span> <span id="reassign-count-label">objectif à traiter</span>
+                        <span id="reassign-count" class="font-bold text-primary">0</span> <span
+                            id="reassign-count-label">objectif à traiter</span>
                     </p>
                 </div>
-                <button onclick="closeModal('modal-reassign')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+                <button onclick="closeModal('modal-reassign')"
+                    class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
             </div>
-            
-            <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl relative z-10">
+
+            <div
+                class="mb-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl relative z-10">
                 <p class="text-sm text-slate-300 flex items-start gap-3">
                     <i class="fa-solid fa-exclamation-triangle text-yellow-500 flex-shrink-0 mt-0.5"></i>
-                    <span>La catégorie <strong id="reassign-cat-name" class="text-yellow-400"></strong> va être supprimée. Réassignez ses objectifs à une autre catégorie ou supprimez-les.</span>
+                    <span>La catégorie <strong id="reassign-cat-name" class="text-yellow-400"></strong> va être
+                        supprimée. Réassignez ses objectifs à une autre catégorie ou supprimez-les.</span>
                 </p>
             </div>
 
@@ -534,10 +648,12 @@
             </div>
 
             <div class="border-t border-white/10 pt-4 flex gap-3 justify-end relative z-10">
-                <button onclick="closeModal('modal-reassign')" class="glass px-6 py-2.5 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 font-semibold text-sm">
+                <button onclick="closeModal('modal-reassign')"
+                    class="glass px-6 py-2.5 rounded-xl hover:bg-slate-800 transition-colors border border-white/10 font-semibold text-sm">
                     Annuler
                 </button>
-                <button onclick="confirmReassignAndDelete()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg">
+                <button onclick="confirmReassignAndDelete()"
+                    class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg">
                     <i class="fa-solid fa-trash-alt mr-2"></i>
                     Supprimer la catégorie
                 </button>
@@ -548,18 +664,21 @@
     <div id="modal-info" class="modal">
         <div class="glass p-6 xl:p-8 rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-gaming text-xl font-black uppercase text-primary flex items-center gap-3">
+                <h3 class="font-gaming text-xl select-none font-black uppercase text-primary flex items-center gap-3">
                     <i class="fa-solid fa-info-circle"></i>
                     Informations
                 </h3>
-                <button onclick="closeModal('modal-info')" class="text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
+                <button onclick="closeModal('modal-info')"
+                    class="text-slate-500 hover:text-white select-none text-3xl transition-colors">×</button>
             </div>
 
             <div class="space-y-5 text-sm">
 
                 <div class="bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-2xl p-4">
                     <p class="text-slate-300 leading-relaxed">
-                        <span class="font-black text-white">Personal Heaven</span> est une application de productivité personnelle gamifiée. Chaque action accomplie vous rapporte des crédits, fait évoluer votre rang et débloque des succès. Tout reste privé — aucune donnée ne quitte votre appareil.
+                        <span class="font-black text-white">Ascendora</span> est une application de productivité
+                        personnelle gamifiée. Chaque action accomplie vous rapporte des crédits, fait évoluer votre rang
+                        et débloque des succès. Tout reste privé — aucune donnée ne quitte votre appareil.
                     </p>
                 </div>
 
@@ -568,11 +687,15 @@
                         <i class="fa-solid fa-list-check"></i> Objectifs
                     </h4>
                     <div class="space-y-2 text-slate-400">
-                        <p>Créez des objectifs classés par catégories personnalisables. Cochez-les pour gagner des crédits selon votre multiplicateur d'ascension.</p>
-                        <p>Les <strong class="text-slate-300">objectifs quotidiens</strong> se réinitialisent chaque jour à minuit. Compléter tous vos quotidiens en une journée déclenche un bonus de streak et des crédits supplémentaires.</p>
+                        <p>Créez des objectifs classés par catégories personnalisables. Cochez-les pour gagner des
+                            crédits selon votre multiplicateur d'ascension.</p>
+                        <p>Les <strong class="text-slate-300">objectifs quotidiens</strong> se réinitialisent chaque
+                            jour à minuit. Compléter tous vos quotidiens en une journée déclenche un bonus de streak et
+                            des crédits supplémentaires.</p>
                         <p class="text-xs bg-slate-800/60 rounded-lg px-3 py-2 border border-white/5">
                             <i class="fa-solid fa-lock text-yellow-500 mr-1.5"></i>
-                            <strong class="text-slate-300">Anti-abus :</strong> un objectif validé se verrouille automatiquement après 5 minutes ou dès qu'un achat d'ascension est effectué.
+                            <strong class="text-slate-300">Anti-abus :</strong> un objectif validé se verrouille
+                            automatiquement après 5 minutes ou dès qu'un achat d'ascension est effectué.
                         </p>
                     </div>
                 </div>
@@ -582,8 +705,12 @@
                         <i class="fa-solid fa-star"></i> Ascension & Crédits
                     </h4>
                     <div class="space-y-2 text-slate-400">
-                        <p>Les crédits gagnés permettent d'acheter des niveaux d'<strong class="text-slate-300">Ascension</strong> via le menu Évolution. Chaque niveau augmente le multiplicateur de gains sur vos objectifs.</p>
-                        <p>Votre <strong class="text-slate-300">rang</strong> évolue automatiquement selon votre niveau d'ascension. Le <strong class="text-slate-300">streak</strong> comptabilise vos jours consécutifs de complétion des quotidiens.</p>
+                        <p>Les crédits gagnés permettent d'acheter des niveaux d'<strong
+                                class="text-slate-300">Ascension</strong> via le menu Évolution. Chaque niveau augmente
+                            le multiplicateur de gains sur vos objectifs.</p>
+                        <p>Votre <strong class="text-slate-300">rang</strong> évolue automatiquement selon votre niveau
+                            d'ascension. Le <strong class="text-slate-300">streak</strong> comptabilise vos jours
+                            consécutifs de complétion des quotidiens.</p>
                     </div>
                 </div>
 
@@ -592,8 +719,11 @@
                         <i class="fa-solid fa-heart"></i> Sac d'apaisement
                     </h4>
                     <div class="space-y-2 text-slate-400">
-                        <p>Écrivez ce qui vous angoisse, choisissez un type (anxiété, stress, peur…) et ajoutez-le à la liste.</p>
-                        <p><strong class="text-slate-300">Envoyer au sac</strong> joue une animation symbolique — sur mobile via une modal plein écran. <strong class="text-slate-300">Brûler</strong> libère définitivement vos angoisses avec une animation de flammes.</p>
+                        <p>Écrivez ce qui vous angoisse, choisissez un type (anxiété, stress, peur…) et ajoutez-le à la
+                            liste.</p>
+                        <p><strong class="text-slate-300">Envoyer au sac</strong> joue une animation symbolique — sur
+                            mobile via une modal plein écran. <strong class="text-slate-300">Brûler</strong> libère
+                            définitivement vos angoisses avec une animation de flammes.</p>
                     </div>
                 </div>
 
@@ -601,7 +731,9 @@
                     <h4 class="font-bold text-[#8b5cf6] uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
                         <i class="fa-solid fa-sticky-note"></i> Notes personnelles
                     </h4>
-                    <p class="text-slate-400">Capturez vos idées et réflexions. Appuyez sur une note pour la modifier, ou sur la corbeille pour la supprimer. Les notes sont triées de la plus récente à la plus ancienne.</p>
+                    <p class="text-slate-400">Capturez vos idées et réflexions. Appuyez sur une note pour la modifier,
+                        ou sur la corbeille pour la supprimer. Les notes sont triées de la plus récente à la plus
+                        ancienne.</p>
                 </div>
 
                 <div>
@@ -609,8 +741,12 @@
                         <i class="fa-solid fa-trophy"></i> Succès
                     </h4>
                     <div class="space-y-2 text-slate-400">
-                        <p>Des succès se débloquent selon vos actions : objectifs créés, quotidiens complétés, streak maintenu, peurs brûlées, notes écrites, rangs atteints…</p>
-                        <p>Chaque succès affiche une <strong class="text-slate-300">icône de difficulté</strong> — de <i class="fa-solid fa-leaf text-[#10b981]"></i> (facile) à <i class="fa-solid fa-crown text-[#a855f7]"></i> (extrême). Certains ont leur description masquée <strong class="text-slate-300">(????)</strong> jusqu'au déblocage.</p>
+                        <p>Des succès se débloquent selon vos actions : objectifs créés, quotidiens complétés, streak
+                            maintenu, peurs brûlées, notes écrites, rangs atteints…</p>
+                        <p>Chaque succès affiche une <strong class="text-slate-300">icône de difficulté</strong> — de <i
+                                class="fa-solid fa-leaf text-[#10b981]"></i> (facile) à <i
+                                class="fa-solid fa-crown text-[#a855f7]"></i> (extrême). Certains ont leur description
+                            masquée <strong class="text-slate-300">(????)</strong> jusqu'au déblocage.</p>
                     </div>
                 </div>
 
@@ -621,26 +757,32 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
                             <i class="fa-solid fa-database text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Local uniquement</strong> — tout est dans votre navigateur.</span>
+                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Local
+                                    uniquement</strong> — tout est dans votre navigateur.</span>
                         </div>
                         <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
                             <i class="fa-solid fa-server text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Aucun serveur</strong> — rien n'est envoyé à l'extérieur.</span>
+                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Aucun serveur</strong> —
+                                rien n'est envoyé à l'extérieur.</span>
                         </div>
                         <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
                             <i class="fa-solid fa-eye-slash text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Pas de tracking</strong> — aucune donnée personnelle collectée.</span>
+                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Pas de tracking</strong>
+                                — aucune donnée personnelle collectée.</span>
                         </div>
                         <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
                             <i class="fa-solid fa-trash text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Suppression</strong> — effacez tout depuis les Paramètres.</span>
+                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Suppression</strong> —
+                                effacez tout depuis les Paramètres.</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between gap-4">
-                    <p class="text-xs text-slate-500">Projet développé par <strong class="text-slate-400">M3philes</strong> — fourni gratuitement, sans garantie.</p>
-                    <span class="text-[10px] font-gaming text-primary font-bold whitespace-nowrap">V1.4</span>
+                <div
+                    class="bg-slate-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between gap-4">
+                    <p class="text-xs text-slate-500">Projet développé par <strong
+                            class="text-slate-400">M3philes</strong> — fourni gratuitement, sans garantie.</p>
+                    <span class="text-[10px] font-gaming text-primary font-bold whitespace-nowrap">V1.5</span>
                 </div>
             </div>
         </div>
@@ -648,32 +790,41 @@
 
     <!-- Note Edit Modal -->
     <div id="modal-note-edit" class="modal">
-        <div class="glass p-6 rounded-[2rem] w-full max-w-lg mx-4 border-white/10">
+        <div class="glass p-6 select-none rounded-[2rem] w-full max-w-lg mx-4 border-white/10">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-gaming text-sm font-black uppercase text-purple-400 flex items-center gap-2">
                     <i class="fa-solid fa-pen"></i> Modifier la note
                 </h3>
-                <button onclick="closeModal('modal-note-edit')" class="text-slate-500 hover:text-white text-2xl transition-colors">&times;</button>
+                <button onclick="closeModal('modal-note-edit')"
+                    class="text-slate-500 hover:text-white text-3xl select-none transition-colors">×</button>
             </div>
-            <textarea id="note-edit-content" class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 resize-none text-sm mb-4" rows="5"></textarea>
+            <textarea id="note-edit-content"
+                class="w-full bg-slate-800/50 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 resize-none text-sm mb-4"
+                rows="5"></textarea>
             <div class="flex gap-2">
-                <button onclick="closeModal('modal-note-edit')" class="flex-1 glass py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white border border-white/10 transition-colors">Annuler</button>
-                <button onclick="saveNoteEdit()" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">Enregistrer</button>
+                <button onclick="closeModal('modal-note-edit')"
+                    class="flex-1 glass py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white border border-white/10 transition-colors">Annuler</button>
+                <button onclick="saveNoteEdit()"
+                    class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">Enregistrer</button>
             </div>
         </div>
     </div>
 
     <!-- Peace Animation Modal (mobile only) -->
-    <div id="peace-anim-modal" class="fixed inset-0 z-[200] hidden flex-col items-center justify-center xl:hidden" style="background: rgba(2,6,23,0.97); backdrop-filter: blur(24px);">
+    <div id="peace-anim-modal" class="fixed inset-0 z-[200] hidden flex-col items-center justify-center xl:hidden"
+        style="background: rgba(2,6,23,0.97); backdrop-filter: blur(24px);">
         <div class="w-full max-w-sm mx-auto px-6 flex flex-col items-center gap-6 py-10">
             <!-- Words cloud -->
-            <div id="peace-anim-cloud" class="relative w-full min-h-[140px] flex flex-wrap content-center justify-center gap-2 p-4"></div>
+            <div id="peace-anim-cloud"
+                class="relative w-full min-h-[140px] flex flex-wrap content-center justify-center gap-2 p-4"></div>
             <!-- Bag -->
             <div id="peace-anim-bag-container" class="relative flex items-center justify-center w-40 h-40">
                 <img src="assets/bag.png" id="peace-anim-bag-image" class="w-28 h-auto">
             </div>
             <!-- Message -->
-            <p id="peace-anim-message" class="font-gaming text-sm font-black uppercase text-pink-400 tracking-widest text-center opacity-0 transition-opacity duration-500"></p>
+            <p id="peace-anim-message"
+                class="font-gaming text-sm font-black uppercase text-pink-400 tracking-widest text-center opacity-0 transition-opacity duration-500">
+            </p>
         </div>
     </div>
 
@@ -684,27 +835,34 @@
     <!-- Bottom Navigation (mobile only) -->
     <nav id="bottom-nav" class="xl:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10 px-2">
         <div class="flex items-center justify-around py-2">
-            <button onclick="navigateTo('dashboard')" id="bn-dashboard" class="bottom-nav-btn active flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all" style="color: #06b6d4;">
+            <button onclick="navigateTo('dashboard')" id="bn-dashboard"
+                class="bottom-nav-btn active flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all"
+                style="color: #06b6d4;">
                 <i class="fa-solid fa-list-check text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Objectifs</span>
             </button>
-            <button onclick="navigateTo('peace')" id="bn-peace" class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+            <button onclick="navigateTo('peace')" id="bn-peace"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-heart text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Sac</span>
             </button>
-            <button onclick="navigateTo('notes')" id="bn-notes" class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+            <button onclick="navigateTo('notes')" id="bn-notes"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-sticky-note text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Notes</span>
             </button>
-            <button onclick="navigateTo('achievements')" id="bn-achievements" class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+            <button onclick="navigateTo('achievements')" id="bn-achievements"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-trophy text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Succès</span>
             </button>
-            <button onclick="openModal('modal-info')" class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+            <button onclick="openModal('modal-info')"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-question-circle text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Info</span>
             </button>
         </div>
     </nav>
 </body>
+
 </html>

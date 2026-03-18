@@ -666,15 +666,15 @@ function renderQuests(mult) {
                             <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}33;">
                                 <i class="fa-solid ${catIcon} text-xs" style="color: ${catColor};"></i>
                             </div>
-                            <span class="text-[9px] font-black uppercase" style="color: ${catColor};">${escapeHtml(q.cat)}</span>
-                            <span class="text-[9px] font-bold text-slate-600 cursor-help" title="${escapeHtml(fullDate)}">
+                            <span class="text-[9px] font-black uppercase" select-none style="color: ${catColor};">${escapeHtml(q.cat)}</span>
+                            <span class="text-[9px] select-none font-bold text-slate-600 cursor-help" title="${escapeHtml(fullDate)}">
                                 <i class="fa-solid fa-clock mr-1"></i>${escapeHtml(relativeTime)}
                             </span>
                         </div>
                         <div class="text-sm font-bold text-white">${escapeHtml(q.text)}</div>
                     </div>
                     <div class="text-right flex flex-col items-end gap-2">
-                         <div class="text-xs font-gaming text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-lg align-center m-auto justify-center inline-flex gap-1">+${reward} ${getCreditIcon('sm')}</div>
+                         <div class="text-xs select-none font-gaming text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-lg align-center m-auto justify-center inline-flex gap-1">+${reward} ${getCreditIcon('sm')}</div>
                          <button onclick="event.stopPropagation(); deleteQuest(${q.id})" class="text-slate-600 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 </div>
@@ -716,7 +716,7 @@ function renderDailyCard() {
     }
 
     dailyCardEl.innerHTML = `
-        <div class="glass p-6 rounded-[2.5rem] border-2 ${isLocked ? 'border-green-500/50 bg-green-500/5' : allDone ? 'border-green-500/50 bg-green-500/5' : 'border-yellow-500/30'} transition-all ${isLocked ? 'opacity-60' : ''}">
+        <div class="glass p-6 select-none rounded-[2.5rem] border-2 ${isLocked ? 'border-green-500/50 bg-green-500/5' : allDone ? 'border-green-500/50 bg-green-500/5' : 'border-yellow-500/30'} transition-all ${isLocked ? 'opacity-60' : ''}">
             <div class="flex items-center gap-3 mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
                     <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-calendar-check'} text-white text-xl"></i>
@@ -1087,15 +1087,17 @@ function renderCategoryManager() {
         </div>`).join('');
 
     const formHtml = `
-        <div class="bg-slate-900/80 p-5 rounded-[2rem] border border-white/10">
-            <div id="icon-picker" class="grid grid-cols-8 gap-2 mb-4 max-h-40 overflow-y-auto pr-2"></div>
-            <div id="color-picker" class="grid grid-cols-8 gap-2 mb-4"></div>
+        <div class="bg-slate-900/60 backdrop-blur-sm p-5 rounded-2xl shadow-xl">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Icône</p>
+            <div id="icon-picker" class="grid grid-cols-9 gap-1.5 mb-4 max-h-36 overflow-y-auto p-0.5"></div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Couleur</p>
+            <div id="color-picker" class="grid grid-cols-12 gap-2 mb-4"></div>
             <div class="flex gap-2">
-                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." class="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none">
-                <button onclick="saveCategory()" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform">
+                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." class="flex-1 bg-slate-800/80 border border-white/8 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none placeholder-slate-600 transition-all">
+                <button onclick="saveCategory()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                     <i class="fa-solid ${editingCategory ? 'fa-check' : 'fa-plus'}"></i>
                 </button>
-                ${editingCategory ? '<button onclick="cancelEditCategory()" class="bg-slate-700 text-white px-4 py-3 rounded-xl font-bold hover:scale-105 transition-transform"><i class="fa-solid fa-times"></i></button>' : ''}
+                ${editingCategory ? '<button onclick="cancelEditCategory()" class="bg-slate-700/80 text-white px-4 py-3 rounded-xl font-bold transition-all"><i class="fa-solid fa-times"></i></button>' : ''}
             </div>
         </div>
     `;
@@ -1562,8 +1564,8 @@ function initIconPicker() {
     if (!picker) return;
 
     picker.innerHTML = CONFIG.ICON_POOL.map(icon => `
-        <button onclick="selectIcon('${icon}')" class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all hover:scale-110 ${selectedIcon === icon ? 'border-primary bg-primary/20 text-primary scale-110' : 'border-white/5 text-slate-500 hover:border-primary/50'}">
-            <i class="fa-solid ${icon}"></i>
+        <button onclick="selectIcon('${icon}')" title="${icon.replace('fa-', '')}" class="aspect-square rounded-xl flex items-center justify-center transition-all duration-150 outline outline-2 ${selectedIcon === icon ? 'outline-primary bg-primary/20 text-primary shadow-lg shadow-primary/20' : 'outline-transparent bg-white/5 text-slate-400 hover:outline-primary/40 hover:text-white hover:bg-white/10'}">
+            <i class="fa-solid ${icon} text-sm"></i>
         </button>`).join('');
 }
 
@@ -1574,7 +1576,7 @@ function initColorPicker() {
     const colors = ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'];
 
     picker.innerHTML = colors.map(color => `
-        <button onclick="selectColor('${color}')" class="w-10 h-10 rounded-lg border-2 transition-all hover:scale-110 ${selectedColor === color ? 'scale-110 ring-2 ring-white' : ''}" style="background: ${color}; border-color: ${selectedColor === color ? '#fff' : color};">
+        <button onclick="selectColor('${color}')" class="aspect-square rounded-xl border-1 transition-all duration-150 ${selectedColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900' : 'border-transparent hover:brightness-125'}" style="background: ${color}; ${selectedColor === color ? `border-color: ${color};` : ''}">
         </button>`).join('');
 }
 
@@ -1964,7 +1966,7 @@ function renderPeaceFears() {
         const div = document.createElement('div');
         div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-pink-500/30 transition-all';
         div.innerHTML = `
-            <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center justify-between select-none gap-2">
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-white truncate mb-1">${escapeHtml(fear.text)}</p>
                     <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${typeColors[fear.type]}">
@@ -2371,7 +2373,7 @@ function renderNotes() {
     
     sortedNotes.forEach(note => {
         const div = document.createElement('div');
-        div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-purple-500/30 transition-all cursor-pointer';
+        div.className = 'glass p-3 rounded-xl border select-none border-white/10 group hover:border-purple-500/30 transition-all cursor-pointer';
         
         const updatedDate = new Date(note.updatedAt);
         const dateStr = updatedDate.toLocaleDateString('fr-FR', { 
@@ -2520,7 +2522,7 @@ function unlockAchievement(achievement) {
 
 function showAchievementNotification(achievement) {
     const notification = document.createElement('div');
-    notification.className = 'fixed top-4 left-4 glass p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 z-50 animate-bounce max-w-sm';
+    notification.className = 'fixed top-4 left-4 glass p-4 rounded-xl select-none border border-yellow-500/30 bg-yellow-500/10 z-50 animate-bounce max-w-sm';
     notification.innerHTML = `
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${achievement.color}33;">

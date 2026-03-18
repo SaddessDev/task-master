@@ -2,7 +2,7 @@
   "achievements": [
     {
       "id": "first_quest",
-      "name": "Premier pas",
+      "name": "C'est pour un ami",
       "description": "Créer votre premier objectif",
       "icon": "fa-shoe-prints",
       "color": "#06b6d4",
@@ -12,7 +12,7 @@
     },
     {
       "id": "quest_master",
-      "name": "Maître des objectifs",
+      "name": "To-Do List Addict",
       "description": "Créer 10 objectifs",
       "icon": "fa-crown",
       "color": "#06b6d4",
@@ -22,7 +22,7 @@
     },
     {
       "id": "quest_legend",
-      "name": "Légende des objectifs",
+      "name": "Ministre de la Paperasse",
       "description": "Créer 50 objectifs",
       "icon": "fa-star",
       "color": "#06b6d4",
@@ -32,7 +32,7 @@
     },
     {
       "id": "quests_completed_1",
-      "name": "Premier succès",
+      "name": "J'ai fait un truc !",
       "description": "Compléter votre premier objectif",
       "icon": "fa-check",
       "color": "#06b6d4",
@@ -42,7 +42,7 @@
     },
     {
       "id": "quests_completed_3",
-      "name": "En route",
+      "name": "Même pas fatigué",
       "description": "Compléter 3 objectifs",
       "icon": "fa-check-double",
       "color": "#06b6d4",
@@ -52,27 +52,27 @@
     },
     {
       "id": "quests_completed_5",
-      "name": "Lancé",
+      "name": "Sur un malentendu...",
       "description": "Compléter 5 objectifs",
       "icon": "fa-circle-check",
       "color": "#06b6d4",
-      "obscuration": false,
+      "obscuration": true,
       "difficulty": 1,
       "condition": { "type": "quests_completed", "value": 5 }
     },
     {
       "id": "quests_completed_10",
-      "name": "Accomplisseur",
+      "name": "Productivité Insolente",
       "description": "Compléter 10 objectifs",
       "icon": "fa-check-circle",
       "color": "#06b6d4",
-      "obscuration": false,
+      "obscuration": true,
       "difficulty": 2,
       "condition": { "type": "quests_completed", "value": 10 }
     },
     {
       "id": "quests_completed_50",
-      "name": "Conquérant",
+      "name": "Légende du Post-it",
       "description": "Compléter 50 objectifs",
       "icon": "fa-medal",
       "color": "#06b6d4",
@@ -82,7 +82,7 @@
     },
     {
       "id": "quests_completed_100",
-      "name": "Invincible",
+      "name": "Dieu du Travail bien fait",
       "description": "Compléter 100 objectifs",
       "icon": "fa-crown",
       "color": "#06b6d4",
@@ -92,7 +92,7 @@
     },
     {
       "id": "first_daily",
-      "name": "Routine établie",
+      "name": "Adieu, Procrastination",
       "description": "Créer votre premier objectif quotidien",
       "icon": "fa-calendar-check",
       "color": "#10b981",
@@ -102,7 +102,7 @@
     },
     {
       "id": "daily_warrior",
-      "name": "Guerrier quotidien",
+      "name": "Machine de Guerre Matinale",
       "description": "Créer 5 objectifs quotidiens",
       "icon": "fa-fire",
       "color": "#10b981",
@@ -112,7 +112,7 @@
     },
     {
       "id": "daily_completions_1",
-      "name": "Première journée",
+      "name": "Une journée sans faute",
       "description": "Compléter tous vos objectifs quotidiens pour la première fois",
       "icon": "fa-sun",
       "color": "#10b981",
@@ -122,7 +122,7 @@
     },
     {
       "id": "daily_completions_3",
-      "name": "Régularité",
+      "name": "Jamais deux sans trois",
       "description": "Compléter tous vos objectifs quotidiens 3 fois",
       "icon": "fa-calendar-check",
       "color": "#10b981",
@@ -132,7 +132,7 @@
     },
     {
       "id": "daily_completions_5",
-      "name": "Discipline",
+      "name": "Métronome Humain",
       "description": "Compléter tous vos objectifs quotidiens 5 fois",
       "icon": "fa-medal",
       "color": "#10b981",
@@ -142,7 +142,7 @@
     },
     {
       "id": "streak_3",
-      "name": "Série de 3",
+      "name": "Petit joueur de feu",
       "description": "Atteindre une série de 3 jours",
       "icon": "fa-fire-flame-simple",
       "color": "#f97316",
@@ -152,7 +152,7 @@
     },
     {
       "id": "streak_7",
-      "name": "Une semaine de feu",
+      "name": "Sept Jours de Gloire",
       "description": "Atteindre une série de 7 jours",
       "icon": "fa-fire",
       "color": "#f97316",
@@ -162,7 +162,7 @@
     },
     {
       "id": "streak_30",
-      "name": "Mois de persévérance",
+      "name": "Habitude ou Obsession ?",
       "description": "Atteindre une série de 30 jours",
       "icon": "fa-trophy",
       "color": "#f97316",
@@ -172,7 +172,7 @@
     },
     {
       "id": "first_fear",
-      "name": "Courage",
+      "name": "Même pas peur (si, un peu)",
       "description": "Ajouter votre première peur au sac",
       "icon": "fa-heart",
       "color": "#ec4899",
@@ -182,7 +182,7 @@
     },
     {
       "id": "peace_10",
-      "name": "Apaisement",
+      "name": "Vide-ordures Mental",
       "description": "Ajouter 10 peurs au sac",
       "icon": "fa-dove",
       "color": "#ec4899",
@@ -192,7 +192,7 @@
     },
     {
       "id": "peace_50",
-      "name": "Libération",
+      "name": "Zénitude Absolue (ou presque)",
       "description": "Ajouter 50 peurs au sac",
       "icon": "fa-feather",
       "color": "#ec4899",
@@ -202,7 +202,7 @@
     },
     {
       "id": "first_note",
-      "name": "Pensée écrite",
+      "name": "Cher Journal...",
       "description": "Créer votre première note",
       "icon": "fa-pen",
       "color": "#8b5cf6",
@@ -212,7 +212,7 @@
     },
     {
       "id": "notes_10",
-      "name": "Écrivain",
+      "name": "Poète de l'ombre",
       "description": "Créer 10 notes",
       "icon": "fa-book",
       "color": "#8b5cf6",
@@ -222,7 +222,7 @@
     },
     {
       "id": "notes_20",
-      "name": "Chroniqueur",
+      "name": "Archives Secrètes du FBI",
       "description": "Créer 20 notes",
       "icon": "fa-book-open",
       "color": "#8b5cf6",
@@ -232,7 +232,7 @@
     },
     {
       "id": "rebirth_1",
-      "name": "Renaissance",
+      "name": "New Game+",
       "description": "Effectuer votre première renaissance",
       "icon": "fa-infinity",
       "color": "#a855f7",
@@ -242,7 +242,7 @@
     },
     {
       "id": "rebirth_5",
-      "name": "Réincarné",
+      "name": "Phénix de Bureau",
       "description": "Effectuer 5 renaissances",
       "icon": "fa-redo",
       "color": "#a855f7",
@@ -252,7 +252,7 @@
     },
     {
       "id": "master_of_all",
-      "name": "Maître des succès",
+      "name": "Le Platine ou rien",
       "description": "Débloquer tous les autres succès",
       "icon": "fa-crown",
       "color": "#fbbf24",
