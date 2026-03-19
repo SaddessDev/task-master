@@ -95,7 +95,7 @@
       "name": "Adieu, Procrastination",
       "description": "Créer votre premier objectif quotidien",
       "icon": "fa-calendar-check",
-      "color": "#10b981",
+      "color": "#eab308",
       "obscuration": false,
       "difficulty": 1,
       "condition": { "type": "dailies_created", "value": 1 }
@@ -105,7 +105,7 @@
       "name": "Machine de Guerre Matinale",
       "description": "Créer 5 objectifs quotidiens",
       "icon": "fa-fire",
-      "color": "#10b981",
+      "color": "#eab308",
       "obscuration": true,
       "difficulty": 2,
       "condition": { "type": "dailies_created", "value": 5 }
@@ -115,7 +115,7 @@
       "name": "Une journée sans faute",
       "description": "Compléter tous vos objectifs quotidiens pour la première fois",
       "icon": "fa-sun",
-      "color": "#10b981",
+      "color": "#eab308",
       "obscuration": false,
       "difficulty": 1,
       "condition": { "type": "daily_completions", "value": 1 }
@@ -125,7 +125,7 @@
       "name": "Jamais deux sans trois",
       "description": "Compléter tous vos objectifs quotidiens 3 fois",
       "icon": "fa-calendar-check",
-      "color": "#10b981",
+      "color": "#eab308",
       "obscuration": false,
       "difficulty": 2,
       "condition": { "type": "daily_completions", "value": 3 }

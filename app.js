@@ -2594,10 +2594,12 @@ function renderAchievements() {
 
 
 function updateAchievementsCount() {
-    const count = state.unlockedAchievements.length;
-    const countLabel = pluralize(count, 'succès obtenu', 'succès obtenus');
+    const unlockedCount = state.unlockedAchievements.length;
+    const totalCount = achievements.length; 
     const countEl = document.getElementById('achievements-count');
+    
     if (countEl) {
-        countEl.textContent = `${count} ${countLabel}`;
+        const label = pluralize(unlockedCount, 'succès obtenu', 'succès obtenus');
+        countEl.textContent = `${unlockedCount} / ${totalCount} ${label}`;
     }
 }
