@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascendora</title>
+    <title>Ascendora | Objectifs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
@@ -72,10 +72,10 @@
                             <i class="fa-solid fa-list-check text-3xl text-primary"></i>
                         </div>
                         <div>
-                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Objectifs <span
-                                    class="text-primary">à compléter</span></h1>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Objectifs à <span
+                                    class="text-primary">compléter</span></h1>
                             <div class="text-[10px] text-slate-500 font-bold tracking-widest flex items-center gap-2">
-                                <span id="rb-label">Renaissance</span> : <span id="rb-val">0</span>
+                                <span id="rb-label">Renaissance</span> : <span class="font-bold text-primary" id="rb-val">0</span>
                             </div>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                             class="glass p-3 select-none rounded-3xl flex flex-wrap items-center gap-3 border-white/10 transition-all hover:border-primary/30">
                             <div
                                 class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-                                <i class="fa-solid text-slate-500 fa-plus text-lg"></i>
+                                <i class="fa-solid text-slate-500 fa-rocket text-lg"></i>
                             </div>
                             <input type="text" id="q-input" placeholder="Nouvel objectif..."
                                 class="flex-1  bg-transparent border-none px-2 text-base font-semibold outline-none text-white min-w-[200px] placeholder:text-slate-600">
@@ -193,7 +193,7 @@
 
                             <button id="add-quest-btn" onclick="addQuest()" disabled
                                 class="bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-transform font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
-                                <i class="fa-solid fa-rocket mr-2"></i>Ajouter
+                                <i class="fa-solid fa-plus mr-2"></i>Ajouter
                             </button>
                         </div>
 
@@ -403,7 +403,7 @@
                                     class="w-full bg-slate-800/50 select-none border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 resize-none text-sm"
                                     rows="3"></textarea>
                                 <button onclick="addNote()"
-                                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 select-none text-white px-4 py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">
+                                    class="w-full bg-gradient-to-r from-purple-600 to-purple-800 transition-all hover:bg-slate-800/50 select-none text-white px-4 py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">
                                     <i class="fa-solid fa-plus mr-2"></i>Ajouter la note
                                 </button>
                             </div>
@@ -434,7 +434,7 @@
 
                             <div class="space-y-4 text-left">
                                 <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                    <p class="text-xs text-slate-400 mb-2">
+                                    <p class="text-xs text-slate-400">
                                         <i class="fa-solid fa-lightbulb text-purple-500 mr-2"></i>
                                         <strong>Conseil :</strong> Utilisez vos notes pour capturer vos idées, vos
                                         pensées et vos réflexions importantes.
@@ -454,8 +454,8 @@
                             <i class="fa-solid fa-trophy text-3xl text-yellow-500"></i>
                         </div>
                         <div>
-                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Succès <span
-                                    class="text-yellow-500">Débloqués</span></h1>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Succès à <span
+                                    class="text-yellow-500">Débloquer</span></h1>
                             <p class="text-[10px] text-slate-500 font-bold tracking-widest">Célébrez vos
                                 accomplissements</p>
                         </div>
@@ -483,9 +483,6 @@
 
                             <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-yellow-500">
                                 Vos succès</h2>
-                            <p id="achievements-count"
-                                class="text-[11px] bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-6 inline-block border border-yellow-500/30">
-                                0 succès</p>
 
                             <div class="space-y-4 text-left">
                                 <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
@@ -782,7 +779,7 @@
                     class="bg-slate-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between gap-4">
                     <p class="text-xs text-slate-500">Projet développé par <strong
                             class="text-slate-400">M3philes</strong> — fourni gratuitement, sans garantie.</p>
-                    <span class="text-[10px] font-gaming text-primary font-bold whitespace-nowrap">V1.5</span>
+                    <span class="text-[10px] font-gaming text-primary font-bold whitespace-nowrap">V1.6</span>
                 </div>
             </div>
         </div>

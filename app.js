@@ -798,66 +798,86 @@ function renderShop() {
         return;
     }
 
-    const items = [
-        { n: 'Cellule Basique', g: 30, p: 300, i: 'fa-battery-half', desc: 'Amélioration génétique de base', color: 'from-cyan-500 to-blue-500' },
-        { n: 'Module Avancé', g: 100, p: 900, i: 'fa-microchip', desc: 'Augmentation neuronale', color: 'from-blue-500 to-purple-500' },
-        { n: 'Noyau Quantique', g: 450, p: 3200, i: 'fa-atom', desc: 'Évolution transcendantale', color: 'from-purple-500 to-pink-500' }
-    ];
+    // Taux : 1 ASC = 10 crédits
+    const ASC_RATE = 10;
+    const maxAffordable = Math.floor(state.coins / ASC_RATE);
+    const remaining = 3000 - state.ascensionPoints;
+    const maxBuy = Math.max(1, Math.min(maxAffordable, remaining));
+    const initialVal = Math.max(1, Math.min(10, maxBuy));
 
     container.innerHTML = `
         <div class="mb-6 glass p-6 rounded-2xl border border-white/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs text-slate-400 font-bold uppercase mb-1">Progression vers la Renaissance</div>
-                    <div class="text-2xl font-gaming text-white">${state.ascensionPoints} <span class="text-sm text-slate-500">/ 3000</span></div>
+                    <div class="text-2xl font-gaming text-white">
+                        ${state.ascensionPoints}
+                        <span id="asc-preview-badge" class="text-sm text-cyan-400 opacity-0 transition-opacity duration-300"></span>
+                        <span class="text-sm text-slate-500">/ 3000</span>
+                    </div>
                 </div>
                 <div class="text-right">
                     <div class="text-xs text-slate-400 font-bold uppercase mb-1">Crédits Disponibles</div>
                     <div class="text-2xl font-gaming text-yellow-500">${Math.floor(state.coins)}</div>
                 </div>
             </div>
-            <div class="h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
+            <div class="relative h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
                 <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / 3000) * 100}%"></div>
+                <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 transition-all duration-300" style="left:${(state.ascensionPoints / 3000) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
             </div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            ${items.map(item => {
-        const canAfford = state.coins >= item.p;
-        return `
-                    <div class="relative group">
-                        <div class="absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-20 rounded-3xl transition-opacity duration-300 blur-xl"></div>
-                        <div class="relative glass p-6 rounded-3xl border border-white/10 hover:border-white/20 transition-all hover:scale-105 duration-300">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg">
-                                <i class="fa-solid ${item.i} text-2xl text-white"></i>
-                            </div>
-                            <h4 class="text-sm font-black uppercase text-white text-center mb-2">${item.n}</h4>
-                            <p class="text-[10px] text-slate-400 text-center mb-4 h-8">${item.desc}</p>
-                            
-                            <div class="bg-slate-900/50 rounded-xl p-3 mb-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] text-slate-500 uppercase font-bold">Gain</span>
-                                    <span class="text-sm font-gaming text-green-400">+${item.g} ASC</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] text-slate-500 uppercase font-bold">Coût</span>
-                                    <span class="text-sm font-gaming text-yellow-500 gap-1 inline-flex">${item.p} ${getCreditIcon('md')}</span>
-                                </div>
-                            </div>
-                            
-                            <button onclick="buyAscension(${item.p}, ${item.g})" class="w-full bg-gradient-to-r ${item.color} text-white font-black py-3 rounded-xl text-sm hover:shadow-xl transition-all ${!canAfford ? 'opacity-40 cursor-not-allowed' : 'hover:scale-105'}" ${!canAfford ? 'disabled' : ''}>
-                                <i class="fa-solid fa-shopping-cart mr-2"></i>Acheter
-                            </button>
-                        </div>
+
+        <div class="glass p-8 rounded-3xl border border-white/10">
+            <div class="text-center mb-4">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-dna text-2xl text-white"></i>
+                </div>
+                <h4 class="font-gaming text-lg font-black uppercase text-white tracking-wider mb-1">Route de la renaissance</h4>
+                <p class="text-[11px] text-slate-400">Choisissez le nombre de points d'Ascension à acquérir</p>
+            </div>
+
+            ${maxAffordable === 0 ? `
+                <div class="text-center inline-flex bg-red-500 rounded-md gap-1 m-auto justify-center items-center text-center w-full py-3">
+                    <i class="fa-solid fa-warning text-1xl"></i>
+                    <p class="text-sm text-neutral-100">Crédits insuffisants. Complétez des objectifs pour en gagner.</p>
+                </div>
+            ` : `
+                <div class="mb-8">
+                    <div class="flex items-end justify-between mb-3">
+                        <span class="text-[10px] text-slate-500 uppercase font-bold">Points sélectionnés</span>
+                        <span id="slider-asc-val" class="font-gaming text-3xl text-primary">+${initialVal} ASC</span>
                     </div>
-                `;
-    }).join('')}
+                    <input id="asc-slider" type="range" min="1" max="${maxBuy}" value="${initialVal}"
+                        class="w-full h-2 rounded-full appearance-none cursor-pointer accent-cyan-500"
+                        oninput="updateAscSlider(this.value)">
+                    <div class="flex justify-between mt-1">
+                        <span class="text-[9px] text-slate-600">1 ASC</span>
+                        <span class="text-[9px] text-slate-600">${maxBuy} ASC</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 rounded-2xl p-5 mb-6 grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Coût :</div>
+                        <div id="slider-cost" class="font-gaming inline-flex justify-center items-center gap-1 text-base text-yellow-400">${initialVal * ASC_RATE} ${getCreditIcon('sm')}</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Crédits restant :</div>
+                        <div id="slider-remaining" class="font-gaming gap-1 justify-center items-center inline-flex text-base text-slate-300">${Math.floor(state.coins) - initialVal * ASC_RATE} ${getCreditIcon('sm')}</div>
+                    </div>
+                </div>
+
+                <button id="asc-buy-btn" onclick="buyAscensionSlider()"
+                    class="w-full bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest hover:scale-105 hover:shadow-xl transition-all">
+                    <i class="fa-solid fa-bolt mr-2"></i>Acquérir les points
+                </button>
+            `}
         </div>
-        
-        <div class="mt-8 glass p-6 rounded-2xl border border-white/10 text-center">
-            <i class="fa-solid fa-lightbulb text-yellow-500 text-2xl mb-3"></i>
+
+        <div class="mt-6 glass p-5 rounded-2xl border border-white/10 text-center">
+            <i class="fa-solid fa-lightbulb text-yellow-500 text-xl mb-2"></i>
             <p class="text-xs text-slate-400">
-                <span class="font-bold text-white">Astuce :</span> Accumulez 3000 points d'Ascension pour débloquer la Renaissance et obtenir un multiplicateur permanent !
+                <span class="font-bold text-white">Taux :</span> 10 crédits = 1 point d'Ascension &nbsp;·&nbsp; Objectif : 3000 ASC pour la Renaissance
             </p>
         </div>
     `;
@@ -1013,6 +1033,56 @@ function filterByCategory(name) {
 // ===== GESTION DE LA BOUTIQUE =====
 
 function buyAscension(cost, gain) {
+    if (state.coins >= cost) {
+        state.coins -= cost;
+        state.ascensionPoints += gain;
+        state.lastAscensionPurchase = Date.now();
+        fx('shop-card', 'flash-win');
+        saveState();
+        render();
+    } else {
+        fx('shop-card', 'animate-shake');
+    }
+}
+
+function updateAscSlider(val) {
+    const ASC_RATE = 10;
+    const v = parseInt(val);
+    const cost = v * ASC_RATE;
+    document.getElementById('slider-asc-val').textContent = `+${v} ASC`;
+    document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
+    document.getElementById('slider-remaining').innerHTML = `${Math.floor(state.coins) - cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
+
+    // Preview sur la progress bar
+    const currentPct = (state.ascensionPoints / 3000) * 100;
+    const gainPct = (v / 3000) * 100;
+    const previewBar = document.getElementById('asc-preview-bar');
+    const badge = document.getElementById('asc-preview-badge');
+    if (previewBar) {
+        previewBar.style.left = `${currentPct}%`;
+        previewBar.style.width = `${Math.min(gainPct, 100 - currentPct)}%`;
+        const atRight = (currentPct + gainPct) >= 100;
+        let br;
+        if (currentPct === 0) {
+            br = atRight ? '9999px' : '9999px 0 0 9999px'; // rond gauche, carré droite (sauf si plein)
+        } else {
+            br = atRight ? '0 9999px 9999px 0' : '0';      // pas de radius, sauf si atteint le bord
+        }
+        previewBar.style.borderRadius = br;
+    }
+    if (badge) {
+        badge.textContent = `+${v}`;
+        badge.classList.remove('opacity-0');
+        badge.classList.add('opacity-100');
+    }
+}
+
+function buyAscensionSlider() {
+    const ASC_RATE = 10;
+    const slider = document.getElementById('asc-slider');
+    if (!slider) return;
+    const gain = parseInt(slider.value);
+    const cost = gain * ASC_RATE;
     if (state.coins >= cost) {
         state.coins -= cost;
         state.ascensionPoints += gain;
@@ -1793,6 +1863,14 @@ function toggleMobileMenu() {
 function navigateTo(page) {
     currentPage = page;
 
+    const pageTitles = {
+        dashboard:    'Objectifs',
+        peace:        'Apaisement',
+        notes:        'Notes',
+        achievements: 'Succès'
+    };
+    document.title = `Ascendora | ${pageTitles[page] || page}`;
+
     // Masquer toutes les pages
     document.querySelectorAll('.page-content').forEach(p => {
         p.classList.add('hidden');
@@ -1807,7 +1885,6 @@ function navigateTo(page) {
         updateNotesCount();
     } else if (page === 'achievements') {
         renderAchievements();
-        updateAchievementsCount();
     }
     
     // Mettre à jour la bottom nav + sidebar avec la couleur de la page
@@ -2551,25 +2628,22 @@ function renderAchievements() {
         return;
     }
 
-    achievements.forEach(achievement => {
+    const difficultyIcons = {
+        1: { icon: 'fa-leaf',  color: '#10b981' },
+        2: { icon: 'fa-fire',  color: '#f97316' },
+        3: { icon: 'fa-bolt',  color: '#eab308' },
+        4: { icon: 'fa-skull', color: '#ef4444' },
+        5: { icon: 'fa-crown', color: '#a855f7' }
+    };
+
+    const buildCard = (achievement) => {
         const isUnlocked = state.unlockedAchievements.includes(achievement.id);
         const shouldObscure = achievement.obscuration && !isUnlocked;
         const displayDescription = shouldObscure ? '????' : achievement.description;
-
-        // Icône de difficulté évolutive
-        const difficultyIcons = {
-            1: { icon: 'fa-leaf', color: '#10b981' },
-            2: { icon: 'fa-fire', color: '#f97316' },
-            3: { icon: 'fa-bolt', color: '#eab308' },
-            4: { icon: 'fa-skull', color: '#ef4444' },
-            5: { icon: 'fa-crown', color: '#a855f7' }
-        };
-        
         const diffIcon = difficultyIcons[achievement.difficulty] || difficultyIcons[1];
 
         const div = document.createElement('div');
         div.className = `glass p-4 rounded-xl border transition-all ${isUnlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-white/10 opacity-50'}`;
-
         div.innerHTML = `
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${isUnlocked ? achievement.color + '33' : 'rgba(30,41,59,0.6)'};">
@@ -2585,20 +2659,42 @@ function renderAchievements() {
                 ${isUnlocked ? '<i class="fa-solid fa-check text-yellow-500 text-lg flex-shrink-0"></i>' : ''}
             </div>
         `;
+        return div;
+    };
 
-        container.appendChild(div);
-    });
-}
+    // ── Section : Débloqués ──
+    const unlocked = achievements.filter(a => state.unlockedAchievements.includes(a.id));
 
+    if (unlocked.length > 0) {
+        const sectionTitle = document.createElement('div');
+        sectionTitle.className = 'col-span-full mb-1';
+        sectionTitle.innerHTML = `
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-trophy text-yellow-500 text-base"></i>
+                <span class="text-sm font-black uppercase tracking-widest text-white">Succès débloqués</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">${unlocked.length}</span>
+            </div>
+            <div class="h-px bg-yellow-500/20"></div>
+        `;
+        container.appendChild(sectionTitle);
+        unlocked.forEach(a => container.appendChild(buildCard(a)));
+    }
 
+    // ── Section : Non débloqués ──
+    const locked = achievements.filter(a => !state.unlockedAchievements.includes(a.id));
 
-function updateAchievementsCount() {
-    const unlockedCount = state.unlockedAchievements.length;
-    const totalCount = achievements.length; 
-    const countEl = document.getElementById('achievements-count');
-    
-    if (countEl) {
-        const label = pluralize(unlockedCount, 'succès obtenu', 'succès obtenus');
-        countEl.textContent = `${unlockedCount} / ${totalCount} ${label}`;
+    if (locked.length > 0) {
+        const sectionTitle = document.createElement('div');
+        sectionTitle.className = 'col-span-full mt-6 mb-1';
+        sectionTitle.innerHTML = `
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-lock text-slate-500 text-base"></i>
+                <span class="text-sm font-black uppercase tracking-widest text-slate-400">Succès non débloqués</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/5 text-slate-500 border border-white/10">${locked.length}</span>
+            </div>
+            <div class="h-px bg-white/5"></div>
+        `;
+        container.appendChild(sectionTitle);
+        locked.forEach(a => container.appendChild(buildCard(a)));
     }
 }
