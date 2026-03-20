@@ -15,12 +15,11 @@ const CONFIG = {
         'fa-umbrella', 'fa-gift', 'fa-bell', 'fa-envelope', 'fa-phone', 'fa-clock'
     ],
     STAGES: [
-        { min: 0, n: "Novice", r: "Rang I", i: "fa-seedling", desc: "Le début de votre voyage" },
-        { min: 100, n: "Apprenti", r: "Rang II", i: "fa-book-open", desc: "Vous apprenez les bases" },
-        { min: 500, n: "Adepte", r: "Rang III", i: "fa-fire", desc: "Votre discipline s'affine" },
-        { min: 1500, n: "Expert", r: "Rang IV", i: "fa-star", desc: "Maîtrise reconnue" },
-        { min: 3000, n: "Maître", r: "Rang V", i: "fa-crown", desc: "Excellence incarnée" },
-        { min: 5000, n: "Légende", r: "Rang VI", i: "fa-trophy", desc: "Au sommet de la gloire" }
+        { min: 0, n: "Novice", r: "Rang I", i: "1", desc: "Le début de votre voyage" },
+        { min: 100, n: "Apprenti", r: "Rang II", i: "2", desc: "Vous apprenez les bases" },
+        { min: 500, n: "Adepte", r: "Rang III", i: "3", desc: "Votre discipline s'affine" },
+        { min: 1500, n: "Expert", r: "Rang IV", i: "4", desc: "Maîtrise reconnue" },
+        { min: 3000, n: "Maître", r: "Rang V", i: "5", desc: "Excellence incarnée" },
     ],
     CREDIT: {
         type: 'image', // 'image' ou 'icon'
@@ -424,7 +423,7 @@ function render() {
 
     document.getElementById('comp-stage').innerText = cur.n;
     document.getElementById('comp-rank').innerText = cur.r;
-    document.getElementById('comp-icon').className = `fa-solid ${cur.i} text-3xl text-primary`;
+    document.getElementById('comp-icon').src = `assets/ranks/${cur.i}.png`;
 
     // Mise à jour de la description du stage
     const descEl = document.getElementById('comp-desc');
@@ -445,12 +444,12 @@ function render() {
             nextRankEl.innerHTML = `
                 <div class="text-[9px] text-slate-500 uppercase font-bold mb-3">Prochain Rang</div>
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center border border-primary/20">
-                        <i class="fa-solid ${nextStage.i} text-primary text-lg"></i>
+                    <div class="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center">
+                        <img src="assets/ranks/${nextStage.i}.png" class="w-12 object-contain">
                     </div>
                     <div class="flex-1">
                         <div class="text-[11px] font-bold text-white">${nextStage.n}</div>
-                        <div class="text-[9px] text-slate-500 mb-2">Encore ${remaining} ${pluralize(remaining, 'point')}</div>
+                        <div class="text-[9px] text-slate-500">Encore ${remaining} ${pluralize(remaining, 'point')}</div>
                         <div class="h-2 bg-slate-900 rounded-full overflow-hidden shadow-inner">
                             <div class="h-full bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-1000" style="width: ${progress}%"></div>
                         </div>
@@ -769,7 +768,7 @@ function renderDailyCard() {
 function renderShop() {
     const container = document.getElementById('shop-items-container');
 
-    if (state.ascensionPoints >= 5000) {
+    if (state.ascensionPoints >= 3000) {
         container.innerHTML = `
             <div class="relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-orange-900/50 border-2 border-purple-500/30">
                 <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 animate-pulse"></div>
@@ -810,7 +809,7 @@ function renderShop() {
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-xs text-slate-400 font-bold uppercase mb-1">Progression vers la Renaissance</div>
-                    <div class="text-2xl font-gaming text-white">${state.ascensionPoints} <span class="text-sm text-slate-500">/ 5000</span></div>
+                    <div class="text-2xl font-gaming text-white">${state.ascensionPoints} <span class="text-sm text-slate-500">/ 3000</span></div>
                 </div>
                 <div class="text-right">
                     <div class="text-xs text-slate-400 font-bold uppercase mb-1">Crédits Disponibles</div>
@@ -818,7 +817,7 @@ function renderShop() {
                 </div>
             </div>
             <div class="h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
-                <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / 5000) * 100}%"></div>
+                <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / 3000) * 100}%"></div>
             </div>
         </div>
         
@@ -858,7 +857,7 @@ function renderShop() {
         <div class="mt-8 glass p-6 rounded-2xl border border-white/10 text-center">
             <i class="fa-solid fa-lightbulb text-yellow-500 text-2xl mb-3"></i>
             <p class="text-xs text-slate-400">
-                <span class="font-bold text-white">Astuce :</span> Accumulez 5000 points d'Ascension pour débloquer la Renaissance et obtenir un multiplicateur permanent !
+                <span class="font-bold text-white">Astuce :</span> Accumulez 3000 points d'Ascension pour débloquer la Renaissance et obtenir un multiplicateur permanent !
             </p>
         </div>
     `;
