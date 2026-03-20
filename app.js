@@ -3,6 +3,9 @@
  */
 
 // Configuration
+const REBIRTH_THRESHOLD = 2000; // Points d'ascension requis pour la renaissance
+const ASC_RATE = 2;             // Points d'ascension gagnés par 10 crédits
+
 const CONFIG = {
     THEMES: ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444'],
     ICON_POOL: [
@@ -18,8 +21,8 @@ const CONFIG = {
         { min: 0, n: "Novice", r: "Rang I", i: "1", desc: "Le début de votre voyage" },
         { min: 100, n: "Apprenti", r: "Rang II", i: "2", desc: "Vous apprenez les bases" },
         { min: 500, n: "Adepte", r: "Rang III", i: "3", desc: "Votre discipline s'affine" },
-        { min: 1500, n: "Expert", r: "Rang IV", i: "4", desc: "Maîtrise reconnue" },
-        { min: 3000, n: "Maître", r: "Rang V", i: "5", desc: "Excellence incarnée" },
+        { min: 1000, n: "Expert", r: "Rang IV", i: "4", desc: "Maîtrise reconnue" },
+        { min: REBIRTH_THRESHOLD, n: "Maître", r: "Rang V", i: "5", desc: "Excellence incarnée" },
     ],
     CREDIT: {
         type: 'image', // 'image' ou 'icon'
@@ -768,7 +771,7 @@ function renderDailyCard() {
 function renderShop() {
     const container = document.getElementById('shop-items-container');
 
-    if (state.ascensionPoints >= 3000) {
+    if (state.ascensionPoints >= REBIRTH_THRESHOLD) {
         container.innerHTML = `
             <div class="relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-orange-900/50 border-2 border-purple-500/30">
                 <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 animate-pulse"></div>
@@ -798,12 +801,15 @@ function renderShop() {
         return;
     }
 
-    // Taux : 1 ASC = 10 crédits
-    const ASC_RATE = 10;
-    const maxAffordable = Math.floor(state.coins / ASC_RATE);
-    const remaining = 3000 - state.ascensionPoints;
-    const maxBuy = Math.max(1, Math.min(maxAffordable, remaining));
+    // Taux : ASC_RATE ASC par 10 crédits
+    // Le slider représente des paliers de 10 crédits
+    const maxPaliers = Math.floor(state.coins / 10);
+    const remaining = REBIRTH_THRESHOLD - state.ascensionPoints;
+    const maxPaliersForRemaining = Math.ceil(remaining / ASC_RATE);
+    const maxBuy = Math.max(1, Math.min(maxPaliers, maxPaliersForRemaining));
     const initialVal = Math.max(1, Math.min(10, maxBuy));
+    const initialAsc = initialVal * ASC_RATE;
+    const initialCost = initialVal * 10;
 
     container.innerHTML = `
         <div class="mb-6 glass p-6 rounded-2xl border border-white/10">
@@ -813,7 +819,7 @@ function renderShop() {
                     <div class="text-2xl font-gaming text-white">
                         ${state.ascensionPoints}
                         <span id="asc-preview-badge" class="text-sm text-cyan-400 opacity-0 transition-opacity duration-300"></span>
-                        <span class="text-sm text-slate-500">/ 3000</span>
+                        <span class="text-sm text-slate-500">/ ${REBIRTH_THRESHOLD}</span>
                     </div>
                 </div>
                 <div class="text-right">
@@ -822,8 +828,8 @@ function renderShop() {
                 </div>
             </div>
             <div class="relative h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
-                <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / 3000) * 100}%"></div>
-                <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 transition-all duration-300" style="left:${(state.ascensionPoints / 3000) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
+                <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%"></div>
+                <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 transition-all duration-300" style="left:${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
             </div>
         </div>
 
@@ -836,7 +842,7 @@ function renderShop() {
                 <p class="text-[11px] text-slate-400">Choisissez le nombre de points d'Ascension à acquérir</p>
             </div>
 
-            ${maxAffordable === 0 ? `
+            ${maxPaliers === 0 ? `
                 <div class="text-center inline-flex bg-red-500 rounded-md gap-1 m-auto justify-center items-center text-center w-full py-3">
                     <i class="fa-solid fa-warning text-1xl"></i>
                     <p class="text-sm text-neutral-100">Crédits insuffisants. Complétez des objectifs pour en gagner.</p>
@@ -845,25 +851,25 @@ function renderShop() {
                 <div class="mb-8">
                     <div class="flex items-end justify-between mb-3">
                         <span class="text-[10px] text-slate-500 uppercase font-bold">Points sélectionnés</span>
-                        <span id="slider-asc-val" class="font-gaming text-3xl text-primary">+${initialVal} ASC</span>
+                        <span id="slider-asc-val" class="font-gaming text-3xl text-primary">+${initialAsc} ASC</span>
                     </div>
                     <input id="asc-slider" type="range" min="1" max="${maxBuy}" value="${initialVal}"
                         class="w-full h-2 rounded-full appearance-none cursor-pointer accent-cyan-500"
                         oninput="updateAscSlider(this.value)">
                     <div class="flex justify-between mt-1">
-                        <span class="text-[9px] text-slate-600">1 ASC</span>
-                        <span class="text-[9px] text-slate-600">${maxBuy} ASC</span>
+                        <span class="text-[9px] text-slate-600">${ASC_RATE} ASC</span>
+                        <span class="text-[9px] text-slate-600">${maxBuy * ASC_RATE} ASC</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900/60 rounded-2xl p-5 mb-6 grid grid-cols-3 gap-4 text-center">
                     <div>
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Coût :</div>
-                        <div id="slider-cost" class="font-gaming inline-flex justify-center items-center gap-1 text-base text-yellow-400">${initialVal * ASC_RATE} ${getCreditIcon('sm')}</div>
+                        <div id="slider-cost" class="font-gaming inline-flex justify-center items-center gap-1 text-base text-yellow-400">${initialCost} ${getCreditIcon('sm')}</div>
                     </div>
                     <div>
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Crédits restant :</div>
-                        <div id="slider-remaining" class="font-gaming gap-1 justify-center items-center inline-flex text-base text-slate-300">${Math.floor(state.coins) - initialVal * ASC_RATE} ${getCreditIcon('sm')}</div>
+                        <div id="slider-remaining" class="font-gaming gap-1 justify-center items-center inline-flex text-base text-slate-300">${Math.floor(state.coins) - initialCost} ${getCreditIcon('sm')}</div>
                     </div>
                 </div>
 
@@ -877,7 +883,7 @@ function renderShop() {
         <div class="mt-6 glass p-5 rounded-2xl border border-white/10 text-center">
             <i class="fa-solid fa-lightbulb text-yellow-500 text-xl mb-2"></i>
             <p class="text-xs text-slate-400">
-                <span class="font-bold text-white">Taux :</span> 10 crédits = 1 point d'Ascension &nbsp;·&nbsp; Objectif : 3000 ASC pour la Renaissance
+                <span class="font-bold text-white">Taux :</span> 10 crédits = ${ASC_RATE} point${ASC_RATE > 1 ? 's' : ''} d'Ascension &nbsp;·&nbsp; Objectif : ${REBIRTH_THRESHOLD} ASC pour la Renaissance
             </p>
         </div>
     `;
@@ -1046,16 +1052,16 @@ function buyAscension(cost, gain) {
 }
 
 function updateAscSlider(val) {
-    const ASC_RATE = 10;
-    const v = parseInt(val);
-    const cost = v * ASC_RATE;
-    document.getElementById('slider-asc-val').textContent = `+${v} ASC`;
+    const paliers = parseInt(val);
+    const asc = paliers * ASC_RATE;
+    const cost = paliers * 10;
+    document.getElementById('slider-asc-val').textContent = `+${asc} ASC`;
     document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
     document.getElementById('slider-remaining').innerHTML = `${Math.floor(state.coins) - cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
 
     // Preview sur la progress bar
-    const currentPct = (state.ascensionPoints / 3000) * 100;
-    const gainPct = (v / 3000) * 100;
+    const currentPct = (state.ascensionPoints / REBIRTH_THRESHOLD) * 100;
+    const gainPct = (asc / REBIRTH_THRESHOLD) * 100;
     const previewBar = document.getElementById('asc-preview-bar');
     const badge = document.getElementById('asc-preview-badge');
     if (previewBar) {
@@ -1078,11 +1084,11 @@ function updateAscSlider(val) {
 }
 
 function buyAscensionSlider() {
-    const ASC_RATE = 10;
     const slider = document.getElementById('asc-slider');
     if (!slider) return;
-    const gain = parseInt(slider.value);
-    const cost = gain * ASC_RATE;
+    const paliers = parseInt(slider.value);
+    const gain = paliers * ASC_RATE;
+    const cost = paliers * 10;
     if (state.coins >= cost) {
         state.coins -= cost;
         state.ascensionPoints += gain;
