@@ -4,7 +4,7 @@
 
 // Configuration
 const REBIRTH_THRESHOLD = 2000; // Points d'ascension requis pour la renaissance
-const ASC_RATE = 2;             // Points d'ascension gagnés par 10 crédits
+const ASC_RATE = 4;             // Points d'ascension gagnés par 10 crédits
 
 const CONFIG = {
     THEMES: ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444'],
