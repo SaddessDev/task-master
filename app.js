@@ -364,8 +364,11 @@ function getDateGroup(timestamp) {
 
 // ===== GESTION DES MODALES =====
 
+let activeModalId = null; // Modal actuellement ouverte
+
 function openModal(id) {
     document.getElementById(id).classList.add('active');
+    activeModalId = id;
     if (id === 'modal-config') {
         activeConfigTab = 'categories';
         renderConfigModal();
@@ -374,11 +377,13 @@ function openModal(id) {
 
 function closeModal(id) {
     document.getElementById(id).classList.remove('active');
+    if (activeModalId === id) activeModalId = null;
     if (id === 'modal-config') {
         resetCatForm();
         editingCategory = null;
     }
 }
+
 
 // ===== RENDU DE L'INTERFACE =====
 
@@ -829,7 +834,7 @@ function renderShop() {
             </div>
             <div class="relative h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
                 <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%"></div>
-                <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 transition-all duration-300" style="left:${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
+                <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 animate-pulse transition-all duration-300" style="left:${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
             </div>
         </div>
 
@@ -1077,7 +1082,7 @@ function updateAscSlider(val) {
         previewBar.style.borderRadius = br;
     }
     if (badge) {
-        badge.textContent = `+${v}`;
+        badge.textContent = `+${asc}`;
         badge.classList.remove('opacity-0');
         badge.classList.add('opacity-100');
     }
@@ -1807,6 +1812,18 @@ window.addEventListener('DOMContentLoaded', () => {
     render();
     initFilterBarDrag();
 
+    // Fermer la modal active avec Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && activeModalId) closeModal(activeModalId);
+    });
+
+    // Fermer la modal active en cliquant sur le backdrop (hors du contenu)
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(modal.id);
+        });
+    });
+
     // Vérification en temps réel du lock des quests (toutes les 30s)
     setInterval(() => {
         const hasLockable = state.quests.some(q => q.done && q.completedAt && !isQuestLocked(q));
@@ -2005,9 +2022,9 @@ function renderPeaceTypeList() {
     typeList.innerHTML = types.map(type => `
         <button onclick="selectPeaceType('${type.value}', '${type.label}', '${type.icon}', '${type.color}')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800/50 transition-all text-left group">
             <div class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style="background: ${type.color}33;">
-                <i class="fa-solid ${type.icon} text-xs" style="color: ${type.color};"></i>
+                <i class="fa-solid ${type.icon} text-md" style="color: ${type.color};"></i>
             </div>
-            <span class="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">${type.label}</span>
+            <span class="text-md font-semibold text-slate-300 group-hover:text-white transition-colors">${type.label}</span>
         </button>
     `).join('');
 }
