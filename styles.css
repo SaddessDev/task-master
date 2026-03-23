@@ -34,7 +34,13 @@ body {
 
 .modal.active { 
     display: flex; 
-    animation: fadeIn 0.3s ease; 
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; 
+}
+
+.modal.closing {
+    display: flex;
+    animation: modalOut 0.2s ease-in both;
+    pointer-events: none;
 }
 
 @keyframes pop { 
@@ -69,6 +75,16 @@ body {
         opacity: 1; 
         transform: scale(1) translateY(0); 
     } 
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(16px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes modalOut {
+    from { opacity: 1; transform: scale(1)    translateY(0); }
+    to   { opacity: 0; transform: scale(0.95) translateY(12px); }
 }
 
 @keyframes float {
@@ -846,4 +862,24 @@ input[type="range"]#asc-slider::-webkit-slider-thumb {
 }
 input[type="range"]#asc-slider::-webkit-slider-thumb:hover {
     transform: scale(1.2);
+}
+
+/* Chronos datetime input */
+input[type="datetime-local"] {
+    color-scheme: dark;
+}
+
+/* Page transitions */
+.page-content {
+    animation: pageIn 0.25s ease both;
+}
+
+.page-content.hidden {
+    display: none;
+    animation: none;
+}
+
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

@@ -376,12 +376,17 @@ function openModal(id) {
 }
 
 function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    if (activeModalId === id) activeModalId = null;
-    if (id === 'modal-config') {
-        resetCatForm();
-        editingCategory = null;
-    }
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('closing');
+    setTimeout(() => {
+        el.classList.remove('active', 'closing');
+        if (activeModalId === id) activeModalId = null;
+        if (id === 'modal-config') {
+            resetCatForm();
+            editingCategory = null;
+        }
+    }, 200);
 }
 
 
@@ -1173,7 +1178,7 @@ function renderCategoryManager() {
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Couleur</p>
             <div id="color-picker" class="grid grid-cols-12 gap-2 mb-4"></div>
             <div class="flex gap-2">
-                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." class="flex-1 bg-slate-800/80 border border-white/8 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none placeholder-slate-600 transition-all">
+                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." class="flex-1 bg-slate-800/80 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none placeholder-slate-600 transition-all">
                 <button onclick="saveCategory()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                     <i class="fa-solid ${editingCategory ? 'fa-check' : 'fa-plus'}"></i>
                 </button>
@@ -1230,7 +1235,7 @@ function renderDailyManager() {
     const formHtml = `
         <div class="bg-slate-900/80 p-5 rounded-[2rem] border border-white/10">
             <div class="flex gap-2 mb-3">
-                <input type="text" id="new-daily-input" placeholder="Nouvel objectif régulier..." class="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none">
+                <input type="text" id="new-daily-input" placeholder="Nouvel objectif régulier..." class="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary outline-none">
             </div>
             <div class="flex gap-2">
                 <div class="relative flex-1">
@@ -1890,7 +1895,8 @@ function navigateTo(page) {
         dashboard:    'Objectifs',
         peace:        'Apaisement',
         notes:        'Notes',
-        achievements: 'Succès'
+        achievements: 'Succès',
+        chronos:      'Chronos'
     };
     document.title = `Ascendora | ${pageTitles[page] || page}`;
 
@@ -1908,6 +1914,8 @@ function navigateTo(page) {
         updateNotesCount();
     } else if (page === 'achievements') {
         renderAchievements();
+    } else if (page === 'chronos') {
+        renderChronos();
     }
     
     // Mettre à jour la bottom nav + sidebar avec la couleur de la page
@@ -1915,9 +1923,14 @@ function navigateTo(page) {
         dashboard: '#06b6d4',
         peace: '#ec4899',
         notes: '#8b5cf6',
-        achievements: '#fbbf24'
+        achievements: '#fbbf24',
+        chronos: '#f97316'
     };
     const color = pageColors[page] || 'var(--c-primary)';
+
+    // Mettre à jour --c-primary pour que text-primary/border-primary/etc. suivent la couleur de la page
+    const rebirthColor = CONFIG.THEMES[state.rebirths % CONFIG.THEMES.length];
+    document.documentElement.style.setProperty('--c-primary', pageColors[page] || rebirthColor);
 
     // Sidebar
     document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -2719,5 +2732,311 @@ function renderAchievements() {
         `;
         container.appendChild(sectionTitle);
         locked.forEach(a => container.appendChild(buildCard(a)));
+    }
+}
+
+
+// ===== CHRONOS =====
+
+let chronosCountdownInterval = null;
+
+let chronosEditingId = null; // null = création, sinon id de l'event édité
+
+function openChronosAdd() {
+    chronosEditingId = null;
+    document.getElementById('chronos-name-input').value = '';
+    document.getElementById('chronos-date-input').value = '';
+    document.getElementById('chronos-tasks-input').value = '';
+    document.getElementById('chronos-modal-title').textContent = 'Nouvel événement';
+    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-plus text-white text-sm';
+    document.getElementById('chronos-submit-label').innerHTML = '<i class="fa-solid fa-plus"></i> Créer l\'événement';
+    openModal('modal-chronos-add');
+}
+
+function openChronosEdit(id) {
+    const ev = state.chronosEvents.find(e => e.id === id);
+    if (!ev) return;
+    chronosEditingId = id;
+
+    document.getElementById('chronos-name-input').value = ev.name;
+    const d = new Date(ev.deadline);
+    // format datetime-local : YYYY-MM-DDTHH:MM
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('chronos-date-input').value =
+        `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    document.getElementById('chronos-tasks-input').value = ev.tasks.map(t => t.text).join('\n');
+    document.getElementById('chronos-modal-title').textContent = 'Modifier l\'événement';
+    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-pen text-white text-sm';
+    document.getElementById('chronos-submit-label').innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer';
+    openModal('modal-chronos-add');
+}
+
+function submitChronosEvent() {
+    const name = document.getElementById('chronos-name-input').value.trim();
+    const dateVal = document.getElementById('chronos-date-input').value;
+    const tasksRaw = document.getElementById('chronos-tasks-input').value;
+
+    if (!name || !dateVal) { fx('modal-chronos-add', 'animate-shake'); return; }
+    const deadline = new Date(dateVal).getTime();
+    if (deadline <= Date.now() && !chronosEditingId) { fx('modal-chronos-add', 'animate-shake'); return; }
+
+    if (!state.chronosEvents) state.chronosEvents = [];
+
+    if (chronosEditingId) {
+        const ev = state.chronosEvents.find(e => e.id === chronosEditingId);
+        if (ev) {
+            ev.name = name;
+            ev.deadline = deadline;
+            // Conserver les tâches existantes avec leur état done, ajouter les nouvelles
+            const newTexts = tasksRaw.split('\n').map(t => t.trim()).filter(Boolean);
+            ev.tasks = newTexts.map(text => {
+                const existing = ev.tasks.find(t => t.text === text);
+                return existing || { id: Date.now() + Math.random(), text, done: false };
+            });
+        }
+    } else {
+        const tasks = tasksRaw.split('\n').map(t => t.trim()).filter(Boolean)
+            .map(t => ({ id: Date.now() + Math.random(), text: t, done: false }));
+        state.chronosEvents.push({ id: Date.now(), name, deadline, tasks, archived: false, completedAt: null, rewardClaimed: false });
+    }
+
+    saveState();
+    closeModal('modal-chronos-add');
+    renderChronos();
+}
+
+function addChronosEvent() { submitChronosEvent(); } // compat
+
+function toggleChronosTask(eventId, taskId) {
+    const ev = state.chronosEvents.find(e => e.id === eventId);
+    if (!ev || ev.archived) return;
+
+    const task = ev.tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    task.done = !task.done;
+
+    const mult = getMultiplier();
+    const reward = Math.round(10 * mult);
+
+    if (task.done) {
+        state.xp += reward;
+        state.coins += reward;
+        createCoinParticles(reward, 'chronos-coins-display');
+        animateNumberIncrement('chronos-coins-display', state.coins - reward, state.coins);
+        fx('chronos-coins-display', 'animate-pop');
+
+        // Vérifier si tout est complété avant deadline → bonus x2
+        const allDone = ev.tasks.every(t => t.done);
+        if (allDone && Date.now() < ev.deadline && !ev.rewardClaimed) {
+            ev.rewardClaimed = true;
+            ev.completedAt = Date.now();
+            const bonus = Math.round(100 * mult);
+            state.xp += bonus;
+            state.coins += bonus;
+            showChronosBonus(bonus);
+        }
+    } else {
+        state.xp = Math.max(0, state.xp - reward);
+        state.coins = Math.max(0, state.coins - reward);
+    }
+
+    saveState();
+    renderChronos();
+    checkAchievements();
+}
+
+function deleteChronosEvent(id) {
+    state.chronosEvents = state.chronosEvents.filter(e => e.id !== id);
+    saveState();
+    renderChronos();
+}
+
+function showChronosBonus(amount) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[300] glass px-6 py-3 rounded-2xl border border-orange-500/40 bg-orange-500/10 text-orange-400 font-black text-sm uppercase tracking-widest flex items-center gap-3 animate-bounce';
+    toast.innerHTML = `<i class="fa-solid fa-star"></i> Bonus deadline ! +${amount} crédits`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function formatCountdown(ms) {
+    if (ms <= 0) return { label: 'Expiré', urgent: 2 };
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+
+    let label, urgent = 0;
+    if (d > 0) label = `J-${d}`;
+    else if (h > 0) label = `${h}h ${m % 60}min`;
+    else label = `${m}min ${s % 60}s`;
+
+    if (ms < 3600000) urgent = 2;       // < 1h : rouge
+    else if (ms < 86400000) urgent = 1; // < 24h : orange
+
+    return { label, urgent };
+}
+
+function renderChronos() {
+    if (!state.chronosEvents) state.chronosEvents = [];
+
+    // Archiver les événements expirés
+    state.chronosEvents.forEach(ev => {
+        if (!ev.archived && Date.now() > ev.deadline) {
+            ev.archived = true;
+            // Événement sans tâches → considéré comme finalisé avec récompense
+            if (ev.tasks.length === 0 && !ev.rewardClaimed) {
+                ev.rewardClaimed = true;
+                ev.completedAt = ev.deadline;
+                const bonus = Math.round(50 * getMultiplier());
+                state.coins += bonus;
+                state.xp += bonus;
+                showChronosBonus(bonus);
+            }
+            saveState();
+        }
+    });
+
+    const active = state.chronosEvents.filter(e => !e.archived).sort((a, b) => a.deadline - b.deadline);
+    const archived = state.chronosEvents.filter(e => e.archived).sort((a, b) => b.deadline - a.deadline);
+
+    // Count + coins display
+    const countEl = document.getElementById('chronos-count');
+    if (countEl) countEl.textContent = `${active.length} événement${active.length !== 1 ? 's' : ''} actif${active.length !== 1 ? 's' : ''}`;
+    const coinsEl = document.getElementById('chronos-coins-display');
+    if (coinsEl) coinsEl.textContent = Math.floor(state.coins);
+    const coinIconEl = document.getElementById('chronos-coin-icon');
+    if (coinIconEl) coinIconEl.innerHTML = getCreditIcon('sm', 'text-yellow-500');
+
+    // Active list
+    const list = document.getElementById('chronos-list');
+    if (!list) return;
+
+    if (active.length === 0) {
+        list.innerHTML = `<div class="text-center py-16 text-slate-500">
+            <i class="fa-solid fa-hourglass-start text-4xl mb-4 opacity-30"></i>
+            <p class="text-sm">Aucun événement actif.</p>
+        </div>`;
+    } else {
+        list.innerHTML = active.map(ev => {
+            const ms = ev.deadline - Date.now();
+            const { label, urgent } = formatCountdown(ms);
+            const done = ev.tasks.filter(t => t.done).length;
+            const total = ev.tasks.length;
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            const allDone = total > 0 && done === total;
+
+            const borderColor = urgent === 2 ? 'rgba(239,68,68,0.35)' : urgent === 1 ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.07)';
+            const glowColor  = urgent === 2 ? 'rgba(239,68,68,0.08)' : urgent === 1 ? 'rgba(249,115,22,0.06)' : 'transparent';
+            const countdownColor = urgent === 2 ? '#f87171' : urgent === 1 ? '#fb923c' : 'var(--c-primary)';
+            const statusIcon = allDone
+                ? '<i class="fa-solid fa-circle-check text-green-400"></i>'
+                : urgent === 2
+                    ? '<i class="fa-solid fa-triangle-exclamation text-red-400 animate-pulse"></i>'
+                    : '<i class="fa-solid fa-hourglass-half text-primary"></i>';
+
+            return `
+            <div class="relative rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.01]"
+                style="background: rgba(15,23,42,0.7); border: 1px solid ${borderColor}; box-shadow: 0 0 30px ${glowColor}, 0 4px 20px rgba(0,0,0,0.3); backdrop-filter: blur(20px);">
+
+                <!-- Top accent line -->
+                <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-current to-transparent opacity-60" style="color:${countdownColor}"></div>
+
+                <div class="p-5">
+                    <!-- Header row -->
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="flex-shrink-0 mt-0.5">${statusIcon}</div>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-white text-sm leading-tight truncate">${escapeHtml(ev.name)}</h3>
+                                <div class="text-[10px] text-slate-500 mt-0.5">
+                                    <i class="fa-regular fa-calendar mr-1"></i>
+                                    ${new Date(ev.deadline).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <!-- Countdown badge -->
+                            <div class="px-3 py-1.5 rounded-xl text-xs font-gaming font-black chronos-countdown"
+                                data-deadline="${ev.deadline}"
+                                style="background: ${countdownColor}18; color: ${countdownColor}; border: 1px solid ${countdownColor}30">
+                                ${label}
+                            </div>
+                            <!-- Actions -->
+                            <button onclick="openChronosEdit(${ev.id})" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-primary/20 text-slate-500 hover:text-primary transition-all flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteChronosEvent(${ev.id})" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-all flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    ${total > 0 ? `
+                    <!-- Progress -->
+                    <div class="mb-3">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">${done}/${total} sous-tâches</span>
+                            <span class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
+                        </div>
+                        <div class="h-1 bg-slate-900 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-700"
+                                style="width:${pct}%; background: linear-gradient(90deg, var(--c-primary), #a855f7)"></div>
+                        </div>
+                    </div>
+                    <!-- Tasks -->
+                    <div class="space-y-1.5">
+                        ${ev.tasks.map(task => `
+                        <div onclick="toggleChronosTask(${ev.id}, ${task.id})"
+                            class="group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all hover:bg-white/5 ${task.done ? 'opacity-40' : ''}">
+                            <div class="w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center transition-all
+                                ${task.done ? 'bg-green-500/30 border border-green-500/50' : 'border border-white/15 group-hover:border-primary/40'}">
+                                ${task.done ? '<i class="fa-solid fa-check text-green-400" style="font-size:8px"></i>' : ''}
+                            </div>
+                            <span class="text-xs flex-1 ${task.done ? 'line-through text-slate-600' : 'text-slate-300'}">${escapeHtml(task.text)}</span>
+                            ${!task.done ? `<span class="text-[9px] text-slate-700 group-hover:text-slate-500 transition-colors">+${Math.round(10 * getMultiplier())} <i class="fa-solid fa-coins text-[8px]"></i></span>` : ''}
+                        </div>`).join('')}
+                    </div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // Archives
+    const archivesList = document.getElementById('chronos-archives-list');
+    if (archivesList) {
+        if (archived.length === 0) {
+            archivesList.innerHTML = '<p class="italic text-xs text-slate-600">Aucune archive.</p>';
+        } else {
+            archivesList.innerHTML = archived.slice(0, 5).map(ev => {
+                const done = ev.tasks.filter(t => t.done).length;
+                const total = ev.tasks.length;
+                const success = ev.rewardClaimed;
+                return `<div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs text-slate-400 truncate">${escapeHtml(ev.name)}</div>
+                        <div class="text-[9px] text-slate-600">${total > 0 ? `${done}/${total} · ` : ''}${new Date(ev.deadline).toLocaleDateString('fr-FR')}</div>
+                    </div>
+                    <i class="fa-solid ${success ? 'fa-circle-check text-green-500' : 'fa-circle-xmark text-red-500/50'} ml-3 flex-shrink-0"></i>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // Relancer le ticker des countdowns
+    if (chronosCountdownInterval) clearInterval(chronosCountdownInterval);
+    if (active.length > 0) {
+        chronosCountdownInterval = setInterval(() => {
+            document.querySelectorAll('.chronos-countdown').forEach(el => {
+                const deadline = parseInt(el.dataset.deadline);
+                const { label, urgent } = formatCountdown(deadline - Date.now());
+                const color = urgent === 2 ? '#f87171' : urgent === 1 ? '#fb923c' : 'var(--c-primary)';
+                el.textContent = label;
+                el.style.color = color;
+                el.style.background = color + '18';
+                el.style.borderColor = color + '30';
+            });
+        }, 1000);
     }
 }

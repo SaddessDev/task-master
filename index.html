@@ -25,7 +25,7 @@
                     <img src="assets/dark_Logo.png" alt="Ascendora logo">
                 </div>
                 <div>
-                    <h2 class="font-gaming text-xl font-black uppercase text-white">Ascendora</h2>
+                    <h2 class="font-gaming text-xl font-black uppercase text-white">Ascendora</span></h2>
                 </div>
             </div>
 
@@ -51,15 +51,12 @@
                     <i class="fa-solid fa-trophy text-lg"></i>
                     <span>Succès</span>
                 </a>
-            </nav>
-
-            <div class="border-t border-white/10 pt-4 space-y-2">
-                <a onclick="openModal('modal-info')"
-                    class="sidebar-link flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                    <i class="fa-solid fa-question-circle text-lg"></i>
-                    <span>Informations</span>
+                <a onclick="navigateTo('chronos')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-hourglass-half text-lg"></i>
+                    <span>Chronos</span>
                 </a>
-            </div>
+            </nav>
         </aside>
 
         <!-- Main content -->
@@ -530,6 +527,71 @@
                     </aside>
                 </div>
             </div>
+
+            <!-- Chronos Page -->
+            <div id="chronos-page" class="page-content hidden">
+                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-hourglass-half text-3xl text-primary"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Chronos <span class="text-primary">Événements</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest" id="chronos-count">0 événement actif</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20">
+                            <span id="chronos-coins-display" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
+                            <span id="chronos-coin-icon"></span>
+                        </div>
+                        <button onclick="openChronosAdd()"
+                            class="bg-primary/10 border border-primary/30 text-primary px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nouvel événement</span><span class="sm:hidden">Nouveau</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="grid xl:grid-cols-12 gap-6">
+                    <main class="xl:col-span-8 space-y-4" id="chronos-list">
+                        <div class="text-center py-16 text-slate-500">
+                            <i class="fa-solid fa-hourglass-start text-4xl mb-4 opacity-30"></i>
+                            <p class="text-sm">Aucun événement. Créez-en un pour commencer.</p>
+                        </div>
+                    </main>
+                    <aside class="xl:col-span-4 space-y-4">
+                        <div class="glass p-6 rounded-[2rem] border-white/5 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-40"></div>
+                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-primary mb-4">Comment ça marche</h3>
+                            <div class="space-y-3 text-xs text-slate-400">
+                                <div class="flex gap-3 items-start">
+                                    <i class="fa-solid fa-calendar-plus text-primary mt-0.5 flex-shrink-0"></i>
+                                    <span>Créez un événement avec une date cible et des sous-tâches à compléter.</span>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <i class="fa-solid fa-bolt text-yellow-500 mt-0.5 flex-shrink-0"></i>
+                                    <span>Chaque sous-tâche complétée rapporte <strong class="text-white">XP + crédits</strong>.</span>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <i class="fa-solid fa-star text-orange-400 mt-0.5 flex-shrink-0"></i>
+                                    <span>Tout compléter <strong class="text-white">avant la deadline</strong> donne un bonus x2.</span>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <i class="fa-solid fa-skull text-red-400 mt-0.5 flex-shrink-0"></i>
+                                    <span>Passé la date, l'événement est archivé et les récompenses sont perdues.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass p-6 rounded-[2rem] border-white/5" id="chronos-archives-panel">
+                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Archives</h3>
+                            <div id="chronos-archives-list" class="space-y-2 text-xs text-slate-500">
+                                <p class="italic">Aucune archive.</p>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -658,133 +720,6 @@
         </div>
     </div>
 
-    <div id="modal-info" class="modal">
-        <div class="glass p-6 xl:p-8 rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-gaming text-xl select-none font-black uppercase text-primary flex items-center gap-3">
-                    <i class="fa-solid fa-info-circle"></i>
-                    Informations
-                </h3>
-                <button onclick="closeModal('modal-info')"
-                    class="text-slate-500 hover:text-white select-none text-3xl transition-colors">×</button>
-            </div>
-
-            <div class="space-y-5 text-sm">
-
-                <div class="bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-2xl p-4">
-                    <p class="text-slate-300 leading-relaxed">
-                        <span class="font-black text-white">Ascendora</span> est une application de productivité
-                        personnelle gamifiée. Chaque action accomplie vous rapporte des crédits, fait évoluer votre rang
-                        et débloque des succès. Tout reste privé — aucune donnée ne quitte votre appareil.
-                    </p>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-[#06b6d4] uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-list-check"></i> Objectifs
-                    </h4>
-                    <div class="space-y-2 text-slate-400">
-                        <p>Créez des objectifs classés par catégories personnalisables. Cochez-les pour gagner des
-                            crédits selon votre multiplicateur d'ascension.</p>
-                        <p>Les <strong class="text-slate-300">objectifs quotidiens</strong> se réinitialisent chaque
-                            jour à minuit. Compléter tous vos quotidiens en une journée déclenche un bonus de streak et
-                            des crédits supplémentaires.</p>
-                        <p class="text-xs bg-slate-800/60 rounded-lg px-3 py-2 border border-white/5">
-                            <i class="fa-solid fa-lock text-yellow-500 mr-1.5"></i>
-                            <strong class="text-slate-300">Anti-abus :</strong> un objectif validé se verrouille
-                            automatiquement après 5 minutes ou dès qu'un achat d'ascension est effectué.
-                        </p>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-yellow-500 uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-star"></i> Ascension & Crédits
-                    </h4>
-                    <div class="space-y-2 text-slate-400">
-                        <p>Les crédits gagnés permettent d'acheter des niveaux d'<strong
-                                class="text-slate-300">Ascension</strong> via le menu Évolution. Chaque niveau augmente
-                            le multiplicateur de gains sur vos objectifs.</p>
-                        <p>Votre <strong class="text-slate-300">rang</strong> évolue automatiquement selon votre niveau
-                            d'ascension. Le <strong class="text-slate-300">streak</strong> comptabilise vos jours
-                            consécutifs de complétion des quotidiens.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-[#ec4899] uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-heart"></i> Sac d'apaisement
-                    </h4>
-                    <div class="space-y-2 text-slate-400">
-                        <p>Écrivez ce qui vous angoisse, choisissez un type (anxiété, stress, peur…) et ajoutez-le à la
-                            liste.</p>
-                        <p><strong class="text-slate-300">Envoyer au sac</strong> joue une animation symbolique — sur
-                            mobile via une modal plein écran. <strong class="text-slate-300">Brûler</strong> libère
-                            définitivement vos angoisses avec une animation de flammes.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-[#8b5cf6] uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-sticky-note"></i> Notes personnelles
-                    </h4>
-                    <p class="text-slate-400">Capturez vos idées et réflexions. Appuyez sur une note pour la modifier,
-                        ou sur la corbeille pour la supprimer. Les notes sont triées de la plus récente à la plus
-                        ancienne.</p>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-[#fbbf24] uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-trophy"></i> Succès
-                    </h4>
-                    <div class="space-y-2 text-slate-400">
-                        <p>Des succès se débloquent selon vos actions : objectifs créés, quotidiens complétés, streak
-                            maintenu, peurs brûlées, notes écrites, rangs atteints…</p>
-                        <p>Chaque succès affiche une <strong class="text-slate-300">icône de difficulté</strong> — de <i
-                                class="fa-solid fa-leaf text-[#10b981]"></i> (facile) à <i
-                                class="fa-solid fa-crown text-[#a855f7]"></i> (extrême). Certains ont leur description
-                            masquée <strong class="text-slate-300">(????)</strong> jusqu'au déblocage.</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2 text-xs">
-                        <i class="fa-solid fa-shield-alt"></i> Confidentialité
-                    </h4>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
-                            <i class="fa-solid fa-database text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Local
-                                    uniquement</strong> — tout est dans votre navigateur.</span>
-                        </div>
-                        <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
-                            <i class="fa-solid fa-server text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Aucun serveur</strong> —
-                                rien n'est envoyé à l'extérieur.</span>
-                        </div>
-                        <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
-                            <i class="fa-solid fa-eye-slash text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Pas de tracking</strong>
-                                — aucune donnée personnelle collectée.</span>
-                        </div>
-                        <div class="bg-slate-800/50 rounded-xl p-3 border border-white/5 flex items-start gap-2">
-                            <i class="fa-solid fa-trash text-primary text-xs mt-0.5 flex-shrink-0"></i>
-                            <span class="text-xs text-slate-400"><strong class="text-slate-300">Suppression</strong> —
-                                effacez tout depuis les Paramètres.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-slate-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between gap-4">
-                    <p class="text-xs text-slate-500">Projet développé par <strong
-                            class="text-slate-400">M3philes</strong> — fourni gratuitement, sans garantie.</p>
-                    <span class="text-[10px] font-gaming text-primary font-bold whitespace-nowrap">V1.6</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Note Edit Modal -->
     <div id="modal-note-edit" class="modal">
         <div class="glass p-6 select-none rounded-[2rem] w-full max-w-lg mx-4 border-white/10">
@@ -803,6 +738,58 @@
                     class="flex-1 glass py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white border border-white/10 transition-colors">Annuler</button>
                 <button onclick="saveNoteEdit()"
                     class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chronos Add Event Modal -->
+    <div id="modal-chronos-add" class="modal">
+        <div class="glass select-none rounded-[2.5rem] w-full max-w-lg mx-4 border-white/10 overflow-hidden">
+            <!-- Header gradient -->
+            <div class="relative p-8 pb-6 bg-gradient-to-br from-primary/10 to-purple-500/10 border-b border-white/5">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-60"></div>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg">
+                            <i id="chronos-modal-icon" class="fa-solid fa-hourglass-half text-white text-sm"></i>
+                        </div>
+                        <h3 id="chronos-modal-title" class="font-gaming text-base font-black uppercase text-white tracking-wider">Nouvel événement</h3>
+                    </div>
+                    <button onclick="closeModal('modal-chronos-add')" class="text-slate-500 hover:text-white text-2xl transition-colors leading-none">&times;</button>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="p-8 space-y-5">
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Nom de l'événement</label>
+                    <input id="chronos-name-input" type="text" maxlength="60" placeholder="Ex: Examen de maths, Visite de Paul..."
+                        class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary placeholder-slate-600 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Date & heure cible</label>
+                    <input id="chronos-date-input" type="datetime-local"
+                        class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary placeholder-slate-600 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">
+                        Sous-tâches
+                        <span class="text-slate-700 normal-case font-normal ml-1">· optionnel, une par ligne</span>
+                    </label>
+                    <textarea id="chronos-tasks-input" rows="4" placeholder="Réviser le chapitre 3&#10;Faire les exercices&#10;Relire les notes..."
+                        class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary outline-none transition-all resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-1">
+                    <button onclick="closeModal('modal-chronos-add')"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-2xl placeholder-slate-600 font-bold text-sm uppercase transition-colors active:scale-95 transition-all">
+                        <i class="fa-solid fa-times mr-2"></i>
+                        Annuler</button>
+                    <button id="chronos-submit-btn" onclick="submitChronosEvent()"
+                        class="flex-2 min-w-[140px] relative overflow-hidden bg-gradient-to-r from-cyan-600 to-purple-500 text-white py-3 px-6 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all">
+                        <span id="chronos-submit-label" class="flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Créer l'événement
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -853,10 +840,10 @@
                 <i class="fa-solid fa-trophy text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Succès</span>
             </button>
-            <button onclick="openModal('modal-info')"
+            <button onclick="navigateTo('chronos')" id="bn-chronos"
                 class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
-                <i class="fa-solid fa-question-circle text-xl"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wide">Info</span>
+                <i class="fa-solid fa-hourglass-half text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wide">Chronos</span>
             </button>
         </div>
     </nav>

@@ -44,7 +44,8 @@ const DB = {
             lastLoginDate: "",
             dailyBonusClaimed: false,
             dailyBonusClaimedAt: null,
-            lastAscensionPurchase: null
+            lastAscensionPurchase: null,
+            chronosEvents: []
         };
     },
 
