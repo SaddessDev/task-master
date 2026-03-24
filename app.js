@@ -392,6 +392,31 @@ function closeModal(id) {
 
 // ===== RENDU DE L'INTERFACE =====
 
+function updateCoinsDisplay() {
+    const coins = Math.floor(Math.max(0, state.coins));
+    const icon = getCreditIcon('sm', 'text-yellow-500');
+
+    // Dashboard
+    const coinsEl = document.getElementById('coins');
+    if (coinsEl) coinsEl.innerText = coins;
+    const coinIconEl = document.getElementById('coin-icon');
+    if (coinIconEl) coinIconEl.innerHTML = icon;
+
+    // Chronos
+    const chronosCoinsEl = document.getElementById('chronos-coins-display');
+    if (chronosCoinsEl) chronosCoinsEl.textContent = coins;
+    const chronosCoinIconEl = document.getElementById('chronos-coin-icon');
+    if (chronosCoinIconEl) chronosCoinIconEl.innerHTML = icon;
+
+    // Mobile
+    const coinsMobile = document.getElementById('coins-mobile');
+    const coinsMobileHeader = document.getElementById('coins-mobile-header');
+    const coinIconMobile = document.getElementById('coin-icon-mobile');
+    if (coinsMobile) coinsMobile.innerText = coins;
+    if (coinsMobileHeader) coinsMobileHeader.innerText = coins;
+    if (coinIconMobile) coinIconMobile.innerHTML = icon;
+}
+
 function render() {
     const mult = getMultiplier();
 
@@ -399,8 +424,7 @@ function render() {
     document.documentElement.style.setProperty('--c-primary', CONFIG.THEMES[state.rebirths % CONFIG.THEMES.length]);
 
     // Mise à jour des statistiques
-    document.getElementById('coins').innerText = Math.floor(Math.max(0, state.coins));
-    document.getElementById('coin-icon').innerHTML = getCreditIcon('sm', 'text-yellow-500');
+    updateCoinsDisplay();
 
     const ascPtsHeaderEl = document.getElementById('asc-pts-header');
     if (ascPtsHeaderEl) ascPtsHeaderEl.innerText = state.ascensionPoints;
@@ -409,7 +433,6 @@ function render() {
     const streakEl = document.getElementById('streak-val');
     if (streakEl) streakEl.innerText = state.streak || 0;
 
-    // Sync valeurs menu mobile
     const coinsMobile = document.getElementById('coins-mobile');
     const streakMobile = document.getElementById('streak-mobile');
     const ascMobile = document.getElementById('asc-mobile');
@@ -2904,11 +2927,7 @@ function renderChronos() {
     // Count + coins display
     const countEl = document.getElementById('chronos-count');
     if (countEl) countEl.textContent = `${active.length} événement${active.length !== 1 ? 's' : ''} actif${active.length !== 1 ? 's' : ''}`;
-    const coinsEl = document.getElementById('chronos-coins-display');
-    if (coinsEl) coinsEl.textContent = Math.floor(state.coins);
-    const coinIconEl = document.getElementById('chronos-coin-icon');
-    if (coinIconEl) coinIconEl.innerHTML = getCreditIcon('sm', 'text-yellow-500');
-
+    updateCoinsDisplay();
     // Active list
     const list = document.getElementById('chronos-list');
     if (!list) return;
