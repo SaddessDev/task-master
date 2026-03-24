@@ -56,6 +56,11 @@
                     <i class="fa-solid fa-hourglass-half text-lg"></i>
                     <span>Chronos</span>
                 </a>
+                <a onclick="navigateTo('forge')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-hammer text-lg"></i>
+                    <span>Forge</span>
+                </a>
             </nav>
         </aside>
 
@@ -592,6 +597,28 @@
                 </div>
             </div>
 
+            <!-- Forge Page -->
+            <div id="forge-page" class="page-content hidden">
+                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-hammer text-3xl text-primary"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Forge de l'<span class="text-primary">Ascension</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Construisez et améliorez vos modules</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20">
+                            <span id="forge-coins-display" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
+                            <span id="forge-coin-icon"></span>
+                        </div>
+                    </div>
+                </header>
+                <div id="forge-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6"></div>
+            </div>
+
         </div>
     </div>
 
@@ -844,6 +871,11 @@
                 class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-hourglass-half text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Chronos</span>
+            </button>
+            <button onclick="navigateTo('forge')" id="bn-forge"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+                <i class="fa-solid fa-hammer text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wide">Forge</span>
             </button>
         </div>
     </nav>

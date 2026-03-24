@@ -45,7 +45,12 @@ const DB = {
             dailyBonusClaimed: false,
             dailyBonusClaimedAt: null,
             lastAscensionPurchase: null,
-            chronosEvents: []
+            chronosEvents: [],
+            forge: {},
+            chronosEventsCreated: 0,
+            chronosEventsCompleted: 0,
+            forgeBuilds: 0,
+            forgeMaxLevel: 0
         };
     },
 

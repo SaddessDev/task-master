@@ -259,6 +259,96 @@
       "obscuration": true,
       "difficulty": 5,
       "condition": { "type": "all_achievements", "value": 1 }
+    },
+    {
+      "id": "chronos_first",
+      "name": "Contre la montre",
+      "description": "Créer votre premier événement Chronos",
+      "icon": "fa-hourglass-half",
+      "color": "#f97316",
+      "obscuration": false,
+      "difficulty": 1,
+      "condition": { "type": "chronos_created", "value": 1 }
+    },
+    {
+      "id": "chronos_5",
+      "name": "Agenda chargé",
+      "description": "Créer 5 événements Chronos",
+      "icon": "fa-calendar-days",
+      "color": "#f97316",
+      "obscuration": true,
+      "difficulty": 2,
+      "condition": { "type": "chronos_created", "value": 5 }
+    },
+    {
+      "id": "chronos_20",
+      "name": "Maître du temps",
+      "description": "Créer 20 événements Chronos",
+      "icon": "fa-clock-rotate-left",
+      "color": "#f97316",
+      "obscuration": true,
+      "difficulty": 4,
+      "condition": { "type": "chronos_created", "value": 20 }
+    },
+    {
+      "id": "chronos_complete_1",
+      "name": "Dans les temps",
+      "description": "Compléter un événement Chronos avant la deadline",
+      "icon": "fa-flag-checkered",
+      "color": "#f97316",
+      "obscuration": false,
+      "difficulty": 2,
+      "condition": { "type": "chronos_completed", "value": 1 }
+    },
+    {
+      "id": "chronos_complete_5",
+      "name": "Ponctualité légendaire",
+      "description": "Compléter 5 événements Chronos avant la deadline",
+      "icon": "fa-trophy",
+      "color": "#f97316",
+      "obscuration": true,
+      "difficulty": 4,
+      "condition": { "type": "chronos_completed", "value": 5 }
+    },
+    {
+      "id": "forge_first",
+      "name": "Premier coup de marteau",
+      "description": "Améliorez votre premier module de la Forge",
+      "icon": "fa-hammer",
+      "color": "#a855f7",
+      "obscuration": false,
+      "difficulty": 1,
+      "condition": { "type": "forge_builds", "value": 1 }
+    },
+    {
+      "id": "forge_5",
+      "name": "Artisan",
+      "description": "Effectuer 5 améliorations dans la Forge",
+      "icon": "fa-screwdriver-wrench",
+      "color": "#a855f7",
+      "obscuration": true,
+      "difficulty": 2,
+      "condition": { "type": "forge_builds", "value": 5 }
+    },
+    {
+      "id": "forge_max_one",
+      "name": "Niveau maximum",
+      "description": "Amener un module au niveau 5",
+      "icon": "fa-star",
+      "color": "#a855f7",
+      "obscuration": true,
+      "difficulty": 4,
+      "condition": { "type": "forge_max_level", "value": 5 }
+    },
+    {
+      "id": "forge_all_max",
+      "name": "Forgeron de l'Ascension",
+      "description": "Amener tous les modules au niveau maximum",
+      "icon": "fa-fire-flame-curved",
+      "color": "#a855f7",
+      "obscuration": true,
+      "difficulty": 5,
+      "condition": { "type": "forge_all_max", "value": 1 }
     }
   ]
 }

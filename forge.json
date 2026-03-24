@@ -1,0 +1,68 @@
+{
+  "modules": [
+    {
+      "id": "nexus",
+      "name": "Nexus de Crédits",
+      "icon": "fa-coins",
+      "color": "#f59e0b",
+      "desc": "Augmente les crédits gagnés sur chaque objectif complété.",
+      "effectLabel": "+{n}% crédits",
+      "effectStep": 10,
+      "levels": [
+        { "cost": 50,   "duration": 30 },
+        { "cost": 150,  "duration": 120 },
+        { "cost": 400,  "duration": 600 },
+        { "cost": 900,  "duration": 3600 },
+        { "cost": 2000, "duration": 21600 }
+      ]
+    },
+    {
+      "id": "forge_asc",
+      "name": "Forge d'Ascension",
+      "icon": "fa-star",
+      "color": "#a855f7",
+      "desc": "Réduit le coût en crédits des points d'ascension.",
+      "effectLabel": "-{n}% coût ascension",
+      "effectStep": 5,
+      "levels": [
+        { "cost": 80,   "duration": 60 },
+        { "cost": 200,  "duration": 300 },
+        { "cost": 500,  "duration": 1800 },
+        { "cost": 1200, "duration": 7200 },
+        { "cost": 2500, "duration": 43200 }
+      ]
+    },
+    {
+      "id": "sanctuaire",
+      "name": "Sanctuaire du Streak",
+      "icon": "fa-fire",
+      "color": "#f97316",
+      "desc": "Augmente le bonus de récompense du streak quotidien.",
+      "effectLabel": "+{n}% bonus streak",
+      "effectStep": 15,
+      "levels": [
+        { "cost": 60,   "duration": 45 },
+        { "cost": 180,  "duration": 180 },
+        { "cost": 450,  "duration": 900 },
+        { "cost": 1000, "duration": 5400 },
+        { "cost": 2200, "duration": 28800 }
+      ]
+    },
+    {
+      "id": "amplificateur",
+      "name": "Amplificateur XP",
+      "icon": "fa-bolt",
+      "color": "#06b6d4",
+      "desc": "Multiplie l'XP gagné sur toutes les actions.",
+      "effectLabel": "+{n}% XP",
+      "effectStep": 8,
+      "levels": [
+        { "cost": 70,   "duration": 40 },
+        { "cost": 190,  "duration": 240 },
+        { "cost": 480,  "duration": 1200 },
+        { "cost": 1100, "duration": 6000 },
+        { "cost": 2400, "duration": 36000 }
+      ]
+    }
+  ]
+}

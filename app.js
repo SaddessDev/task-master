@@ -116,28 +116,14 @@ function createCoinParticles(amount, targetElement) {
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    for (let i = 0; i < 8; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'coin-particle';
-        
-        // Utiliser l'icône de crédit configurée
-        if (CONFIG.CREDIT.type === 'image') {
-            particle.innerHTML = `<img src="${CONFIG.CREDIT.image}" style="width: 20px; height: 20px;">`;
-        } else {
-            particle.innerHTML = `<i class="fa-solid ${CONFIG.CREDIT.icon} text-yellow-500 text-xl"></i>`;
-        }
-        
-        const angle = (Math.PI * 2 * i) / 8;
-        const distance = 50 + Math.random() * 30;
-        const startX = centerX + Math.cos(angle) * distance;
-        const startY = centerY + Math.sin(angle) * distance;
-        
-        particle.style.left = startX + 'px';
-        particle.style.top = startY + 'px';
-        
-        document.body.appendChild(particle);
-        
-        setTimeout(() => particle.remove(), 1000);
+    if (amount > 0) {
+        const label = document.createElement('div');
+        label.className = 'coin-gain-label';
+        label.textContent = `+${Math.floor(amount)}`;
+        label.style.left = centerX + 'px';
+        label.style.top = (centerY - 10) + 'px';
+        document.body.appendChild(label);
+        setTimeout(() => label.remove(), 900);
     }
 }
 
@@ -410,6 +396,12 @@ function updateCoinsDisplay() {
     const chronosCoinIconEl = document.getElementById('chronos-coin-icon');
     if (chronosCoinIconEl) chronosCoinIconEl.innerHTML = icon;
 
+    // Forge
+    const forgeCoinsEl = document.getElementById('forge-coins-display');
+    if (forgeCoinsEl) forgeCoinsEl.textContent = coins;
+    const forgeCoinIconEl = document.getElementById('forge-coin-icon');
+    if (forgeCoinIconEl) forgeCoinIconEl.innerHTML = icon;
+
     // Mobile
     const coinsMobile = document.getElementById('coins-mobile');
     const coinsMobileHeader = document.getElementById('coins-mobile-header');
@@ -679,7 +671,7 @@ function renderQuests(mult) {
         `;
 
         quests.forEach(q => {
-            const reward = Math.floor(50 * mult);
+            const reward = Math.floor(50 * mult * getForgeCoinsMultiplier());
             const category = state.categories.find(c => c.name === q.cat);
             const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
             const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
@@ -712,6 +704,7 @@ function renderQuests(mult) {
                     </div>
                     <div class="text-right flex flex-col items-end gap-2">
                          <div class="text-xs select-none font-gaming text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-lg align-center m-auto justify-center inline-flex gap-1">+${reward} ${getCreditIcon('sm')}</div>
+                         ${getForgeState('nexus').level > 0 ? `<div class="text-[9px] font-bold px-2 py-0.5 rounded-md inline-flex items-center gap-1" style="background:#a855f715;color:#a855f7;"><i class="fa-solid fa-hammer text-[8px]"></i>x${(getForgeCoinsMultiplier()).toFixed(1)}</div>` : ''}
                          <button onclick="event.stopPropagation(); deleteQuest(${q.id})" class="text-slate-600 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 </div>
@@ -767,11 +760,11 @@ function renderDailyCard() {
             ${isLocked ? `
                 <div class="text-center mb-4">
                     <div class="text-xs font-bold text-green-400 mb-1">✓ BONUS OBTENU</div>
-                    <div class="text-[10px] text-yellow-500 font-gaming inline-flex gap-1 m-auto justify-center">+${Math.floor(350 * mult)} ${getCreditIcon('sm')}</div>
+                    <div class="text-[10px] text-yellow-500 font-gaming inline-flex gap-1 m-auto justify-center">+${Math.floor(350 * mult * (1 + getForgeStreakBonus()) * getForgeCoinsMultiplier())} ${getCreditIcon('sm')}</div>
                 </div>
             ` : `
                 <div class="text-xs font-bold text-yellow-500 inline-flex gap-1 content-center justify-center m-auto w-full text-center mb-4">
-                    Bonus: ${Math.floor(350 * mult)} ${getCreditIcon('sm')}
+                    Bonus: ${Math.floor(350 * mult * (1 + getForgeStreakBonus()) * getForgeCoinsMultiplier())} ${getCreditIcon('sm')}
                 </div>
             `}
             
@@ -964,12 +957,13 @@ function toggleQuest(id) {
     }
 
     q.done = !q.done;
-    const val = 50 * getMultiplier();
+    const val = Math.floor(50 * getMultiplier() * getForgeCoinsMultiplier());
 
     if (q.done) {
         q.completedAt = Date.now();
+        q.reward = val; // stocker pour untoggle exact
         const oldCoins = state.coins;
-        state.xp += val;
+        state.xp += Math.floor(val * getForgeXpBonus());
         state.coins += val;
         state.questsCompleted++;
 
@@ -978,9 +972,11 @@ function toggleQuest(id) {
         animateNumberIncrement('coins', oldCoins, state.coins);
         fx('coin-display', 'animate-pop');
     } else {
+        const refund = q.reward ?? val;
         delete q.completedAt;
-        state.xp = Math.max(0, state.xp - val);
-        state.coins = Math.max(0, state.coins - val);
+        delete q.reward;
+        state.xp = Math.max(0, state.xp - refund);
+        state.coins = Math.max(0, state.coins - refund);
         state.questsCompleted = Math.max(0, state.questsCompleted - 1);
     }
 
@@ -1035,11 +1031,11 @@ function toggleDaily(id) {
     const allDone = state.dailies.length > 0 && state.dailies.every(x => x.done);
 
     if (allDone && !state.dailyBonusClaimed) {
-        const bonus = 350 * getMultiplier();
+        const bonus = Math.floor(350 * getMultiplier() * (1 + getForgeStreakBonus()));
         const oldCoins = state.coins;
 
-        state.coins += bonus;
-        state.xp += bonus;
+        state.coins += Math.floor(bonus * getForgeCoinsMultiplier());
+        state.xp += Math.floor(bonus * getForgeXpBonus());
         state.dailyBonusClaimed = true;
         state.dailyBonusClaimedAt = new Date().toISOString();
         state.dailyCompletions = (state.dailyCompletions || 0) + 1;
@@ -1089,9 +1085,10 @@ function buyAscension(cost, gain) {
 function updateAscSlider(val) {
     const paliers = parseInt(val);
     const asc = paliers * ASC_RATE;
-    const cost = paliers * 10;
+    const discount = getForgeAscDiscount();
+    const cost = Math.floor(paliers * 10 * (1 - discount));
     document.getElementById('slider-asc-val').textContent = `+${asc} ASC`;
-    document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
+    document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>${discount > 0 ? ` <span class="text-[9px] text-green-400">-${Math.round(discount*100)}%</span>` : ''}`;
     document.getElementById('slider-remaining').innerHTML = `${Math.floor(state.coins) - cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
 
     // Preview sur la progress bar
@@ -1123,7 +1120,7 @@ function buyAscensionSlider() {
     if (!slider) return;
     const paliers = parseInt(slider.value);
     const gain = paliers * ASC_RATE;
-    const cost = paliers * 10;
+    const cost = Math.floor(paliers * 10 * (1 - getForgeAscDiscount()));
     if (state.coins >= cost) {
         state.coins -= cost;
         state.ascensionPoints += gain;
@@ -1934,9 +1931,275 @@ function initFilterBarDrag() {
     });
 }
 
+// ===== FORGE DE L'ASCENSION =====
+
+let FORGE_MODULES = [];
+
+async function loadForgeModules() {
+    try {
+        const res = await fetch('forge.json');
+        const data = await res.json();
+        FORGE_MODULES = data.modules.map(m => ({
+            ...m,
+            effect: (lvl) => m.effectLabel.replace('{n}', lvl * m.effectStep)
+        }));
+    } catch (e) {
+        console.error('Erreur chargement forge.json', e);
+    }
+}
+
+let forgeInterval = null;
+
+function getForgeModule(id) {
+    return FORGE_MODULES.find(m => m.id === id);
+}
+
+function getForgeState(id) {
+    if (!state.forge) state.forge = {};
+    if (!state.forge[id]) state.forge[id] = { level: 0, building: null };
+    return state.forge[id];
+}
+
+// Retourne le multiplicateur de crédits issu de la forge
+function getForgeCoinsMultiplier() {
+    const fs = getForgeState('nexus');
+    return 1 + (fs.level * 0.10);
+}
+
+// Retourne la réduction du coût d'ascension
+function getForgeAscDiscount() {
+    const fs = getForgeState('forge_asc');
+    return fs.level * 0.05;
+}
+
+// Retourne le bonus streak
+function getForgeStreakBonus() {
+    const fs = getForgeState('sanctuaire');
+    return fs.level * 0.15;
+}
+
+// Retourne le bonus XP
+function getForgeXpBonus() {
+    const fs = getForgeState('amplificateur');
+    return 1 + (fs.level * 0.08);
+}
+
+function buildModule(id) {
+    const mod = getForgeModule(id);
+    const fs = getForgeState(id);
+    if (!mod || fs.building) return;
+
+    // Slot unique : vérifier qu'aucun autre module n'est en construction
+    const alreadyBuilding = FORGE_MODULES.some(m => {
+        const s = getForgeState(m.id);
+        return s.building && (Date.now() - s.building.startedAt) < s.building.duration;
+    });
+    if (alreadyBuilding) {
+        // Feedback visuel : faire pulser la carte en cours
+        const buildingMod = FORGE_MODULES.find(m => {
+            const s = getForgeState(m.id);
+            return s.building && (Date.now() - s.building.startedAt) < s.building.duration;
+        });
+        if (buildingMod) fx(`forge-bar-${buildingMod.id}`, 'animate-pop');
+        return;
+    }
+
+    const nextLevel = fs.level;
+    if (nextLevel >= mod.levels.length) return;
+
+    const levelData = mod.levels[nextLevel];
+    if (state.coins < levelData.cost) {
+        fx('forge-coins-display', 'animate-pop');
+        return;
+    }
+
+    state.coins -= levelData.cost;
+    fs.building = {
+        startedAt: Date.now(),
+        duration: levelData.duration * 1000,
+        targetLevel: nextLevel + 1
+    };
+    saveState();
+    updateCoinsDisplay();
+    renderForge();
+}
+
+function collectModule(id) {
+    const fs = getForgeState(id);
+    if (!fs.building) return;
+
+    const elapsed = Date.now() - fs.building.startedAt;
+    if (elapsed < fs.building.duration) return;
+
+    fs.level = fs.building.targetLevel;
+    fs.building = null;
+    state.forgeBuilds = (state.forgeBuilds || 0) + 1;
+    state.forgeMaxLevel = Math.max(state.forgeMaxLevel || 0, fs.level);
+    saveState();
+
+    createCoinParticles(0, 'forge-coins-display');
+    renderForge();
+    checkAchievements();
+}
+
+function formatForgeDuration(ms) {
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}min`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h${m % 60 > 0 ? ` ${m % 60}min` : ''}`;
+    const d = Math.floor(h / 24);
+    return `${d}j ${h % 24}h`;
+}
+
+function renderForge() {
+    const grid = document.getElementById('forge-grid');
+    if (!grid) return;
+
+    // Mettre à jour l'affichage des coins
+    const forgeCoinsEl = document.getElementById('forge-coins-display');
+    if (forgeCoinsEl) forgeCoinsEl.textContent = Math.floor(state.coins);
+    const forgeCoinIconEl = document.getElementById('forge-coin-icon');
+    if (forgeCoinIconEl) forgeCoinIconEl.innerHTML = getCreditIcon('sm', 'text-yellow-500');
+
+    grid.innerHTML = FORGE_MODULES.map(mod => {
+        const fs = getForgeState(mod.id);
+        const level = fs.level;
+        const maxLevel = mod.levels.length;
+        const isMaxed = level >= maxLevel;
+        const isBuilding = !!fs.building;
+        const isReady = isBuilding && (Date.now() - fs.building.startedAt) >= fs.building.duration;
+
+        let progressPct = 0;
+        let timeLeftStr = '';
+        if (isBuilding && !isReady) {
+            const elapsed = Date.now() - fs.building.startedAt;
+            progressPct = Math.min((elapsed / fs.building.duration) * 100, 100);
+            const remaining = fs.building.duration - elapsed;
+            timeLeftStr = formatForgeDuration(remaining);
+        }
+
+        const nextLevel = level; // 0-indexed
+        const nextData = !isMaxed ? mod.levels[nextLevel] : null;
+        const anyBuildingNow = FORGE_MODULES.some(m => {
+            const s = getForgeState(m.id);
+            return s.building && (Date.now() - s.building.startedAt) < s.building.duration;
+        });
+        const canAfford = nextData && state.coins >= nextData.cost && !anyBuildingNow;
+
+        // Barre de niveaux
+        const levelDots = Array.from({ length: maxLevel }, (_, i) =>
+            `<div class="w-2 h-2 rounded-full transition-all ${i < level ? 'bg-current opacity-100' : 'bg-white/10'}" style="${i < level ? `color: ${mod.color}` : ''}"></div>`
+        ).join('');
+
+        // Bouton d'action
+        let actionBtn = '';
+        if (isReady) {
+            actionBtn = `
+                <button onclick="collectModule('${mod.id}')"
+                    class="w-full py-3 rounded-2xl font-black text-sm uppercase tracking-widest text-white transition-all active:scale-95"
+                    style="background: linear-gradient(135deg, ${mod.color}, ${mod.color}99);">
+                    <i class="fa-solid fa-check mr-2"></i>Collecter !
+                </button>`;
+        } else if (isBuilding) {
+            actionBtn = `
+                <div class="w-full py-3 rounded-2xl font-bold text-sm text-center text-slate-500 glass border border-white/5 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hammer text-xs opacity-50"></i>
+                    Il reste :<span id="forge-timer-${mod.id}">${timeLeftStr}</span>
+                </div>`;
+        } else if (isMaxed) {
+            actionBtn = `
+                <div class="w-full py-3 rounded-2xl font-black text-sm text-center uppercase tracking-widest"
+                    style="background: ${mod.color}15; color: ${mod.color};">
+                    <i class="fa-solid fa-crown mr-2"></i>Niveau max
+                </div>`;
+        } else {
+            actionBtn = `
+                <button onclick="buildModule('${mod.id}')" ${!canAfford ? 'disabled' : ''}
+                    class="w-full py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 ${canAfford ? 'text-white hover:scale-[1.02]' : 'text-slate-500 cursor-not-allowed'}"
+                    style="${canAfford ? `background: linear-gradient(135deg, ${mod.color}cc, ${mod.color}66);` : 'background: rgba(255,255,255,0.05);'}">
+                    <i class="fa-solid fa-hammer mr-2"></i>
+                    Améliorer · ${nextData.cost} ${getCreditIcon('xs', 'inline')}
+                </button>`;
+        }
+
+        return `
+            <div class="forge-card glass p-6 rounded-[2rem] border border-white/5 hover:border-white/10 relative overflow-hidden ${isReady ? 'forge-ready' : ''} ${isBuilding && !isReady ? 'forge-building' : ''}">
+                <div class="absolute top-0 left-0 right-0 h-0.5 opacity-60" style="background: linear-gradient(90deg, transparent, ${mod.color}, transparent);"></div>
+
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
+                            style="background: ${mod.color}20; border: 1px solid ${mod.color}40;">
+                            <i class="fa-solid ${mod.icon} text-xl" style="color: ${mod.color};"></i>
+                        </div>
+                        <div>
+                            <div class="font-gaming text-sm font-black uppercase text-white">${mod.name}</div>
+                            <div class="text-[9px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">
+                                ${isMaxed ? 'Niveau max' : `Niveau ${level} → ${level + 1}`}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-1 mt-1">${levelDots}</div>
+                </div>
+
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">${mod.desc}</p>
+
+                ${level > 0 ? `
+                <div class="mb-4 px-3 py-2 rounded-xl text-xs font-bold" style="background: ${mod.color}15; color: ${mod.color};">
+                    <i class="fa-solid fa-chart-line mr-2"></i>${mod.effect(level)}
+                </div>` : ''}
+
+                ${isBuilding ? `
+                <div class="mb-4">
+                    <div class="text-[9px] text-slate-500 uppercase font-bold mb-1.5">
+                        Construction niveau ${fs.building.targetLevel}
+                    </div>
+                    <div class="h-2 bg-slate-900 rounded-full overflow-hidden">
+                        <div class="forge-progress-bar h-full rounded-full" id="forge-bar-${mod.id}"
+                            style="width: ${isReady ? 100 : progressPct}%; background: linear-gradient(90deg, ${mod.color}99, ${mod.color});"></div>
+                    </div>
+                </div>` : ''}
+
+                ${!isBuilding && !isMaxed ? `
+                <div class="mb-4 text-[9px] text-slate-600 uppercase font-bold">
+                    <i class="fa-solid fa-clock mr-1"></i>Durée : ${formatForgeDuration(nextData.duration * 1000)}
+                </div>` : ''}
+
+                ${actionBtn}
+            </div>
+        `;
+    }).join('');
+
+    // Démarrer le ticker si une construction est en cours
+    const anyBuilding = FORGE_MODULES.some(m => {
+        const fs = getForgeState(m.id);
+        return fs.building && (Date.now() - fs.building.startedAt) < fs.building.duration;
+    });
+
+    if (anyBuilding && !forgeInterval) {
+        forgeInterval = setInterval(() => {
+            if (currentPage !== 'forge') { clearInterval(forgeInterval); forgeInterval = null; return; }
+            FORGE_MODULES.forEach(mod => {
+                const fs = getForgeState(mod.id);
+                if (!fs.building) return;
+                const elapsed = Date.now() - fs.building.startedAt;
+                const done = elapsed >= fs.building.duration;
+                const bar = document.getElementById(`forge-bar-${mod.id}`);
+                const timer = document.getElementById(`forge-timer-${mod.id}`);
+                if (bar) bar.style.width = (done ? 100 : Math.min((elapsed / fs.building.duration) * 100, 100)) + '%';
+                if (timer) timer.textContent = done ? '...' : formatForgeDuration(fs.building.duration - elapsed);
+                if (done) { clearInterval(forgeInterval); forgeInterval = null; renderForge(); }
+            });
+        }, 1000);
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     loadState();
     loadAchievements();
+    loadForgeModules();
     render();
     initFilterBarDrag();
 
@@ -2019,7 +2282,8 @@ function navigateTo(page) {
         peace:        'Apaisement',
         notes:        'Notes',
         achievements: 'Succès',
-        chronos:      'Chronos'
+        chronos:      'Chronos',
+        forge:        'Forge'
     };
     document.title = `Ascendora | ${pageTitles[page] || page}`;
 
@@ -2039,6 +2303,8 @@ function navigateTo(page) {
         renderAchievements();
     } else if (page === 'chronos') {
         renderChronos();
+    } else if (page === 'forge') {
+        renderForge();
     }
     
     // Mettre à jour la bottom nav + sidebar avec la couleur de la page
@@ -2047,7 +2313,8 @@ function navigateTo(page) {
         peace: '#ec4899',
         notes: '#8b5cf6',
         achievements: '#fbbf24',
-        chronos: '#f97316'
+        chronos: '#f97316',
+        forge: '#a855f7'
     };
     const color = pageColors[page] || 'var(--c-primary)';
 
@@ -2734,6 +3001,23 @@ function checkAchievements() {
             case 'daily_completions':
                 isUnlocked = (state.dailyCompletions || 0) >= achievement.condition.value;
                 break;
+            case 'chronos_created':
+                isUnlocked = (state.chronosEventsCreated || 0) >= achievement.condition.value;
+                break;
+            case 'chronos_completed':
+                isUnlocked = (state.chronosEventsCompleted || 0) >= achievement.condition.value;
+                break;
+            case 'forge_builds':
+                isUnlocked = (state.forgeBuilds || 0) >= achievement.condition.value;
+                break;
+            case 'forge_max_level':
+                isUnlocked = (state.forgeMaxLevel || 0) >= achievement.condition.value;
+                break;
+            case 'forge_all_max': {
+                const allMax = FORGE_MODULES.every(m => getForgeState(m.id).level >= m.levels.length);
+                isUnlocked = allMax;
+                break;
+            }
             case 'all_achievements':
                 // Vérifier si tous les autres achievements sont débloqués
                 const otherAchievements = achievements.filter(a => a.id !== achievement.id);
@@ -2922,6 +3206,7 @@ function submitChronosEvent() {
             .map(t => ({ id: Date.now() + Math.random(), text: t, done: false }));
         state.chronosEvents.push({ id: Date.now(), name, deadline, tasks, archived: false, completedAt: null, rewardClaimed: false });
     }
+    state.chronosEventsCreated = (state.chronosEventsCreated || 0) + 1;
 
     saveState();
     closeModal('modal-chronos-add');
@@ -2940,10 +3225,11 @@ function toggleChronosTask(eventId, taskId) {
     task.done = !task.done;
 
     const mult = getMultiplier();
-    const reward = Math.round(10 * mult);
+    const reward = Math.round(10 * mult * getForgeCoinsMultiplier());
 
     if (task.done) {
-        state.xp += reward;
+        task.reward = reward; // stocker pour untoggle exact
+        state.xp += Math.round(reward * getForgeXpBonus());
         state.coins += reward;
         createCoinParticles(reward, 'chronos-coins-display');
         animateNumberIncrement('chronos-coins-display', state.coins - reward, state.coins);
@@ -2954,14 +3240,17 @@ function toggleChronosTask(eventId, taskId) {
         if (allDone && Date.now() < ev.deadline && !ev.rewardClaimed) {
             ev.rewardClaimed = true;
             ev.completedAt = Date.now();
-            const bonus = Math.round(100 * mult);
-            state.xp += bonus;
+            const bonus = Math.round(100 * mult * getForgeCoinsMultiplier());
+            state.xp += Math.round(bonus * getForgeXpBonus());
             state.coins += bonus;
+            state.chronosEventsCompleted = (state.chronosEventsCompleted || 0) + 1;
             showChronosBonus(bonus);
         }
     } else {
-        state.xp = Math.max(0, state.xp - reward);
-        state.coins = Math.max(0, state.coins - reward);
+        const refund = task.reward ?? reward;
+        delete task.reward;
+        state.xp = Math.max(0, state.xp - Math.round(refund * getForgeXpBonus()));
+        state.coins = Math.max(0, state.coins - refund);
     }
 
     saveState();
@@ -3012,9 +3301,9 @@ function renderChronos() {
             if (ev.tasks.length === 0 && !ev.rewardClaimed) {
                 ev.rewardClaimed = true;
                 ev.completedAt = ev.deadline;
-                const bonus = Math.round(50 * getMultiplier());
+                const bonus = Math.round(50 * getMultiplier() * getForgeCoinsMultiplier());
                 state.coins += bonus;
-                state.xp += bonus;
+                state.xp += Math.round(bonus * getForgeXpBonus());
                 showChronosBonus(bonus);
             }
             saveState();

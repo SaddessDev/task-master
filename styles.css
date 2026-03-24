@@ -97,21 +97,6 @@ body {
     50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.8); }
 }
 
-@keyframes coinFloat {
-    0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translateY(-30px) scale(1.2);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(-60px) scale(0.5);
-        opacity: 0;
-    }
-}
-
 @keyframes numberIncrement {
     0% {
         transform: scale(1);
@@ -150,13 +135,6 @@ body {
 
 .animate-float {
     animation: float 3s ease-in-out infinite;
-}
-
-.coin-particle {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    animation: coinFloat 1s ease-out forwards;
 }
 
 .confetti-piece {
@@ -882,4 +860,49 @@ input[type="datetime-local"] {
 @keyframes pageIn {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== FORGE ===== */
+.forge-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.forge-card:hover {
+    transform: translateY(-2px);
+}
+.forge-progress-bar {
+    transition: width 1s linear;
+}
+@keyframes forgeGlow {
+    0%, 100% { box-shadow: 0 0 8px #a855f740; }
+    50%       { box-shadow: 0 0 20px #a855f780; }
+}
+.forge-building {
+    animation: forgeGlow 2s ease-in-out infinite;
+}
+@keyframes forgeReady {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.03); }
+}
+.forge-ready {
+    animation: forgeReady 1.5s ease-in-out infinite;
+}
+
+/* ===== COIN GAIN LABEL ===== */
+.coin-gain-label {
+    position: fixed;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 15px;
+    color: #fbbf24;
+    text-shadow: 0 0 12px #f59e0b88;
+    pointer-events: none;
+    z-index: 9999;
+    animation: coinGainFloat 0.9s ease-out forwards;
+}
+
+@keyframes coinGainFloat {
+    0%   { opacity: 1;   transform: translateX(-50%) translateY(0);    scale: 0.8; }
+    20%  { opacity: 1;   transform: translateX(-50%) translateY(-8px);  scale: 1.1; }
+    100% { opacity: 0;   transform: translateX(-50%) translateY(-40px); scale: 0.9; }
 }
