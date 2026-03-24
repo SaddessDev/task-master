@@ -41,6 +41,7 @@ let activeConfigTab = 'categories'; // 'categories' ou 'dailies'
 let selectedCategoryForQuest = null; // Catégorie sélectionnée pour nouvelle quête
 let selectedCategoryForDaily = null; // Catégorie sélectionnée pour nouveau daily
 let categoryToDelete = null; // Catégorie en cours de suppression
+let editingDaily = null; // Daily en cours d'édition
 let reassignmentData = null; // Données de réassignation des objectifs
 let currentPage = 'dashboard'; // Page actuelle
 let peaceFears = []; // Peurs dans le sac d'apaisement
@@ -385,6 +386,7 @@ function closeModal(id) {
         if (id === 'modal-config') {
             resetCatForm();
             editingCategory = null;
+            editingDaily = null;
         }
     }, 200);
 }
@@ -1170,6 +1172,7 @@ function renderConfigModal() {
 
 function switchConfigTab(tab) {
     activeConfigTab = tab;
+    editingDaily = null;
     renderConfigModal();
 }
 
@@ -1201,7 +1204,7 @@ function renderCategoryManager() {
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Couleur</p>
             <div id="color-picker" class="grid grid-cols-12 gap-2 mb-4"></div>
             <div class="flex gap-2">
-                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." class="flex-1 bg-slate-800/80 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none placeholder-slate-600 transition-all">
+                <input type="text" id="new-cat-input" placeholder="Nom du secteur..." value="${editingCategory ? escapeHtml(state.categories.find(c => c.id === editingCategory)?.name || '') : ''}" class="flex-1 bg-slate-800/80 rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary outline-none placeholder-slate-600 transition-all">
                 <button onclick="saveCategory()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                     <i class="fa-solid ${editingCategory ? 'fa-check' : 'fa-plus'}"></i>
                 </button>
@@ -1232,22 +1235,30 @@ function renderDailyManager() {
             const catColor = category ? category.color : '#06b6d4';
 
             return `
-                <div class="flex justify-between items-center glass p-4 rounded-2xl border-white/5 hover:border-primary/30 transition-all group">
-                    <div class="flex items-center gap-3 text-white flex-1">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: ${catColor}33; border: 2px solid ${catColor};">
+                <div draggable="true" data-id="${d.id}" class="flex justify-between items-center glass p-4 rounded-2xl border-white/5 hover:border-primary/30 transition-all group cursor-move">
+                    <div class="flex items-center gap-3 text-white flex-1 pointer-events-none">
+                        <i class="fa-solid fa-grip-vertical text-slate-700"></i>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${catColor}33; border: 2px solid ${catColor};">
                             <i class="fa-solid ${category ? category.icon : 'fa-tag'}" style="color: ${catColor};"></i>
                         </div>
-                        <div class="flex-1">
-                            <div class="text-xs font-bold">${d.text}</div>
-                            <div class="text-[9px] text-slate-500 uppercase">${d.cat}</div>
+                        <div class="flex-1" id="daily-view-${d.id}">
+                            <div class="text-xs font-bold">${escapeHtml(d.text)}</div>
+                            <div class="text-[9px] text-slate-500 uppercase">${escapeHtml(d.cat)}</div>
                         </div>
                     </div>
-                    <button onclick="removeDaily(${d.id})" class="p-2 text-slate-500 hover:text-red-500 transition-colors">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div class="flex gap-1">
+                        <button onclick="startEditDaily(${d.id})" class="p-2 transition-colors ${editingDaily === d.id ? 'text-primary' : 'text-slate-500 hover:text-primary'}">
+                            <i class="fa-solid fa-pen text-xs"></i>
+                        </button>
+                        <button onclick="removeDaily(${d.id})" class="p-2 text-slate-500 hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             `;
         }).join('');
+
+        initDailyDrag();
     }
 
     // Initialiser la catégorie sélectionnée pour les dailies
@@ -1258,7 +1269,7 @@ function renderDailyManager() {
     const formHtml = `
         <div class="bg-slate-900/80 p-5 rounded-[2rem] border border-white/10">
             <div class="flex gap-2 mb-3">
-                <input type="text" id="new-daily-input" placeholder="Nouvel objectif régulier..." class="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary outline-none">
+                <input type="text" id="new-daily-input" placeholder="Nouvel objectif régulier..." class="flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary outline-none" value="${editingDaily ? escapeHtml(state.dailies.find(d => d.id === editingDaily)?.text || '') : ''}">
             </div>
             <div class="flex gap-2">
                 <div class="relative flex-1">
@@ -1285,8 +1296,9 @@ function renderDailyManager() {
                     </div>
                 </div>
                 <button onclick="addDaily()" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform">
-                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid ${editingDaily ? 'fa-check' : 'fa-plus'}"></i>
                 </button>
+                ${editingDaily ? `<button onclick="cancelEditDaily()" class="bg-slate-700/80 text-white px-4 py-3 rounded-xl font-bold transition-all"><i class="fa-solid fa-times"></i></button>` : ''}
             </div>
         </div>
     `;
@@ -1348,10 +1360,7 @@ function editCategory(id) {
     editingCategory = id;
     selectedIcon = cat.icon;
     selectedColor = cat.color;
-    document.getElementById('new-cat-input').value = cat.name;
 
-    initIconPicker();
-    initColorPicker();
     renderConfigModal();
 }
 
@@ -1603,29 +1612,38 @@ function confirmReassignAndDelete() {
 function addDaily() {
     const input = document.getElementById('new-daily-input');
     const text = input.value.trim();
-    
-    // Validation: longueur max 200 caractères
     if (!text || text.length > 200) return;
 
     if (!selectedCategoryForDaily) {
         selectedCategoryForDaily = state.categories[0];
     }
 
-    const newId = state.dailies.length > 0 ? Math.max(...state.dailies.map(d => d.id)) + 1 : 1;
+    if (editingDaily) {
+        // Mode édition
+        const d = state.dailies.find(x => x.id === editingDaily);
+        if (d) {
+            d.text = text;
+            d.cat = selectedCategoryForDaily.name;
+        }
+        editingDaily = null;
+        saveState();
+        renderDailyManager();
+        renderDailyCard();
+    } else {
+        // Mode ajout
+        const newId = state.dailies.length > 0 ? Math.max(...state.dailies.map(d => d.id)) + 1 : 1;
+        state.dailies.push({ id: newId, text, cat: selectedCategoryForDaily.name, done: false });
+        state.dailiesCreated++;
+        saveState();
+        render();
+        renderConfigModal();
+        checkAchievements();
+    }
+}
 
-    state.dailies.push({
-        id: newId,
-        text: text,
-        cat: selectedCategoryForDaily.name,
-        done: false
-    });
-
-    state.dailiesCreated++;
-    input.value = "";
-    saveState();
-    render();
-    renderConfigModal();
-    checkAchievements();
+function cancelEditDaily() {
+    editingDaily = null;
+    renderDailyManager();
 }
 
 function toggleDailyCategorySelector() {
@@ -1643,9 +1661,19 @@ function toggleDailyCategorySelector() {
 }
 
 function selectCategoryForDaily(categoryId) {
+    // Sauvegarder le texte en cours avant le re-render
+    const currentInput = document.getElementById('new-daily-input');
+    const savedText = currentInput ? currentInput.value : null;
+
     selectedCategoryForDaily = state.categories.find(c => c.id === categoryId);
     renderConfigModal();
     toggleDailyCategorySelector();
+
+    // Restaurer le texte après le re-render
+    if (savedText !== null) {
+        const newInput = document.getElementById('new-daily-input');
+        if (newInput) newInput.value = savedText;
+    }
 }
 
 function removeDaily(id) {
@@ -1698,6 +1726,74 @@ function selectIcon(icon) {
     initIconPicker();
 }
 
+// ===== DRAG AND DROP DAILIES =====
+
+function initDailyDrag() {
+    const list = document.getElementById('cat-manage-list');
+    if (!list) return;
+
+    let dragTarget = null;
+
+    list.addEventListener('dragstart', (e) => {
+        const item = e.target.closest('[data-id]');
+        if (!item) return;
+        dragTarget = item;
+        item.classList.add('dragging');
+    });
+
+    list.addEventListener('dragend', () => {
+        if (!dragTarget) return;
+        dragTarget.classList.remove('dragging');
+        dragTarget = null;
+
+        const newOrder = [];
+        list.querySelectorAll('[data-id]').forEach(el => {
+            const daily = state.dailies.find(d => d.id === parseInt(el.getAttribute('data-id')));
+            if (daily) newOrder.push(daily);
+        });
+        state.dailies = newOrder;
+        saveState();
+        renderDailyCard();
+    });
+
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!dragTarget) return;
+
+        const siblings = [...list.querySelectorAll('[data-id]:not(.dragging)')];
+        const afterElement = siblings.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = e.clientY - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset, element: child };
+            }
+            return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+
+        if (afterElement == null) {
+            list.appendChild(dragTarget);
+        } else {
+            list.insertBefore(dragTarget, afterElement);
+        }
+    });
+}
+
+function startEditDaily(id) {
+    const d = state.dailies.find(x => x.id === id);
+    if (!d) return;
+    editingDaily = id;
+    // Pré-sélectionner la catégorie du daily
+    const cat = state.categories.find(c => c.name === d.cat);
+    if (cat) selectedCategoryForDaily = cat;
+    renderDailyManager();
+    document.getElementById('new-daily-input')?.focus();
+}
+
+function saveDaily(id) {
+    // Conservé pour compatibilité, redirige vers addDaily
+    addDaily();
+}
+
 // ===== DRAG AND DROP =====
 
 function initDragAndDrop() {
@@ -1707,14 +1803,16 @@ function initDragAndDrop() {
     let dragTarget = null;
 
     list.addEventListener('dragstart', (e) => {
-        if (!e.target.hasAttribute('data-id')) return;
-        dragTarget = e.target;
-        e.target.classList.add('dragging');
+        const item = e.target.closest('[data-id]');
+        if (!item) return;
+        dragTarget = item;
+        item.classList.add('dragging');
     });
 
     list.addEventListener('dragend', (e) => {
-        if (!e.target.hasAttribute('data-id')) return;
-        e.target.classList.remove('dragging');
+        if (!dragTarget) return;
+        dragTarget.classList.remove('dragging');
+        dragTarget = null;
         const newOrder = [];
         list.querySelectorAll('[data-id]').forEach(el => {
             const cat = state.categories.find(c => c.id === parseInt(el.getAttribute('data-id')));
@@ -1727,14 +1825,16 @@ function initDragAndDrop() {
 
     list.addEventListener('dragover', (e) => {
         e.preventDefault();
-        const afterElement = [...list.querySelectorAll('[draggable]:not(.dragging)')].reduce((closest, child) => {
+        if (!dragTarget) return;
+
+        const siblings = [...list.querySelectorAll('[data-id]:not(.dragging)')];
+        const afterElement = siblings.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = e.clientY - box.top - box.height / 2;
             if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
+                return { offset, element: child };
             }
+            return closest;
         }, { offset: Number.NEGATIVE_INFINITY }).element;
 
         if (afterElement == null) {
