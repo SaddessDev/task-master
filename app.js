@@ -2156,7 +2156,7 @@ function renderForge() {
                 ${isBuilding ? `
                 <div class="mb-4">
                     <div class="text-[9px] text-slate-500 uppercase font-bold mb-1.5">
-                        Construction niveau ${fs.building.targetLevel}
+                        Amélioration de niveau ${fs.building.targetLevel}
                     </div>
                     <div class="h-2 bg-slate-900 rounded-full overflow-hidden">
                         <div class="forge-progress-bar h-full rounded-full" id="forge-bar-${mod.id}"
