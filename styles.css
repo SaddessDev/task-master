@@ -870,7 +870,7 @@ input[type="datetime-local"] {
     transform: translateY(-2px);
 }
 .forge-progress-bar {
-    transition: width 1s linear;
+    transition: none;
 }
 @keyframes forgeGlow {
     0%, 100% { box-shadow: 0 0 8px #a855f740; }

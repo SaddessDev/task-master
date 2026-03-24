@@ -2186,13 +2186,14 @@ function renderForge() {
                 if (!fs.building) return;
                 const elapsed = Date.now() - fs.building.startedAt;
                 const done = elapsed >= fs.building.duration;
+                const pct = done ? 100 : (elapsed / fs.building.duration) * 100;
                 const bar = document.getElementById(`forge-bar-${mod.id}`);
                 const timer = document.getElementById(`forge-timer-${mod.id}`);
-                if (bar) bar.style.width = (done ? 100 : Math.min((elapsed / fs.building.duration) * 100, 100)) + '%';
+                if (bar) bar.style.width = pct + '%';
                 if (timer) timer.textContent = done ? '...' : formatForgeDuration(fs.building.duration - elapsed);
                 if (done) { clearInterval(forgeInterval); forgeInterval = null; renderForge(); }
             });
-        }, 1000);
+        }, 250);
     }
 }
 
@@ -3014,7 +3015,7 @@ function checkAchievements() {
                 isUnlocked = (state.forgeMaxLevel || 0) >= achievement.condition.value;
                 break;
             case 'forge_all_max': {
-                const allMax = FORGE_MODULES.every(m => getForgeState(m.id).level >= m.levels.length);
+                const allMax = FORGE_MODULES.length > 0 && FORGE_MODULES.every(m => getForgeState(m.id).level >= m.levels.length);
                 isUnlocked = allMax;
                 break;
             }
