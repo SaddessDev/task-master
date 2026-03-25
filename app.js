@@ -225,9 +225,17 @@ function checkDailiesReset() {
 }
 
 function checkAndUpdateStreak() {
-    const completedDailies = state.dailies.filter(d => d.done).length;
-    const totalDailies = state.dailies.length;
-    // Le requirement ne peut pas dépasser le nombre de dailies disponibles
+    // Exclure les dailies créés après que le bonus a été réclamé aujourd'hui
+    const claimedAt = state.dailyBonusClaimed && state.dailyBonusClaimedAt
+        ? new Date(state.dailyBonusClaimedAt).getTime()
+        : null;
+
+    const eligibleDailies = claimedAt
+        ? state.dailies.filter(d => !d.createdAt || d.createdAt <= claimedAt)
+        : state.dailies;
+
+    const completedDailies = eligibleDailies.filter(d => d.done).length;
+    const totalDailies = eligibleDailies.length;
     const requirement = Math.min(state.streakRequirement || 3, totalDailies);
 
     // Si pas assez de dailies, ne pas compter le streak
@@ -688,9 +696,9 @@ function renderQuests(mult) {
                    </div>`;
 
             html += `
-                <div class="glass p-5 rounded-[2rem] flex items-center gap-4 quest-card border transition-all hover:scale-[1.02] ${q.done ? 'opacity-40 border-white/5' : 'border-white/10 hover:border-primary/50'}">
+                <div class="glass p-5 rounded-[2rem] flex items-center gap-4 border overflow-hidden transition-all hover:scale-[1.02] ${q.done ? 'opacity-40 border-white/5' : 'border-white/10 hover:border-primary/50'}">
                     ${toggleBtn}
-                    <div class="flex-1">
+                    <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2">
                             <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}33;">
                                 <i class="fa-solid ${catIcon} text-xs" style="color: ${catColor};"></i>
@@ -702,10 +710,14 @@ function renderQuests(mult) {
                         </div>
                         <div class="text-sm font-bold text-white">${escapeHtml(q.text)}</div>
                     </div>
-                    <div class="text-right flex flex-col items-end gap-2">
-                         <div class="text-xs select-none font-gaming text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-lg align-center m-auto justify-center inline-flex gap-1">+${reward} ${getCreditIcon('sm')}</div>
-                         ${getForgeState('nexus').level > 0 ? `<div class="text-[9px] font-bold px-2 py-0.5 rounded-md inline-flex items-center gap-1" style="background:#a855f715;color:#a855f7;"><i class="fa-solid fa-hammer text-[8px]"></i>x${(getForgeCoinsMultiplier()).toFixed(1)}</div>` : ''}
-                         <button onclick="event.stopPropagation(); deleteQuest(${q.id})" class="text-slate-600 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                    <div class="flex-shrink-0 flex flex-col items-end gap-1.5 min-w-0">
+                        <div class="text-xs select-none font-gaming text-yellow-500 bg-yellow-500/10 px-2.5 py-1 rounded-lg inline-flex items-center gap-1 whitespace-nowrap">+${reward} ${getCreditIcon('sm')}</div>
+                        ${getMultiplier() > 1 || getForgeState('nexus').level > 0 ? `
+                        <div class="flex flex-wrap justify-end gap-1">
+                            ${getMultiplier() > 1 ? `<div class="text-[9px] font-bold text-purple-400 px-1.5 py-0.5 rounded bg-purple-500/10 whitespace-nowrap"><i class="fa-solid fa-star text-[8px]"></i> x${getMultiplier().toFixed(1)}</div>` : ''}
+                            ${getForgeState('nexus').level > 0 ? `<div class="text-[9px] font-bold px-1.5 py-0.5 rounded inline-flex items-center gap-0.5 whitespace-nowrap" style="background:#a855f715;color:#a855f7;"><i class="fa-solid fa-hammer text-[8px]"></i> x${getForgeCoinsMultiplier().toFixed(1)}</div>` : ''}
+                        </div>` : ''}
+                        <button onclick="event.stopPropagation(); deleteQuest(${q.id})" class="text-slate-600 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 </div>
             `;
@@ -775,22 +787,60 @@ function renderDailyCard() {
             ${timerHtml}
             
             <div class="space-y-2 mt-4 ${isLocked ? 'pointer-events-none' : ''}">
-                ${state.dailies.map(d => {
-        const category = state.categories.find(c => c.name === d.cat);
-        const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
-        const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
-        return `
-                        <div onclick="toggleDaily(${d.id})" class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer transition-all group ${d.done ? 'opacity-50' : ''} ${isLocked ? 'cursor-not-allowed' : ''}">
-                            <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${d.done ? 'bg-green-500 border-green-500' : 'border-slate-700 group-hover:border-primary'}">
-                                ${d.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                ${(() => {
+                    const claimedAt = state.dailyBonusClaimed && state.dailyBonusClaimedAt
+                        ? new Date(state.dailyBonusClaimedAt).getTime()
+                        : null;
+
+                    const eligible = state.dailies.filter(d => !claimedAt || !d.createdAt || d.createdAt <= claimedAt);
+                    const pending  = state.dailies.filter(d => claimedAt && d.createdAt && d.createdAt > claimedAt);
+
+                    const renderItem = (d) => {
+                        const category = state.categories.find(c => c.name === d.cat);
+                        const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
+                        const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
+                        return `
+                            <div onclick="toggleDaily(${d.id})" class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer transition-all group ${d.done ? 'opacity-50' : ''} ${isLocked ? 'cursor-not-allowed' : ''}">
+                                <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${d.done ? 'bg-green-500 border-green-500' : 'border-slate-700 group-hover:border-primary'}">
+                                    ${d.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                                </div>
+                                <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}33;">
+                                    <i class="fa-solid ${catIcon} text-xs" style="color: ${catColor};"></i>
+                                </div>
+                                <span class="text-xs font-bold text-white flex-1">${escapeHtml(d.text)}</span>
+                            </div>`;
+                    };
+
+                    let html = eligible.map(renderItem).join('');
+
+                    if (pending.length > 0) {
+                        html += `
+                            <div class="flex items-center gap-2 pt-1">
+                                <div class="h-px flex-1 bg-white/5"></div>
+                                <span class="text-[9px] text-slate-600 uppercase font-bold tracking-widest whitespace-nowrap">
+                                    <i class="fa-solid fa-clock mr-1"></i>Actifs demain
+                                </span>
+                                <div class="h-px flex-1 bg-white/5"></div>
                             </div>
-                            <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}33;">
-                                <i class="fa-solid ${catIcon} text-xs" style="color: ${catColor};"></i>
-                            </div>
-                            <span class="text-xs font-bold text-white flex-1">${escapeHtml(d.text)}</span>
-                        </div>
-                    `;
-    }).join('')}
+                            ${pending.map(d => {
+                                const category = state.categories.find(c => c.name === d.cat);
+                                const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
+                                const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
+                                return `
+                                    <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/30 opacity-40 cursor-not-allowed pointer-events-none">
+                                        <div class="w-6 h-6 rounded-lg border-2 border-slate-800 flex items-center justify-center">
+                                            <i class="fa-solid fa-clock text-slate-700 text-[8px]"></i>
+                                        </div>
+                                        <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${catColor}22;">
+                                            <i class="fa-solid ${catIcon} text-xs" style="color: ${catColor}88;"></i>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-600 flex-1">${escapeHtml(d.text)}</span>
+                                    </div>`;
+                            }).join('')}`;
+                    }
+
+                    return html;
+                })()}
             </div>
         </div>
     `;
@@ -1629,7 +1679,7 @@ function addDaily() {
     } else {
         // Mode ajout
         const newId = state.dailies.length > 0 ? Math.max(...state.dailies.map(d => d.id)) + 1 : 1;
-        state.dailies.push({ id: newId, text, cat: selectedCategoryForDaily.name, done: false });
+        state.dailies.push({ id: newId, text, cat: selectedCategoryForDaily.name, done: false, createdAt: Date.now() });
         state.dailiesCreated++;
         saveState();
         render();
@@ -3389,7 +3439,11 @@ function renderChronos() {
                     <div class="mb-3">
                         <div class="flex justify-between items-center mb-1.5">
                             <span class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">${done}/${total} sous-tâches</span>
-                            <span class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
+                            <div class="flex items-center gap-2">
+                                ${getMultiplier() > 1 ? `<span class="text-[9px] font-bold text-purple-400"><i class="fa-solid fa-star" style="font-size:7px"></i> x${getMultiplier().toFixed(1)}</span>` : ''}
+                                ${getForgeState('nexus').level > 0 ? `<span class="text-[9px] font-bold" style="color:#a855f7"><i class="fa-solid fa-hammer" style="font-size:7px"></i> x${getForgeCoinsMultiplier().toFixed(1)}</span>` : ''}
+                                <span class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
+                            </div>
                         </div>
                         <div class="h-1 bg-slate-900 rounded-full overflow-hidden">
                             <div class="h-full rounded-full transition-all duration-700"
@@ -3406,8 +3460,13 @@ function renderChronos() {
                                 ${task.done ? '<i class="fa-solid fa-check text-green-400" style="font-size:8px"></i>' : ''}
                             </div>
                             <span class="text-xs flex-1 ${task.done ? 'line-through text-slate-600' : 'text-slate-300'}">${escapeHtml(task.text)}</span>
-                            ${!task.done ? `<span class="text-[9px] text-slate-700 group-hover:text-slate-500 transition-colors">+${Math.round(10 * getMultiplier())} <i class="fa-solid fa-coins text-[8px]"></i></span>` : ''}
+                            ${!task.done ? `<span class="text-[9px] text-slate-700 group-hover:text-yellow-500/70 transition-colors font-gaming">+${Math.round(10 * getMultiplier() * getForgeCoinsMultiplier())} ${getCreditIcon('xs', 'inline opacity-60')}</span>` : ''}
                         </div>`).join('')}
+                        ${!ev.rewardClaimed ? `
+                        <div class="mt-2 px-3 py-1.5 rounded-xl text-[9px] font-bold text-slate-600 border border-white/5 flex items-center justify-between">
+                            <span><i class="fa-solid fa-star mr-1 text-yellow-600"></i>Bonus complétion totale</span>
+                            <span class="text-yellow-600 font-gaming">+${Math.round(100 * getMultiplier() * getForgeCoinsMultiplier())} ${getCreditIcon('xs', 'inline')}</span>
+                        </div>` : ''}
                     </div>` : ''}
                 </div>
             </div>`;
