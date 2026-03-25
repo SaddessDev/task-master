@@ -26,10 +26,10 @@
       "effectStep": 5,
       "levels": [
         { "cost": 50,   "duration": 30 },
-        { "cost": 10,  "duration": 10 },
-        { "cost": 40,  "duration": 10 },
-        { "cost": 90,  "duration": 30 },
-        { "cost": 10, "duration": 10 }
+        { "cost": 150,  "duration": 120 },
+        { "cost": 400,  "duration": 600 },
+        { "cost": 900,  "duration": 3600 },
+        { "cost": 1500, "duration": 10800 }
       ]
     },
     {
