@@ -13,7 +13,7 @@
         { "cost": 150,  "duration": 120 },
         { "cost": 400,  "duration": 600 },
         { "cost": 900,  "duration": 3600 },
-        { "cost": 2000, "duration": 21600 }
+        { "cost": 1500, "duration": 10800 }
       ]
     },
     {
@@ -25,11 +25,11 @@
       "effectLabel": "-{n}% coût ascension",
       "effectStep": 5,
       "levels": [
-        { "cost": 80,   "duration": 60 },
-        { "cost": 200,  "duration": 300 },
-        { "cost": 500,  "duration": 1800 },
-        { "cost": 1200, "duration": 7200 },
-        { "cost": 2500, "duration": 43200 }
+        { "cost": 50,   "duration": 30 },
+        { "cost": 150,  "duration": 120 },
+        { "cost": 400,  "duration": 600 },
+        { "cost": 900,  "duration": 3600 },
+        { "cost": 1500, "duration": 10800 }
       ]
     },
     {
@@ -41,11 +41,11 @@
       "effectLabel": "+{n}% bonus streak",
       "effectStep": 15,
       "levels": [
-        { "cost": 60,   "duration": 45 },
-        { "cost": 180,  "duration": 180 },
-        { "cost": 450,  "duration": 900 },
-        { "cost": 1000, "duration": 5400 },
-        { "cost": 2200, "duration": 28800 }
+        { "cost": 50,   "duration": 30 },
+        { "cost": 150,  "duration": 120 },
+        { "cost": 400,  "duration": 600 },
+        { "cost": 900,  "duration": 3600 },
+        { "cost": 1500, "duration": 10800 }
       ]
     },
     {
@@ -57,11 +57,11 @@
       "effectLabel": "+{n}% XP",
       "effectStep": 8,
       "levels": [
-        { "cost": 70,   "duration": 40 },
-        { "cost": 190,  "duration": 240 },
-        { "cost": 480,  "duration": 1200 },
-        { "cost": 1100, "duration": 6000 },
-        { "cost": 2400, "duration": 36000 }
+        { "cost": 50,   "duration": 30 },
+        { "cost": 150,  "duration": 120 },
+        { "cost": 400,  "duration": 600 },
+        { "cost": 900,  "duration": 3600 },
+        { "cost": 1500, "duration": 10800 }
       ]
     }
   ]
