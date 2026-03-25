@@ -50,7 +50,8 @@ const DB = {
             chronosEventsCreated: 0,
             chronosEventsCompleted: 0,
             forgeBuilds: 0,
-            forgeMaxLevel: 0
+            forgeMaxLevel: 0,
+            totalCoinsEarned: 0
         };
     },
 

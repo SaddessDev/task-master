@@ -46,11 +46,6 @@
                     <i class="fa-solid fa-sticky-note text-lg"></i>
                     <span>Notes personnelles</span>
                 </a>
-                <a onclick="navigateTo('achievements')"
-                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                    <i class="fa-solid fa-trophy text-lg"></i>
-                    <span>Succès</span>
-                </a>
                 <a onclick="navigateTo('chronos')"
                     class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
                     <i class="fa-solid fa-hourglass-half text-lg"></i>
@@ -60,6 +55,11 @@
                     class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
                     <i class="fa-solid fa-hammer text-lg"></i>
                     <span>Forge</span>
+                </a>
+                <a onclick="navigateTo('achievements')"
+                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
+                    <i class="fa-solid fa-trophy text-lg"></i>
+                    <span>Succès</span>
                 </a>
             </nav>
         </aside>
@@ -77,7 +77,8 @@
                             <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Objectifs à <span
                                     class="text-primary">compléter</span></h1>
                             <div class="text-[10px] text-slate-500 font-bold tracking-widest flex items-center gap-2">
-                                <span id="rb-label">Renaissance</span> : <span class="font-bold text-primary" id="rb-val">0</span>
+                                <span id="rb-label">Renaissance</span> : <span class="font-bold text-primary"
+                                    id="rb-val">0</span>
                             </div>
                         </div>
                     </div>
@@ -541,18 +542,22 @@
                             <i class="fa-solid fa-hourglass-half text-3xl text-primary"></i>
                         </div>
                         <div>
-                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Chronos <span class="text-primary">Événements</span></h1>
-                            <p class="text-[10px] text-slate-500 font-bold tracking-widest" id="chronos-count">0 événement actif</p>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Chronos <span
+                                    class="text-primary">Événements</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest" id="chronos-count">0
+                                événement actif</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20">
-                            <span id="chronos-coins-display" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
+                            <span id="chronos-coins-display"
+                                class="font-gaming text-yellow-500 font-bold text-lg">0</span>
                             <span id="chronos-coin-icon"></span>
                         </div>
                         <button onclick="openChronosAdd()"
                             class="bg-primary/10 border border-primary/30 text-primary px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2">
-                            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nouvel événement</span><span class="sm:hidden">Nouveau</span>
+                            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nouvel événement</span><span
+                                class="sm:hidden">Nouveau</span>
                         </button>
                     </div>
                 </header>
@@ -566,8 +571,11 @@
                     </main>
                     <aside class="xl:col-span-4 space-y-4">
                         <div class="glass p-6 rounded-[2rem] border-white/5 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-40"></div>
-                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-primary mb-4">Comment ça marche</h3>
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-40">
+                            </div>
+                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-primary mb-4">
+                                Comment ça marche</h3>
                             <div class="space-y-3 text-xs text-slate-400">
                                 <div class="flex gap-3 items-start">
                                     <i class="fa-solid fa-calendar-plus text-primary mt-0.5 flex-shrink-0"></i>
@@ -575,11 +583,13 @@
                                 </div>
                                 <div class="flex gap-3 items-start">
                                     <i class="fa-solid fa-bolt text-yellow-500 mt-0.5 flex-shrink-0"></i>
-                                    <span>Chaque sous-tâche complétée rapporte <strong class="text-white">XP + crédits</strong>.</span>
+                                    <span>Chaque sous-tâche complétée rapporte <strong class="text-white">XP +
+                                            crédits</strong>.</span>
                                 </div>
                                 <div class="flex gap-3 items-start">
                                     <i class="fa-solid fa-star text-orange-400 mt-0.5 flex-shrink-0"></i>
-                                    <span>Tout compléter <strong class="text-white">avant la deadline</strong> donne un bonus x2.</span>
+                                    <span>Tout compléter <strong class="text-white">avant la deadline</strong> donne un
+                                        bonus x2.</span>
                                 </div>
                                 <div class="flex gap-3 items-start">
                                     <i class="fa-solid fa-skull text-red-400 mt-0.5 flex-shrink-0"></i>
@@ -588,7 +598,8 @@
                             </div>
                         </div>
                         <div class="glass p-6 rounded-[2rem] border-white/5" id="chronos-archives-panel">
-                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-slate-400 mb-4">Archives</h3>
+                            <h3 class="font-gaming text-sm font-black uppercase tracking-widest text-slate-400 mb-4">
+                                Archives</h3>
                             <div id="chronos-archives-list" class="space-y-2 text-xs text-slate-500">
                                 <p class="italic">Aucune archive.</p>
                             </div>
@@ -605,13 +616,16 @@
                             <i class="fa-solid fa-hammer text-3xl text-primary"></i>
                         </div>
                         <div>
-                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Forge de l'<span class="text-primary">Ascension</span></h1>
-                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Construisez et améliorez vos modules</p>
+                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Forge de l'<span
+                                    class="text-primary">Ascension</span></h1>
+                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Construisez et améliorez vos
+                                modules</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="glass px-3 py-1 rounded-xl flex items-center gap-2 border-yellow-500/20">
-                            <span id="forge-coins-display" class="font-gaming text-yellow-500 font-bold text-lg">0</span>
+                            <span id="forge-coins-display"
+                                class="font-gaming text-yellow-500 font-bold text-lg">0</span>
                             <span id="forge-coin-icon"></span>
                         </div>
                     </div>
@@ -623,7 +637,8 @@
     </div>
 
     <div id="modal-config" class="modal">
-        <div class="glass p-8 select-none rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
+        <div
+            class="glass p-8 select-none rounded-[3rem] w-full max-w-2xl mx-4 border-white/10 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-gaming text-xl font-black uppercase text-primary flex items-center gap-3">
                     <i class="fa-solid fa-gear"></i>
@@ -774,26 +789,35 @@
         <div class="glass select-none rounded-[2.5rem] w-full max-w-lg mx-4 border-white/10 overflow-hidden">
             <!-- Header gradient -->
             <div class="relative p-8 pb-6 bg-gradient-to-br from-primary/10 to-purple-500/10 border-b border-white/5">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-60"></div>
+                <div
+                    class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-60">
+                </div>
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg">
                             <i id="chronos-modal-icon" class="fa-solid fa-hourglass-half text-white text-sm"></i>
                         </div>
-                        <h3 id="chronos-modal-title" class="font-gaming text-base font-black uppercase text-white tracking-wider">Nouvel événement</h3>
+                        <h3 id="chronos-modal-title"
+                            class="font-gaming text-base font-black uppercase text-white tracking-wider">Nouvel
+                            événement</h3>
                     </div>
-                    <button onclick="closeModal('modal-chronos-add')" class="text-slate-500 hover:text-white text-2xl transition-colors leading-none">&times;</button>
+                    <button onclick="closeModal('modal-chronos-add')"
+                        class="text-slate-500 hover:text-white text-2xl transition-colors leading-none">&times;</button>
                 </div>
             </div>
             <!-- Body -->
             <div class="p-8 space-y-5">
                 <div>
-                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Nom de l'événement</label>
-                    <input id="chronos-name-input" type="text" maxlength="60" placeholder="Ex: Examen de maths, Visite de Paul..."
+                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Nom de
+                        l'événement</label>
+                    <input id="chronos-name-input" type="text" maxlength="60"
+                        placeholder="Ex: Examen de maths, Visite de Paul..."
                         class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white focus:ring-2 ring-primary placeholder-slate-600 outline-none transition-all">
                 </div>
                 <div>
-                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Date & heure cible</label>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2 block">Date &
+                        heure cible</label>
                     <input id="chronos-date-input" type="datetime-local"
                         class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary placeholder-slate-600 outline-none transition-all">
                 </div>
@@ -802,7 +826,8 @@
                         Sous-tâches
                         <span class="text-slate-700 normal-case font-normal ml-1">· optionnel, une par ligne</span>
                     </label>
-                    <textarea id="chronos-tasks-input" rows="4" placeholder="Réviser le chapitre 3&#10;Faire les exercices&#10;Relire les notes..."
+                    <textarea id="chronos-tasks-input" rows="4"
+                        placeholder="Réviser le chapitre 3&#10;Faire les exercices&#10;Relire les notes..."
                         class="w-full flex-1 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-slate-600 focus:ring-2 ring-primary outline-none transition-all resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-1">
@@ -862,11 +887,6 @@
                 <i class="fa-solid fa-sticky-note text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Notes</span>
             </button>
-            <button onclick="navigateTo('achievements')" id="bn-achievements"
-                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
-                <i class="fa-solid fa-trophy text-xl"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wide">Succès</span>
-            </button>
             <button onclick="navigateTo('chronos')" id="bn-chronos"
                 class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-hourglass-half text-xl"></i>
@@ -876,6 +896,11 @@
                 class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
                 <i class="fa-solid fa-hammer text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Forge</span>
+            </button>
+            <button onclick="navigateTo('achievements')" id="bn-achievements"
+                class="bottom-nav-btn flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all text-slate-500">
+                <i class="fa-solid fa-trophy text-xl"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wide">Succès</span>
             </button>
         </div>
     </nav>

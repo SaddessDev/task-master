@@ -205,6 +205,12 @@ function saveState() {
     DB.save(state);
 }
 
+function earnCoins(amount) {
+    const n = Math.floor(amount);
+    state.coins += n;
+    state.totalCoinsEarned = (state.totalCoinsEarned || 0) + n;
+}
+
 function loadState() {
     state = DB.load();
     checkDailiesReset();
@@ -1014,7 +1020,7 @@ function toggleQuest(id) {
         q.reward = val; // stocker pour untoggle exact
         const oldCoins = state.coins;
         state.xp += Math.floor(val * getForgeXpBonus());
-        state.coins += val;
+        earnCoins(val);
         state.questsCompleted++;
 
         // Animations de gain
@@ -1084,7 +1090,7 @@ function toggleDaily(id) {
         const bonus = Math.floor(350 * getMultiplier() * (1 + getForgeStreakBonus()));
         const oldCoins = state.coins;
 
-        state.coins += Math.floor(bonus * getForgeCoinsMultiplier());
+        earnCoins(Math.floor(bonus * getForgeCoinsMultiplier()));
         state.xp += Math.floor(bonus * getForgeXpBonus());
         state.dailyBonusClaimed = true;
         state.dailyBonusClaimedAt = new Date().toISOString();
@@ -3057,6 +3063,9 @@ function checkAchievements() {
             case 'chronos_created':
                 isUnlocked = (state.chronosEventsCreated || 0) >= achievement.condition.value;
                 break;
+            case 'total_coins_earned':
+                isUnlocked = (state.totalCoinsEarned || 0) >= achievement.condition.value;
+                break;
             case 'chronos_completed':
                 isUnlocked = (state.chronosEventsCompleted || 0) >= achievement.condition.value;
                 break;
@@ -3281,9 +3290,9 @@ function toggleChronosTask(eventId, taskId) {
     const reward = Math.round(10 * mult * getForgeCoinsMultiplier());
 
     if (task.done) {
-        task.reward = reward; // stocker pour untoggle exact
+        task.reward = reward;
         state.xp += Math.round(reward * getForgeXpBonus());
-        state.coins += reward;
+        earnCoins(reward);
         createCoinParticles(reward, 'chronos-coins-display');
         animateNumberIncrement('chronos-coins-display', state.coins - reward, state.coins);
         fx('chronos-coins-display', 'animate-pop');
@@ -3295,7 +3304,7 @@ function toggleChronosTask(eventId, taskId) {
             ev.completedAt = Date.now();
             const bonus = Math.round(100 * mult * getForgeCoinsMultiplier());
             state.xp += Math.round(bonus * getForgeXpBonus());
-            state.coins += bonus;
+            earnCoins(bonus);
             state.chronosEventsCompleted = (state.chronosEventsCompleted || 0) + 1;
             showChronosBonus(bonus);
         }
@@ -3355,7 +3364,7 @@ function renderChronos() {
                 ev.rewardClaimed = true;
                 ev.completedAt = ev.deadline;
                 const bonus = Math.round(50 * getMultiplier() * getForgeCoinsMultiplier());
-                state.coins += bonus;
+                earnCoins(bonus);
                 state.xp += Math.round(bonus * getForgeXpBonus());
                 showChronosBonus(bonus);
             }
