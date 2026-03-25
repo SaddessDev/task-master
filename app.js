@@ -111,11 +111,11 @@ function fx(elementId, animationClass) {
 function createCoinParticles(amount, targetElement) {
     const target = document.getElementById(targetElement);
     if (!target) return;
-    
+
     const rect = target.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     if (amount > 0) {
         const label = document.createElement('div');
         label.className = 'coin-gain-label';
@@ -130,37 +130,37 @@ function createCoinParticles(amount, targetElement) {
 function animateNumberIncrement(elementId, from, to, duration = 800) {
     const element = document.getElementById(elementId);
     if (!element) return;
-    
+
     const startTime = performance.now();
     const difference = to - from;
-    
+
     function update(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Easing function pour un effet plus naturel
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const current = Math.floor(from + difference * easeOutQuart);
-        
+
         element.textContent = current;
-        
+
         if (progress < 1) {
             requestAnimationFrame(update);
         } else {
             element.textContent = Math.floor(to);
         }
     }
-    
+
     element.classList.add('animate-pop');
     setTimeout(() => element.classList.remove('animate-pop'), 300);
-    
+
     requestAnimationFrame(update);
 }
 
 function createConfetti() {
     const colors = ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444', '#fbbf24'];
     const confettiCount = 50;
-    
+
     for (let i = 0; i < confettiCount; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti-piece';
@@ -169,14 +169,14 @@ function createConfetti() {
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         confetti.style.animationDelay = Math.random() * 0.5 + 's';
         confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
-        
+
         // Formes variées
         if (Math.random() > 0.5) {
             confetti.style.borderRadius = '50%';
         }
-        
+
         document.body.appendChild(confetti);
-        
+
         setTimeout(() => confetti.remove(), 4000);
     }
 }
@@ -187,7 +187,7 @@ function celebrateCompletion(elementId) {
         element.classList.add('celebrate');
         setTimeout(() => element.classList.remove('celebrate'), 600);
     }
-    
+
     createConfetti();
 }
 
@@ -221,7 +221,7 @@ function checkDailiesReset() {
     if (state.lastLoginDate !== today) {
         // Vérifier le streak avant de réinitialiser
         checkAndUpdateStreak();
-        
+
         state.dailies.forEach(d => d.done = false);
         state.dailyBonusClaimed = false;
         state.dailyBonusClaimedAt = null;
@@ -293,7 +293,7 @@ function showStreakLostNotification(streakCount) {
         </div>
     `;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.remove();
     }, 5000);
@@ -478,7 +478,7 @@ function render() {
     // Afficher le prochain rang avec barre de progression
     const nextStage = CONFIG.STAGES.find(s => s.min > state.ascensionPoints);
     const nextRankEl = document.getElementById('next-rank-info');
-    
+
     if (nextStage) {
         const remaining = nextStage.min - state.ascensionPoints;
         const progress = ((state.ascensionPoints - cur.min) / (nextStage.min - cur.min)) * 100;
@@ -794,18 +794,18 @@ function renderDailyCard() {
             
             <div class="space-y-2 mt-4 ${isLocked ? 'pointer-events-none' : ''}">
                 ${(() => {
-                    const claimedAt = state.dailyBonusClaimed && state.dailyBonusClaimedAt
-                        ? new Date(state.dailyBonusClaimedAt).getTime()
-                        : null;
+            const claimedAt = state.dailyBonusClaimed && state.dailyBonusClaimedAt
+                ? new Date(state.dailyBonusClaimedAt).getTime()
+                : null;
 
-                    const eligible = state.dailies.filter(d => !claimedAt || !d.createdAt || d.createdAt <= claimedAt);
-                    const pending  = state.dailies.filter(d => claimedAt && d.createdAt && d.createdAt > claimedAt);
+            const eligible = state.dailies.filter(d => !claimedAt || !d.createdAt || d.createdAt <= claimedAt);
+            const pending = state.dailies.filter(d => claimedAt && d.createdAt && d.createdAt > claimedAt);
 
-                    const renderItem = (d) => {
-                        const category = state.categories.find(c => c.name === d.cat);
-                        const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
-                        const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
-                        return `
+            const renderItem = (d) => {
+                const category = state.categories.find(c => c.name === d.cat);
+                const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
+                const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
+                return `
                             <div onclick="toggleDaily(${d.id})" class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer transition-all group ${d.done ? 'opacity-50' : ''} ${isLocked ? 'cursor-not-allowed' : ''}">
                                 <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${d.done ? 'bg-green-500 border-green-500' : 'border-slate-700 group-hover:border-primary'}">
                                     ${d.done ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
@@ -815,12 +815,12 @@ function renderDailyCard() {
                                 </div>
                                 <span class="text-xs font-bold text-white flex-1">${escapeHtml(d.text)}</span>
                             </div>`;
-                    };
+            };
 
-                    let html = eligible.map(renderItem).join('');
+            let html = eligible.map(renderItem).join('');
 
-                    if (pending.length > 0) {
-                        html += `
+            if (pending.length > 0) {
+                html += `
                             <div class="flex items-center gap-2 pt-1">
                                 <div class="h-px flex-1 bg-white/5"></div>
                                 <span class="text-[9px] text-slate-600 uppercase font-bold tracking-widest whitespace-nowrap">
@@ -829,10 +829,10 @@ function renderDailyCard() {
                                 <div class="h-px flex-1 bg-white/5"></div>
                             </div>
                             ${pending.map(d => {
-                                const category = state.categories.find(c => c.name === d.cat);
-                                const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
-                                const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
-                                return `
+                    const category = state.categories.find(c => c.name === d.cat);
+                    const catColor = isValidHexColor(category?.color) ? category.color : '#06b6d4';
+                    const catIcon = isValidIcon(category?.icon) ? category.icon : 'fa-tag';
+                    return `
                                     <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/30 opacity-40 cursor-not-allowed pointer-events-none">
                                         <div class="w-6 h-6 rounded-lg border-2 border-slate-800 flex items-center justify-center">
                                             <i class="fa-solid fa-clock text-slate-700 text-[8px]"></i>
@@ -842,11 +842,11 @@ function renderDailyCard() {
                                         </div>
                                         <span class="text-xs font-bold text-slate-600 flex-1">${escapeHtml(d.text)}</span>
                                     </div>`;
-                            }).join('')}`;
-                    }
+                }).join('')}`;
+            }
 
-                    return html;
-                })()}
+            return html;
+        })()}
             </div>
         </div>
     `;
@@ -1144,7 +1144,7 @@ function updateAscSlider(val) {
     const discount = getForgeAscDiscount();
     const cost = Math.floor(paliers * 10 * (1 - discount));
     document.getElementById('slider-asc-val').textContent = `+${asc} ASC`;
-    document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>${discount > 0 ? ` <span class="text-[9px] text-green-400">-${Math.round(discount*100)}%</span>` : ''}`;
+    document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>${discount > 0 ? ` <span class="text-[9px] text-green-400">-${Math.round(discount * 100)}%</span>` : ''}`;
     document.getElementById('slider-remaining').innerHTML = `${Math.floor(state.coins) - cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
 
     // Preview sur la progress bar
@@ -1361,10 +1361,10 @@ function renderDailyManager() {
 
 function saveCategory() {
     const name = document.getElementById('new-cat-input').value.trim();
-    
+
     // Validation: longueur max 50 caractères
     if (!name || name.length > 50) return;
-    
+
     // Validation: couleur et icône
     if (!isValidHexColor(selectedColor) || !isValidIcon(selectedIcon)) {
         return;
@@ -1378,14 +1378,14 @@ function saveCategory() {
             cat.name = name;
             cat.icon = selectedIcon;
             cat.color = selectedColor;
-            
+
             // Mettre à jour tous les objectifs enfants
             state.quests.forEach(quest => {
                 if (quest.cat === oldName) {
                     quest.cat = name;
                 }
             });
-            
+
             // Mettre à jour toutes les tâches quotidiennes enfants
             state.dailies.forEach(daily => {
                 if (daily.cat === oldName) {
@@ -1530,19 +1530,19 @@ function updateReassignment(itemId, newCategory) {
 function toggleReassignDropdown(itemId) {
     const button = document.getElementById(`reassign-btn-${itemId}`);
     const chevron = button.querySelector('.fa-chevron-down');
-    
+
     // Fermer tous les autres dropdowns
     document.querySelectorAll('[id^="reassign-dropdown-"]').forEach(d => {
         d.remove();
     });
-    
+
     // Vérifier si on doit ouvrir ou fermer
     if (button.getAttribute('data-open') === 'true') {
         button.setAttribute('data-open', 'false');
         if (chevron) chevron.style.transform = 'rotate(0deg)';
         return;
     }
-    
+
     // Créer le dropdown en fixed
     const rect = button.getBoundingClientRect();
     const dropdown = document.createElement('div');
@@ -1554,9 +1554,9 @@ function toggleReassignDropdown(itemId) {
         right: ${window.innerWidth - rect.right}px;
         z-index: 50000;
     `;
-    
+
     const currentAssignment = reassignmentData.assignments[itemId];
-    
+
     dropdown.innerHTML = `
         <div class="p-2 max-h-48 overflow-y-auto">
             <button onclick="selectReassignCategory(${itemId}, null)" class="w-full text-left mb-2 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-1">
@@ -1564,8 +1564,8 @@ function toggleReassignDropdown(itemId) {
                 Supprimer cet objectif
             </button>
             ${state.categories
-                .filter(c => c.name !== categoryToDelete.name)
-                .map(c => `
+            .filter(c => c.name !== categoryToDelete.name)
+            .map(c => `
                     <button onclick="selectReassignCategory(${itemId}, '${c.name}')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-white hover:bg-slate-700/50 transition-colors flex items-center gap-2 ${currentAssignment === c.name ? 'bg-primary/20 border border-primary/30' : ''}">
                         <div class="w-4 h-4 rounded flex items-center justify-center" style="background: ${c.color}33;">
                             <i class="fa-solid ${c.icon} text-xs" style="color: ${c.color};"></i>
@@ -1573,14 +1573,14 @@ function toggleReassignDropdown(itemId) {
                         ${escapeHtml(c.name)}
                     </button>
                 `)
-                .join('')}
+            .join('')}
         </div>
     `;
-    
+
     document.body.appendChild(dropdown);
     button.setAttribute('data-open', 'true');
     if (chevron) chevron.style.transform = 'rotate(180deg)';
-    
+
     // Fermer au clic en dehors
     setTimeout(() => {
         document.addEventListener('click', closeReassignDropdownOnClickOutside);
@@ -1933,7 +1933,7 @@ function clearAllData() {
     try {
         localStorage.clear();
         sessionStorage.clear();
-        
+
         // Réinitialiser l'état en mémoire
         state = {
             quests: [],
@@ -2111,6 +2111,8 @@ function formatForgeDuration(ms) {
     return `${d}j ${h % 24}h`;
 }
 
+function initForgeSparkListeners() {}
+
 function renderForge() {
     const grid = document.getElementById('forge-grid');
     if (!grid) return;
@@ -2146,10 +2148,26 @@ function renderForge() {
         });
         const canAfford = nextData && state.coins >= nextData.cost && !anyBuildingNow;
 
-        // Barre de niveaux
-        const levelDots = Array.from({ length: maxLevel }, (_, i) =>
-            `<div class="w-2 h-2 rounded-full transition-all ${i < level ? 'bg-current opacity-100' : 'bg-white/10'}" style="${i < level ? `color: ${mod.color}` : ''}"></div>`
-        ).join('');
+        // Barre de niveaux segmentée
+        const levelBar = `
+            <div class="flex flex-col items-end gap-1">
+                <div class="text-[9px] font-black uppercase tracking-widest ${isMaxed ? 'forge-seg-max' : ''}" style="color: ${isMaxed ? '#f97316' : '#475569'}; ${isMaxed ? 'text-shadow: 0 0 8px #f97316;' : ''}">
+                    ${isMaxed ? `${level}/${maxLevel}` : `${level}/${maxLevel}`}
+                </div>
+                <div class="flex gap-0.5">
+                    ${Array.from({ length: maxLevel }, (_, i) => {
+                        const filled = i < level;
+                        const active = i === level && isBuilding && !isReady;
+                        if (isMaxed) {
+                            return `<div class="h-1.5 w-5 rounded-sm forge-seg-max" style="background: linear-gradient(90deg, #f59e0b, #f97316);"></div>`;
+                        }
+                        return `<div class="h-1.5 w-5 rounded-sm overflow-hidden relative" style="background: ${filled ? 'transparent' : 'rgba(255,255,255,0.06)'}">
+                            ${filled ? `<div class="absolute inset-0 rounded-sm" style="background: linear-gradient(90deg, ${mod.color}99, ${mod.color});"></div>` : ''}
+                            ${active ? `<div class="absolute inset-0 rounded-sm opacity-40" style="background: ${mod.color}; animation: pulse 1s ease-in-out infinite;"></div>` : ''}
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
 
         // Bouton d'action
         let actionBtn = '';
@@ -2162,16 +2180,12 @@ function renderForge() {
                 </button>`;
         } else if (isBuilding) {
             actionBtn = `
-                <div class="w-full py-3 rounded-2xl font-bold text-sm text-center text-slate-500 glass border border-white/5 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-hammer text-xs opacity-50"></i>
-                    Il reste :<span id="forge-timer-${mod.id}">${timeLeftStr}</span>
+                <div class="w-full py-3 rounded-2xl font-bold text-sm text-center text-slate-500 glass border border-white/5 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-rotate text-xs opacity-60 forge-spin"></i>
+                    Il reste : <span id="forge-timer-${mod.id}">${timeLeftStr}</span>
                 </div>`;
         } else if (isMaxed) {
-            actionBtn = `
-                <div class="w-full py-3 rounded-2xl font-black text-sm text-center uppercase tracking-widest"
-                    style="background: ${mod.color}15; color: ${mod.color};">
-                    <i class="fa-solid fa-crown mr-2"></i>Niveau max
-                </div>`;
+            actionBtn = '';
         } else {
             actionBtn = `
                 <button onclick="buildModule('${mod.id}')" ${!canAfford ? 'disabled' : ''}
@@ -2183,7 +2197,7 @@ function renderForge() {
         }
 
         return `
-            <div class="forge-card glass p-6 rounded-[2rem] border border-white/5 hover:border-white/10 relative overflow-hidden ${isReady ? 'forge-ready' : ''} ${isBuilding && !isReady ? 'forge-building' : ''}">
+            <div class="forge-card glass p-6 rounded-[2rem] select-none border border-white/5 hover:border-white/10 relative overflow-hidden ${isReady ? 'forge-ready' : ''} ${isBuilding && !isReady ? 'forge-building' : ''}">
                 <div class="absolute top-0 left-0 right-0 h-0.5 opacity-60" style="background: linear-gradient(90deg, transparent, ${mod.color}, transparent);"></div>
 
                 <div class="flex items-start justify-between mb-4">
@@ -2199,7 +2213,7 @@ function renderForge() {
                             </div>
                         </div>
                     </div>
-                    <div class="flex gap-1 mt-1">${levelDots}</div>
+                    <div class="flex gap-1 mt-1">${levelBar}</div>
                 </div>
 
                 <p class="text-xs text-slate-400 mb-4 leading-relaxed">${mod.desc}</p>
@@ -2253,6 +2267,8 @@ function renderForge() {
             });
         }, 250);
     }
+
+    initForgeSparkListeners();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -2322,7 +2338,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ===== NAVIGATION =====
 
-function toggleSidebar() {} // conservé pour compatibilité éventuelle
+function toggleSidebar() { } // conservé pour compatibilité éventuelle
 
 function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
@@ -2337,12 +2353,12 @@ function navigateTo(page) {
     currentPage = page;
 
     const pageTitles = {
-        dashboard:    'Objectifs',
-        peace:        'Apaisement',
-        notes:        'Notes',
+        dashboard: 'Objectifs',
+        peace: 'Apaisement',
+        notes: 'Notes',
         achievements: 'Succès',
-        chronos:      'Chronos',
-        forge:        'Forge'
+        chronos: 'Chronos',
+        forge: 'Forge'
     };
     document.title = `Ascendora | ${pageTitles[page] || page}`;
 
@@ -2350,10 +2366,10 @@ function navigateTo(page) {
     document.querySelectorAll('.page-content').forEach(p => {
         p.classList.add('hidden');
     });
-    
+
     // Afficher la page sélectionnée
     document.getElementById(`${page}-page`).classList.remove('hidden');
-    
+
     // Charger les données spécifiques à la page
     if (page === 'notes') {
         renderNotes();
@@ -2365,7 +2381,7 @@ function navigateTo(page) {
     } else if (page === 'forge') {
         renderForge();
     }
-    
+
     // Mettre à jour la bottom nav + sidebar avec la couleur de la page
     const pageColors = {
         dashboard: '#06b6d4',
@@ -2417,23 +2433,23 @@ function addPeaceFear() {
     const typeEl = document.getElementById('peace-type-value');
     const type = typeEl ? typeEl.value : 'anxiety';
     const text = input.value.trim();
-    
+
     if (!text) {
         alert('Veuillez écrire votre peur ou angoisse');
         return;
     }
-    
+
     const fear = {
         id: Date.now(),
         text: text,
         type: type,
         timestamp: new Date().toISOString()
     };
-    
+
     peaceFears.push(fear);
     state.peaceFearAdded++;
     input.value = '';
-    
+
     renderPeaceFears();
     updatePeaceBag();
     saveState();
@@ -2444,14 +2460,14 @@ function togglePeaceTypeSelector() {
     const dropdown = document.getElementById('peace-type-dropdown');
     const btn = document.getElementById('peace-type-btn');
     const isHidden = dropdown.classList.contains('hidden');
-    
+
     if (isHidden) {
         renderPeaceTypeList();
         dropdown.classList.remove('hidden');
-        
+
         // Position dropdown above button
         const rect = btn.getBoundingClientRect();
-        
+
         document.addEventListener('click', closePeaceTypeDropdownOnClickOutside);
     } else {
         dropdown.classList.add('hidden');
@@ -2462,7 +2478,7 @@ function togglePeaceTypeSelector() {
 function closePeaceTypeDropdownOnClickOutside(e) {
     const dropdown = document.getElementById('peace-type-dropdown');
     const btn = document.getElementById('peace-type-btn');
-    
+
     if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
         dropdown.classList.add('hidden');
         document.removeEventListener('click', closePeaceTypeDropdownOnClickOutside);
@@ -2480,7 +2496,7 @@ function renderPeaceTypeList() {
         { value: 'doubt', label: 'Doute', icon: 'fa-question', color: '#64748b' },
         { value: 'other', label: 'Autre', icon: 'fa-ellipsis', color: '#06b6d4' }
     ];
-    
+
     typeList.innerHTML = types.map(type => `
         <button onclick="selectPeaceType('${type.value}', '${type.label}', '${type.icon}', '${type.color}')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800/50 transition-all text-left group">
             <div class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style="background: ${type.color}33;">
@@ -2502,7 +2518,7 @@ function selectPeaceType(value, label, icon, color) {
 function renderPeaceFears() {
     const container = document.getElementById('peace-list');
     container.innerHTML = '';
-    
+
     peaceFears.forEach(fear => {
         const typeLabels = {
             'anxiety': 'Anxiété',
@@ -2513,7 +2529,7 @@ function renderPeaceFears() {
             'doubt': 'Doute',
             'other': 'Autre'
         };
-        
+
         const typeColors = {
             'anxiety': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
             'fear': 'bg-red-500/10 text-red-400 border-red-500/30',
@@ -2523,7 +2539,7 @@ function renderPeaceFears() {
             'doubt': 'bg-slate-500/10 text-slate-400 border-slate-500/30',
             'other': 'bg-pink-500/10 text-pink-400 border-pink-500/30'
         };
-        
+
         const div = document.createElement('div');
         div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-pink-500/30 transition-all';
         div.innerHTML = `
@@ -2851,23 +2867,23 @@ function createFireParticles(element) {
     const rect = element.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
-    
+
     for (let i = 0; i < 8; i++) {
         const particle = document.createElement('div');
         particle.className = 'fire-particle';
         particle.style.left = x + 'px';
         particle.style.top = y + 'px';
-        
+
         const angle = (Math.PI * 2 * i) / 8;
         const velocity = 3 + Math.random() * 3;
         const vx = Math.cos(angle) * velocity;
         const vy = Math.sin(angle) * velocity - 2;
-        
+
         particle.style.setProperty('--vx', vx);
         particle.style.setProperty('--vy', vy);
-        
+
         document.body.appendChild(particle);
-        
+
         setTimeout(() => particle.remove(), 1500);
     }
 }
@@ -2878,17 +2894,17 @@ function createFireParticlesFromPoint(x, y) {
         particle.className = 'fire-particle';
         particle.style.left = x + 'px';
         particle.style.top = y + 'px';
-        
+
         const angle = (Math.PI * 2 * i) / 12;
         const velocity = 4 + Math.random() * 4;
         const vx = Math.cos(angle) * velocity;
         const vy = Math.sin(angle) * velocity - 3;
-        
+
         particle.style.setProperty('--vx', vx);
         particle.style.setProperty('--vy', vy);
-        
+
         document.body.appendChild(particle);
-        
+
         setTimeout(() => particle.remove(), 1500);
     }
 }
@@ -2899,22 +2915,22 @@ function createFireParticlesFromPoint(x, y) {
 function addNote() {
     const contentEl = document.getElementById('note-content');
     const content = contentEl.value.trim();
-    
+
     if (!content) {
         alert('Veuillez écrire une note');
         return;
     }
-    
+
     const note = {
         id: Date.now(),
         content: content,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
-    
+
     state.notes.push(note);
     contentEl.value = '';
-    
+
     renderNotes();
     updateNotesCount();
     saveState();
@@ -2924,27 +2940,27 @@ function addNote() {
 function renderNotes() {
     const container = document.getElementById('notes-list');
     container.innerHTML = '';
-    
+
     if (state.notes.length === 0) {
         container.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-inbox text-3xl mb-3 block opacity-50"></i><p class="text-sm">Aucune note pour le moment</p></div>';
         return;
     }
-    
+
     const sortedNotes = [...state.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-    
+
     sortedNotes.forEach(note => {
         const div = document.createElement('div');
         div.className = 'glass p-3 rounded-xl border select-none border-white/10 group hover:border-purple-500/30 transition-all cursor-pointer';
-        
+
         const updatedDate = new Date(note.updatedAt);
-        const dateStr = updatedDate.toLocaleDateString('fr-FR', { 
-            year: 'numeric', 
-            month: 'short', 
+        const dateStr = updatedDate.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: 'short',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
         });
-        
+
         div.innerHTML = `
             <div class="flex items-start justify-between gap-2 mb-1.5">
                 <p class="text-sm text-white flex-1 leading-relaxed">${escapeHtml(note.content)}</p>
@@ -2958,11 +2974,11 @@ function renderNotes() {
                 <span class="text-slate-600 ml-1">— appuyer pour modifier</span>
             </div>
         `;
-        
+
         div.addEventListener('click', (e) => {
             if (!e.target.closest('button')) editNote(note.id);
         });
-        
+
         container.appendChild(div);
     });
 }
@@ -3031,10 +3047,10 @@ function checkAchievements() {
         if (state.unlockedAchievements.includes(achievement.id)) {
             return;
         }
-        
+
         // Vérifier les conditions
         let isUnlocked = false;
-        
+
         switch (achievement.condition.type) {
             case 'quests_created':
                 isUnlocked = state.questsCreated >= achievement.condition.value;
@@ -3086,7 +3102,7 @@ function checkAchievements() {
                 isUnlocked = otherAchievements.every(a => state.unlockedAchievements.includes(a.id));
                 break;
         }
-        
+
         if (isUnlocked) {
             unlockAchievement(achievement);
         }
@@ -3096,7 +3112,7 @@ function checkAchievements() {
 function unlockAchievement(achievement) {
     state.unlockedAchievements.push(achievement.id);
     saveState();
-    
+
     // Afficher une notification
     showAchievementNotification(achievement);
 }
@@ -3116,7 +3132,7 @@ function showAchievementNotification(achievement) {
         </div>
     `;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.remove();
     }, 5000);
@@ -3134,9 +3150,9 @@ function renderAchievements() {
     }
 
     const difficultyIcons = {
-        1: { icon: 'fa-leaf',  color: '#10b981' },
-        2: { icon: 'fa-fire',  color: '#f97316' },
-        3: { icon: 'fa-bolt',  color: '#eab308' },
+        1: { icon: 'fa-leaf', color: '#10b981' },
+        2: { icon: 'fa-fire', color: '#f97316' },
+        3: { icon: 'fa-bolt', color: '#eab308' },
         4: { icon: 'fa-skull', color: '#ef4444' },
         5: { icon: 'fa-crown', color: '#a855f7' }
     };
@@ -3232,7 +3248,7 @@ function openChronosEdit(id) {
     // format datetime-local : YYYY-MM-DDTHH:MM
     const pad = n => String(n).padStart(2, '0');
     document.getElementById('chronos-date-input').value =
-        `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     document.getElementById('chronos-tasks-input').value = ev.tasks.map(t => t.text).join('\n');
     document.getElementById('chronos-modal-title').textContent = 'Modifier l\'événement';
     document.getElementById('chronos-modal-icon').className = 'fa-solid fa-pen text-white text-sm';
@@ -3398,7 +3414,7 @@ function renderChronos() {
             const allDone = total > 0 && done === total;
 
             const borderColor = urgent === 2 ? 'rgba(239,68,68,0.35)' : urgent === 1 ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.07)';
-            const glowColor  = urgent === 2 ? 'rgba(239,68,68,0.08)' : urgent === 1 ? 'rgba(249,115,22,0.06)' : 'transparent';
+            const glowColor = urgent === 2 ? 'rgba(239,68,68,0.08)' : urgent === 1 ? 'rgba(249,115,22,0.06)' : 'transparent';
             const countdownColor = urgent === 2 ? '#f87171' : urgent === 1 ? '#fb923c' : 'var(--c-primary)';
             const statusIcon = allDone
                 ? '<i class="fa-solid fa-circle-check text-green-400"></i>'
