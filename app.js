@@ -42,6 +42,7 @@ let selectedCategoryForQuest = null; // Catégorie sélectionnée pour nouvelle 
 let selectedCategoryForDaily = null; // Catégorie sélectionnée pour nouveau daily
 let categoryToDelete = null; // Catégorie en cours de suppression
 let editingDaily = null; // Daily en cours d'édition
+let _editingNoteId = null; // Note en cours d'édition
 let reassignmentData = null; // Données de réassignation des objectifs
 let currentPage = 'dashboard'; // Page actuelle
 let peaceFears = []; // Peurs dans le sac d'apaisement
@@ -488,13 +489,13 @@ function render() {
             nextRankEl.innerHTML = `
                 <div class="text-[9px] text-slate-500 uppercase font-bold mb-3">Prochain Rang</div>
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center">
                         <img src="assets/ranks/${nextStage.i}.png" class="w-12 object-contain">
                     </div>
                     <div class="flex-1">
                         <div class="text-[11px] font-bold text-white">${nextStage.n}</div>
                         <div class="text-[9px] text-slate-500">Encore ${remaining} ${pluralize(remaining, 'point')}</div>
-                        <div class="h-2 bg-slate-900 rounded-full overflow-hidden shadow-inner">
+                        <div class="h-2 bg-slate-600 rounded-full overflow-hidden shadow-inner">
                             <div class="h-full bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-1000" style="width: ${progress}%"></div>
                         </div>
                     </div>
@@ -730,7 +731,7 @@ function renderQuests(mult) {
         });
     });
 
-    questListEl.innerHTML = html || '<div class="col-span-full text-center py-12 text-slate-500"><i class="fa-solid fa-inbox text-4xl mb-3 opacity-30"></i><p class="text-sm">Aucune tâche dans cette catégorie</p></div>';
+    questListEl.innerHTML = html || '<div class="col-span-full text-center select-none py-12 text-slate-500"><i class="fa-solid fa-inbox text-4xl mb-3 opacity-30"></i><p class="text-sm">Aucune tâche dans cette catégorie</p></div>';
 }
 
 function renderDailyCard() {
@@ -786,7 +787,7 @@ function renderDailyCard() {
                 </div>
             `}
             
-            <div class="h-2 bg-slate-900 rounded-full overflow-hidden mb-4">
+            <div class="h-2 bg-slate-600 rounded-full overflow-hidden mb-4">
                 <div class="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500" style="width: ${progress}%"></div>
             </div>
             
@@ -911,7 +912,7 @@ function renderShop() {
                     <div class="text-2xl font-gaming text-yellow-500">${Math.floor(state.coins)}</div>
                 </div>
             </div>
-            <div class="relative h-3 bg-slate-900 rounded-full overflow-hidden mt-4">
+            <div class="relative h-3 bg-slate-600 rounded-full overflow-hidden mt-4">
                 <div class="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-1000" style="width: ${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%"></div>
                 <div id="asc-preview-bar" class="absolute top-0 h-full bg-white/30 animate-pulse transition-all duration-300" style="left:${(state.ascensionPoints / REBIRTH_THRESHOLD) * 100}%; width:0%; border-radius: ${state.ascensionPoints > 0 ? '0' : '9999px 0 0 9999px'}"></div>
             </div>
@@ -1277,7 +1278,7 @@ function renderDailyManager() {
 
     if (state.dailies.length === 0) {
         list.innerHTML = `
-            <div class="text-center py-8 text-slate-500">
+            <div class="text-center select-none py-8 text-slate-500">
                 <i class="fa-solid fa-calendar-xmark text-4xl mb-3 opacity-30"></i>
                 <p class="text-sm">Aucun objectif régulier défini</p>
             </div>
@@ -2111,7 +2112,7 @@ function formatForgeDuration(ms) {
     return `${d}j ${h % 24}h`;
 }
 
-function initForgeSparkListeners() {}
+function initForgeSparkListeners() { }
 
 function renderForge() {
     const grid = document.getElementById('forge-grid');
@@ -2156,16 +2157,16 @@ function renderForge() {
                 </div>
                 <div class="flex gap-0.5">
                     ${Array.from({ length: maxLevel }, (_, i) => {
-                        const filled = i < level;
-                        const active = i === level && isBuilding && !isReady;
-                        if (isMaxed) {
-                            return `<div class="h-1.5 w-5 rounded-sm forge-seg-max" style="background: linear-gradient(90deg, #f59e0b, #f97316);"></div>`;
-                        }
-                        return `<div class="h-1.5 w-5 rounded-sm overflow-hidden relative" style="background: ${filled ? 'transparent' : 'rgba(255,255,255,0.06)'}">
+            const filled = i < level;
+            const active = i === level && isBuilding && !isReady;
+            if (isMaxed) {
+                return `<div class="h-1.5 w-5 rounded-sm forge-seg-max" style="background: linear-gradient(90deg, #f59e0b, #f97316);"></div>`;
+            }
+            return `<div class="h-1.5 w-5 rounded-sm overflow-hidden relative" style="background: ${filled ? 'transparent' : 'rgba(255,255,255,0.06)'}">
                             ${filled ? `<div class="absolute inset-0 rounded-sm" style="background: linear-gradient(90deg, ${mod.color}99, ${mod.color});"></div>` : ''}
                             ${active ? `<div class="absolute inset-0 rounded-sm opacity-40" style="background: ${mod.color}; animation: pulse 1s ease-in-out infinite;"></div>` : ''}
                         </div>`;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>`;
 
@@ -2271,7 +2272,37 @@ function renderForge() {
     initForgeSparkListeners();
 }
 
+// ===== THEME =====
+
+function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    localStorage.setItem('ascendora_theme', isLight ? 'light' : 'dark');
+    updateThemeUI(isLight);
+}
+
+function updateThemeUI(isLight) {
+    const icon    = document.getElementById('theme-icon');
+    const label   = document.getElementById('theme-label');
+    const sw      = document.getElementById('theme-switch');
+    const knob    = document.getElementById('theme-knob');
+    const logo    = document.getElementById('sidebar-logo');
+    if (icon)  icon.className  = `fa-solid ${isLight ? 'fa-sun' : 'fa-moon'} text-lg`;
+    if (label) label.textContent = isLight ? 'Mode clair' : 'Mode sombre';
+    if (sw)    sw.style.background = isLight ? 'var(--c-primary)' : '';
+    if (knob)  knob.style.transform = isLight ? 'translateX(16px)' : '';
+    if (knob)  knob.style.background = isLight ? '#fff' : '';
+    if (logo)  logo.src = isLight ? 'assets/light_logo.png' : 'assets/dark_Logo.png';
+}
+
+function initTheme() {
+    const saved = localStorage.getItem('ascendora_theme');
+    const isLight = saved === 'light';
+    if (isLight) document.documentElement.classList.add('light');
+    updateThemeUI(isLight);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     loadState();
     loadAchievements();
     loadForgeModules();
@@ -2286,7 +2317,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Fermer la modal active en cliquant sur le backdrop (hors du contenu)
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal(modal.id);
+            if (e.target === modal && !modal.hasAttribute('data-no-backdrop-close')) closeModal(modal.id);
         });
     });
 
@@ -2912,102 +2943,175 @@ function createFireParticlesFromPoint(x, y) {
 
 // ===== NOTES PERSONNELLES =====
 
-function addNote() {
-    const contentEl = document.getElementById('note-content');
-    const content = contentEl.value.trim();
+// ===== NOTES PERSONNELLES =====
 
-    if (!content) {
-        alert('Veuillez écrire une note');
+function noteCmd(cmd) {
+    document.getElementById('note-editor')?.focus();
+    document.execCommand(cmd, false, null);
+    updateNoteToolbar();
+}
+
+function noteHeading() {
+    const editor = document.getElementById('note-editor');
+    if (!editor) return;
+    editor.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const block = range.startContainer.nodeType === 3
+        ? range.startContainer.parentElement
+        : range.startContainer;
+    const inH2 = block.closest('h2');
+    if (inH2) {
+        document.execCommand('formatBlock', false, 'p');
+    } else {
+        document.execCommand('formatBlock', false, 'h2');
+    }
+    updateNoteToolbar();
+}
+
+function updateNoteToolbar() {
+    const map = {
+        'bold': 'fa-bold',
+        'italic': 'fa-italic',
+        'underline': 'fa-underline',
+        'strikeThrough': 'fa-strikethrough',
+        'insertUnorderedList': 'fa-list-ul',
+        'insertOrderedList': 'fa-list-ol',
+    };
+    Object.entries(map).forEach(([cmd, icon]) => {
+        const btn = document.querySelector(`.note-tool-btn i.${icon}`)?.closest('.note-tool-btn');
+        if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
+    });
+    // Heading
+    const headingBtn = document.querySelector('.note-tool-btn i.fa-heading')?.closest('.note-tool-btn');
+    if (headingBtn) {
+        const sel = window.getSelection();
+        const block = sel?.rangeCount
+            ? (sel.getRangeAt(0).startContainer.nodeType === 3
+                ? sel.getRangeAt(0).startContainer.parentElement
+                : sel.getRangeAt(0).startContainer)
+            : null;
+        headingBtn.classList.toggle('active', !!block?.closest('h2'));
+    }
+}
+
+function openNoteEditor(id = null) {
+    _editingNoteId = id;
+    const titleInput = document.getElementById('note-title-input');
+    const editor = document.getElementById('note-editor');
+    const modalTitle = document.getElementById('note-modal-title');
+    const modalIcon = document.getElementById('note-modal-icon');
+
+    if (id) {
+        const note = state.notes.find(n => n.id === id);
+        if (!note) return;
+        if (titleInput) titleInput.value = note.title || '';
+        if (editor) editor.innerHTML = note.content || '';
+        if (modalTitle) modalTitle.textContent = 'Modifier la note';
+        if (modalIcon) modalIcon.className = 'fa-solid fa-pen text-purple-400 text-sm';
+    } else {
+        if (titleInput) titleInput.value = '';
+        if (editor) editor.innerHTML = '';
+        if (modalTitle) modalTitle.textContent = 'Nouvelle note';
+        if (modalIcon) modalIcon.className = 'fa-solid fa-plus text-purple-400 text-sm';
+    }
+
+    openModal('modal-note-edit');
+    setTimeout(() => {
+        if (!titleInput?.value) titleInput?.focus();
+        else editor?.focus();
+        // Écouter les changements de sélection pour mettre à jour la toolbar
+        editor?.addEventListener('keyup', updateNoteToolbar);
+        editor?.addEventListener('mouseup', updateNoteToolbar);
+        editor?.addEventListener('selectionchange', updateNoteToolbar);
+    }, 150);
+}
+
+// Conservé pour compatibilité
+function addNote() { openNoteEditor(); }
+function editNote(id) { openNoteEditor(id); }
+
+function saveNoteEdit() {
+    const titleInput = document.getElementById('note-title-input');
+    const editor = document.getElementById('note-editor');
+    const title = titleInput ? titleInput.value.trim() : '';
+    const content = editor ? editor.innerHTML.trim() : '';
+
+    if (!content || content === '<br>') {
+        closeModal('modal-note-edit');
         return;
     }
 
-    const note = {
-        id: Date.now(),
-        content: content,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    };
+    if (_editingNoteId) {
+        const note = state.notes.find(n => n.id === _editingNoteId);
+        if (note) {
+            note.title = title;
+            note.content = content;
+            note.updatedAt = new Date().toISOString();
+        }
+    } else {
+        state.notes.push({
+            id: Date.now(),
+            title,
+            content,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+        checkAchievements();
+    }
 
-    state.notes.push(note);
-    contentEl.value = '';
-
+    _editingNoteId = null;
+    saveState();
     renderNotes();
     updateNotesCount();
-    saveState();
-    checkAchievements();
+    closeModal('modal-note-edit');
 }
 
 function renderNotes() {
     const container = document.getElementById('notes-list');
-    container.innerHTML = '';
+    if (!container) return;
 
     if (state.notes.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-inbox text-3xl mb-3 block opacity-50"></i><p class="text-sm">Aucune note pour le moment</p></div>';
+        container.innerHTML = `
+            <div class="col-span-full select-none text-center py-16 text-slate-500">
+                <i class="fa-solid fa-book-open text-4xl mb-4 opacity-30 block"></i>
+                <p class="text-sm">Aucune note. Créez-en une !</p>
+            </div>`;
         return;
     }
 
-    const sortedNotes = [...state.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    const sorted = [...state.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-    sortedNotes.forEach(note => {
-        const div = document.createElement('div');
-        div.className = 'glass p-3 rounded-xl border select-none border-white/10 group hover:border-purple-500/30 transition-all cursor-pointer';
-
-        const updatedDate = new Date(note.updatedAt);
-        const dateStr = updatedDate.toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+    container.innerHTML = sorted.map(note => {
+        const date = new Date(note.updatedAt).toLocaleDateString('fr-FR', {
+            day: 'numeric', month: 'short', year: 'numeric'
         });
+        // Aperçu texte brut (sans HTML)
+        const tmp = document.createElement('div');
+        tmp.innerHTML = note.content || '';
+        const preview = (tmp.textContent || '').slice(0, 120);
 
-        div.innerHTML = `
-            <div class="flex items-start justify-between gap-2 mb-1.5">
-                <p class="text-sm text-white flex-1 leading-relaxed">${escapeHtml(note.content)}</p>
-                <button onclick="deleteNote(${note.id})" class="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0 p-1.5 hover:bg-red-500/10 rounded-lg lg:opacity-0 lg:group-hover:opacity-100">
-                    <i class="fa-solid fa-trash-alt text-xs"></i>
-                </button>
-            </div>
-            <div class="text-[10px] text-slate-500 flex items-center gap-1.5">
-                <i class="fa-solid fa-clock"></i>
-                <span>${dateStr}</span>
-                <span class="text-slate-600 ml-1">— appuyer pour modifier</span>
-            </div>
-        `;
-
-        div.addEventListener('click', (e) => {
-            if (!e.target.closest('button')) editNote(note.id);
-        });
-
-        container.appendChild(div);
-    });
-}
-
-let _editingNoteId = null;
-
-function editNote(id) {
-    const note = state.notes.find(n => n.id === id);
-    if (!note) return;
-    _editingNoteId = id;
-    const textarea = document.getElementById('note-edit-content');
-    if (textarea) textarea.value = note.content;
-    openModal('modal-note-edit');
-    setTimeout(() => { if (textarea) { textarea.focus(); textarea.setSelectionRange(textarea.value.length, textarea.value.length); } }, 100);
-}
-
-function saveNoteEdit() {
-    const note = state.notes.find(n => n.id === _editingNoteId);
-    if (!note) return;
-    const textarea = document.getElementById('note-edit-content');
-    const newContent = textarea ? textarea.value.trim() : '';
-    if (newContent) {
-        note.content = newContent;
-        note.updatedAt = new Date().toISOString();
-        renderNotes();
-        saveState();
-    }
-    closeModal('modal-note-edit');
-    _editingNoteId = null;
+        return `
+            <div onclick="openNoteEditor(${note.id})"
+                class="glass p-5 rounded-[2rem] border border-white/5 hover:border-purple-500/30 transition-all cursor-pointer group hover:scale-[1.01] relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500/40 to-transparent"></div>
+                <div class="flex items-start justify-between gap-3 mb-3">
+                    <div class="flex-1 min-w-0">
+                        ${note.title ? `<h3 class="font-bold text-white text-sm truncate mb-1">${escapeHtml(note.title)}</h3>` : ''}
+                        <div class="note-card-content text-xs text-slate-400 leading-relaxed line-clamp-3">${note.content || ''}</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); deleteNote(${note.id})"
+                        class="flex-shrink-0 w-7 h-7 rounded-lg bg-white/5 hover:bg-red-500/20 text-slate-600 hover:text-red-400 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+                <div class="text-[9px] text-slate-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>${date}</span>
+                </div>
+            </div>`;
+    }).join('');
 }
 
 function deleteNote(id) {
@@ -3019,14 +3123,17 @@ function deleteNote(id) {
 
 function updateNotesCount() {
     const count = state.notes.length;
-    const countLabel = pluralize(count, 'note', 'notes');
-    const text = `${count} ${countLabel}`;
+
+    // On définit le texte : si 0, on affiche "Aucune note", sinon on utilise pluralize
+    const text = count === 0
+        ? "Aucune note"
+        : `${count} ${pluralize(count, 'note', 'notes')}`;
+
     ['notes-count', 'notes-count-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = text;
     });
 }
-
 
 // ===== ACHIEVEMENTS =====
 
@@ -3393,14 +3500,21 @@ function renderChronos() {
 
     // Count + coins display
     const countEl = document.getElementById('chronos-count');
-    if (countEl) countEl.textContent = `${active.length} événement${active.length !== 1 ? 's' : ''} actif${active.length !== 1 ? 's' : ''}`;
+    if (countEl) {
+        if (active.length < 1) {
+            countEl.textContent = "Aucun événement";
+        } else {
+            const s = active.length > 1 ? 's' : '';
+            countEl.textContent = `${active.length} événement${s} actif${s}`;
+        }
+    }
     updateCoinsDisplay();
     // Active list
     const list = document.getElementById('chronos-list');
     if (!list) return;
 
     if (active.length === 0) {
-        list.innerHTML = `<div class="text-center py-16 text-slate-500">
+        list.innerHTML = `<div class="text-center select-none py-16 text-slate-500">
             <i class="fa-solid fa-hourglass-start text-4xl mb-4 opacity-30"></i>
             <p class="text-sm">Aucun événement actif.</p>
         </div>`;
@@ -3502,7 +3616,7 @@ function renderChronos() {
     const archivesList = document.getElementById('chronos-archives-list');
     if (archivesList) {
         if (archived.length === 0) {
-            archivesList.innerHTML = '<p class="italic text-xs text-slate-600">Aucune archive.</p>';
+            archivesList.innerHTML = '<p class="italic text-xs select-none text-slate-600">Aucune archive.</p>';
         } else {
             archivesList.innerHTML = archived.slice(0, 5).map(ev => {
                 const done = ev.tasks.filter(t => t.done).length;
