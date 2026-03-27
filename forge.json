@@ -10,10 +10,13 @@
       "effectStep": 10,
       "levels": [
         { "cost": 50,   "duration": 30 },
-        { "cost": 150,  "duration": 120 },
-        { "cost": 400,  "duration": 600 },
-        { "cost": 900,  "duration": 3600 },
-        { "cost": 1500, "duration": 10800 }
+        { "cost": 120,  "duration": 90 },
+        { "cost": 250,  "duration": 240 },
+        { "cost": 500,  "duration": 600 },
+        { "cost": 900,  "duration": 1500 },
+        { "cost": 1500, "duration": 3600 },
+        { "cost": 2400, "duration": 7200 },
+        { "cost": 4000, "duration": 14400 }
       ]
     },
     {
@@ -26,10 +29,13 @@
       "effectStep": 5,
       "levels": [
         { "cost": 50,   "duration": 30 },
-        { "cost": 150,  "duration": 120 },
-        { "cost": 400,  "duration": 600 },
-        { "cost": 900,  "duration": 3600 },
-        { "cost": 1500, "duration": 10800 }
+        { "cost": 120,  "duration": 90 },
+        { "cost": 250,  "duration": 240 },
+        { "cost": 500,  "duration": 600 },
+        { "cost": 900,  "duration": 1500 },
+        { "cost": 1500, "duration": 3600 },
+        { "cost": 2400, "duration": 7200 },
+        { "cost": 4000, "duration": 14400 }
       ]
     },
     {
@@ -42,10 +48,13 @@
       "effectStep": 15,
       "levels": [
         { "cost": 50,   "duration": 30 },
-        { "cost": 150,  "duration": 120 },
-        { "cost": 400,  "duration": 600 },
-        { "cost": 900,  "duration": 3600 },
-        { "cost": 1500, "duration": 10800 }
+        { "cost": 120,  "duration": 90 },
+        { "cost": 250,  "duration": 240 },
+        { "cost": 500,  "duration": 600 },
+        { "cost": 900,  "duration": 1500 },
+        { "cost": 1500, "duration": 3600 },
+        { "cost": 2400, "duration": 7200 },
+        { "cost": 4000, "duration": 14400 }
       ]
     },
     {
@@ -58,10 +67,13 @@
       "effectStep": 8,
       "levels": [
         { "cost": 50,   "duration": 30 },
-        { "cost": 150,  "duration": 120 },
-        { "cost": 400,  "duration": 600 },
-        { "cost": 900,  "duration": 3600 },
-        { "cost": 1500, "duration": 10800 }
+        { "cost": 120,  "duration": 90 },
+        { "cost": 250,  "duration": 240 },
+        { "cost": 500,  "duration": 600 },
+        { "cost": 900,  "duration": 1500 },
+        { "cost": 1500, "duration": 3600 },
+        { "cost": 2400, "duration": 7200 },
+        { "cost": 4000, "duration": 14400 }
       ]
     }
   ]
