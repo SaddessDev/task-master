@@ -45,7 +45,7 @@
       "color": "#f97316",
       "desc": "Augmente le bonus de récompense du streak quotidien.",
       "effectLabel": "+{n}% bonus streak",
-      "effectStep": 15,
+      "effectStep": 8,
       "levels": [
         { "cost": 50,   "duration": 30 },
         { "cost": 120,  "duration": 90 },
