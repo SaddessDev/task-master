@@ -46,7 +46,18 @@ const DB = {
             dailyBonusClaimedAt: null,
             lastAscensionPurchase: null,
             chronosEvents: [],
+            activeEventType: 'all',
             forge: {},
+            eventTypes: [
+                { id: 1, name: 'Général',      icon: 'fa-tag',            color: '#06b6d4' },
+                { id: 2, name: 'Anniversaire', icon: 'fa-cake-candles',   color: '#ec4899' },
+                { id: 3, name: 'Rendez-vous',  icon: 'fa-stethoscope',    color: '#10b981' },
+                { id: 4, name: 'Réunion',      icon: 'fa-briefcase',      color: '#f59e0b' },
+                { id: 5, name: 'Voyage',       icon: 'fa-plane',          color: '#8b5cf6' },
+                { id: 6, name: 'Deadline',     icon: 'fa-clock',          color: '#ef4444' },
+                { id: 7, name: 'Célébration',  icon: 'fa-champagne-glasses', color: '#f97316' },
+                { id: 8, name: 'Sport',        icon: 'fa-dumbbell',       color: '#14b8a6' },
+            ],
             chronosEventsCreated: 0,
             chronosEventsCompleted: 0,
             forgeBuilds: 0,
@@ -130,6 +141,11 @@ const DB = {
         // S'assurer que les catégories par défaut existent
         if (!migratedState.categories || migratedState.categories.length === 0) {
             migratedState.categories = defaultState.categories;
+        }
+
+        // S'assurer que les types d'événements par défaut existent
+        if (!migratedState.eventTypes || migratedState.eventTypes.length === 0) {
+            migratedState.eventTypes = defaultState.eventTypes;
         }
         
         // Nettoyer les données invalides

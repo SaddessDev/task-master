@@ -9,13 +9,54 @@ const ASC_RATE = 4;             // Points d'ascension gagnés par 10 crédits
 const CONFIG = {
     THEMES: ['#06b6d4', '#a855f7', '#ec4899', '#10b981', '#f59e0b', '#ef4444'],
     ICON_POOL: [
-        'fa-tag', 'fa-heart', 'fa-briefcase', 'fa-dumbbell', 'fa-code', 'fa-book',
-        'fa-gamepad', 'fa-utensils', 'fa-brain', 'fa-bolt', 'fa-music', 'fa-gem',
-        'fa-rocket', 'fa-star', 'fa-fire', 'fa-trophy', 'fa-medal', 'fa-flag',
-        'fa-bullseye', 'fa-chart-line', 'fa-laptop-code', 'fa-palette', 'fa-camera',
-        'fa-plane', 'fa-bicycle', 'fa-coffee', 'fa-pizza-slice', 'fa-shopping-cart',
-        'fa-home', 'fa-car', 'fa-tree', 'fa-sun', 'fa-moon', 'fa-cloud',
-        'fa-umbrella', 'fa-gift', 'fa-bell', 'fa-envelope', 'fa-phone', 'fa-clock'
+'fa-house', 'fa-magnifying-glass', 'fa-user', 'fa-check', 'fa-xmark', 
+    'fa-bars', 'fa-gear', 'fa-bell', 'fa-ellipsis', 'fa-ellipsis-vertical', 
+    'fa-filter', 'fa-sort', 'fa-arrow-right', 'fa-arrow-left', 'fa-chevron-down',
+    'fa-circle-info', 'fa-circle-question', 'fa-circle-exclamation', 'fa-trash-can', 'fa-pen-to-square',
+
+    // --- Business & Finance ---
+    'fa-cart-shopping', 'fa-bag-shopping', 'fa-credit-card', 'fa-wallet', 'fa-money-bill-1', 
+    'fa-coins', 'fa-landmark', 'fa-chart-simple', 'fa-chart-pie', 'fa-chart-line', 
+    'fa-file-invoice-dollar', 'fa-handshake', 'fa-briefcase', 'fa-receipt', 'fa-piggy-bank',
+
+    // --- Technologie & Digital ---
+    'fa-laptop', 'fa-mobile-screen-button', 'fa-microchip', 'fa-database', 'fa-server', 
+    'fa-code', 'fa-terminal', 'fa-wifi', 'fa-shield-halved', 'fa-lock', 
+    'fa-unlock', 'fa-key', 'fa-battery-full', 'fa-print', 'fa-floppy-disk',
+
+    // --- Communication ---
+    'fa-envelope', 'fa-message', 'fa-comment-dots', 'fa-share-nodes', 'fa-paper-plane', 
+    'fa-phone', 'fa-video', 'fa-microphone', 'fa-at', 'fa-rss', 
+    'fa-thumbs-up', 'fa-thumbs-down', 'fa-heart', 'fa-eye', 'fa-user-group',
+
+    // --- Design & Médias ---
+    'fa-palette', 'fa-brush', 'fa-pen-nib', 'fa-camera', 'fa-image', 
+    'fa-film', 'fa-play', 'fa-pause', 'fa-stop', 'fa-forward', 
+    'fa-backward', 'fa-volume-high', 'fa-music', 'fa-headphones', 'fa-icons',
+
+    // --- Santé & Sport ---
+    'fa-heart-pulse', 'fa-stethoscope', 'fa-kit-medical', 'fa-pills', 'fa-hospital', 
+    'fa-dumbbell', 'fa-person-running', 'fa-bicycle', 'fa-medal', 'fa-trophy', 
+    'fa-baseball', 'fa-basketball', 'fa-football', 'fa-mound', 'fa-spa',
+
+    // --- Food & Travel ---
+    'fa-utensils', 'fa-mug-hot', 'fa-burger', 'fa-pizza-slice', 'fa-cake-candles', 
+    'fa-wine-glass', 'fa-plane', 'fa-car', 'fa-train', 'fa-map-location-dot', 
+    'fa-compass', 'fa-hotel', 'fa-mountain-sun', 'fa-earth-europe', 'fa-suitcase-rolling',
+
+    // --- Objets & Nature ---
+    'fa-gift', 'fa-bolt', 'fa-fire', 'fa-leaf', 'fa-tree', 
+    'fa-seedling', 'fa-sun', 'fa-moon', 'fa-cloud', 'fa-umbrella', 
+    'fa-snowflake', 'fa-droplet', 'fa-hammer', 'fa-wrench', 'fa-screwdriver-wrench',
+
+    // --- Éducation & Bureau ---
+    'fa-book', 'fa-graduation-cap', 'fa-chalkboard-user', 'fa-pencil', 'fa-paperclip', 
+    'fa-folder-open', 'fa-calendar-days', 'fa-clock', 'fa-clipboard-list', 'fa-note-sticky', 
+    'fa-brain', 'fa-lightbulb', 'fa-quote-left', 'fa-calculator', 'fa-compass-drafting',
+
+    // --- Divers ---
+    'fa-rocket', 'fa-gem', 'fa-star', 'fa-bullseye', 'fa-puzzle-piece', 
+    'fa-robot', 'fa-ghost', 'fa-dice', 'fa-gamepad'
     ],
     STAGES: [
         { min: 0, n: "Novice", r: "Rang I", i: "1", desc: "Le début de votre voyage" },
@@ -631,13 +672,23 @@ function renderFilterBar() {
     const bar = document.getElementById('filter-bar');
     const cats = [{ name: 'Toutes', icon: 'fa-layer-group', color: '#06b6d4' }, ...state.categories];
 
+    // Si la catégorie active n'a plus d'objectifs, revenir à "Toutes"
+    if (state.activeCat !== 'Toutes') {
+        const catExists = state.categories.find(c => c.name === state.activeCat);
+        const catHasQuests = state.quests.some(q => q.cat === state.activeCat);
+        if (!catExists || !catHasQuests) state.activeCat = 'Toutes';
+    }
+
     bar.innerHTML = cats.map(c => {
-        const total = c.name === 'Toutes'
-            ? state.quests.length
-            : state.quests.filter(q => q.cat === c.name).length;
         const activeCount = c.name === 'Toutes'
             ? state.quests.filter(q => !q.done).length
             : state.quests.filter(q => q.cat === c.name && !q.done).length;
+        const totalCount = c.name === 'Toutes'
+            ? state.quests.length
+            : state.quests.filter(q => q.cat === c.name).length;
+
+        // Masquer les catégories sans aucun objectif (sauf "Toutes" et la catégorie active)
+        if (c.name !== 'Toutes' && state.activeCat !== c.name && totalCount === 0) return '';
 
         const isActive = state.activeCat === c.name;
         const validColor = isValidHexColor(c.color) ? c.color : '#06b6d4';
@@ -645,9 +696,9 @@ function renderFilterBar() {
 
         return `
             <button onclick="filterByCategory('${escapeHtml(c.name)}')" class="filter-btn flex-shrink-0 px-5 py-3 rounded-2xl text-[10px] font-black uppercase transition-all flex items-center gap-3 ${isActive ? 'text-white shadow-xl scale-105' : 'glass text-slate-400 hover:scale-105'}" style="${bgStyle}">
-                <i class="fa-solid ${isValidIcon(c.icon) ? c.icon : 'fa-tag'} text-base"></i> 
+                <i class="fa-solid ${isValidIcon(c.icon) ? c.icon : 'fa-tag'} text-base"></i>
                 <span>${escapeHtml(c.name)}</span>
-                <span class="opacity-60 font-mono text-[9px] ml-1">${activeCount}/${total}</span>
+                <span class="opacity-60 font-mono text-[9px] ml-1">${activeCount}${totalCount > activeCount ? `/${totalCount}` : ''}</span>
             </button>`;
     }).join('');
 }
@@ -2307,6 +2358,21 @@ window.addEventListener('DOMContentLoaded', () => {
     loadAchievements();
     loadForgeModules();
     render();
+    // Enregistrer le Service Worker et gérer les notifications
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            console.log('[SW] Enregistré', reg.scope);
+        }).catch(err => console.warn('[SW] Erreur:', err));
+    }
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+    // Replanifier les rappels des événements existants
+    if (state.chronosEvents) {
+        state.chronosEvents.filter(e => !e.archived && e.reminder && !e.reminderFired)
+            .forEach(scheduleChronosReminder);
+    }
+    syncRemindersToSW();
     initFilterBarDrag();
 
     // Fermer la modal active avec Escape
@@ -2388,7 +2454,7 @@ function navigateTo(page) {
         peace: 'Apaisement',
         notes: 'Notes',
         achievements: 'Succès',
-        chronos: 'Chronos',
+        chronos: 'Événements',
         forge: 'Forge'
     };
     document.title = `Ascendora | ${pageTitles[page] || page}`;
@@ -3331,17 +3397,265 @@ function renderAchievements() {
 // ===== CHRONOS =====
 
 let chronosCountdownInterval = null;
+let chronosEditingId = null;
+let editingEventTypeId = null;
+let selectedEventTypeId = 1;
+let etSelectedIcon = 'fa-tag';
+let etSelectedColor = '#06b6d4';
 
-let chronosEditingId = null; // null = création, sinon id de l'event édité
+// ===== GESTION DES TYPES D'ÉVÉNEMENTS =====
+
+function getEventTypes() {
+    if (!state.eventTypes || state.eventTypes.length === 0) {
+        state.eventTypes = [{ id: 1, name: 'Général', icon: 'fa-tag', color: '#06b6d4' }];
+    }
+    return state.eventTypes;
+}
+
+function getEventType(id) {
+    return getEventTypes().find(t => t.id === id) || getEventTypes()[0];
+}
+
+function openEventTypesModal() {
+    editingEventTypeId = null;
+    etSelectedIcon = 'fa-tag';
+    etSelectedColor = '#06b6d4';
+    openModal('modal-event-types');
+    // Attendre que la modal soit visible avant de rendre
+    setTimeout(() => {
+        renderEventTypesList();
+        initEtIconPicker();
+        initEtColorPicker();
+    }, 50);
+}
+
+function renderEventTypesList() {
+    const list = document.getElementById('event-types-list');
+    if (!list) return;
+    const types = getEventTypes();
+    if (types.length === 0) {
+        list.innerHTML = '<p class="text-xs text-slate-600 italic text-center py-4">Aucun type défini</p>';
+        return;
+    }
+    list.innerHTML = types.map(t => `
+        <div draggable="true" data-et-id="${t.id}"
+            class="flex items-center gap-3 glass p-3 rounded-2xl border-white/5 hover:border-orange-500/20 transition-all group cursor-move">
+            <i class="fa-solid fa-grip-vertical text-slate-700 pointer-events-none"></i>
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 pointer-events-none"
+                style="background:${t.color}33; border:1px solid ${t.color}55;">
+                <i class="fa-solid ${t.icon} text-sm" style="color:${t.color};"></i>
+            </div>
+            <span class="flex-1 text-xs font-bold text-white pointer-events-none">${escapeHtml(t.name)}</span>
+            <div class="flex gap-1">
+                <button onclick="startEditEventType(${t.id})" class="p-1.5 text-slate-500 hover:text-orange-400 transition-colors">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                </button>
+                <button onclick="deleteEventType(${t.id})" class="p-1.5 text-slate-500 hover:text-red-400 transition-colors">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+            </div>
+        </div>`).join('');
+    initEtDrag();
+}
+
+function initEtIconPicker() {
+    const picker = document.getElementById('et-icon-picker');
+    if (!picker) return;
+    picker.innerHTML = CONFIG.ICON_POOL.map(icon => `
+        <button onclick="selectEtIcon('${icon}')" title="${icon.replace('fa-','')}"
+            class="aspect-square rounded-xl flex items-center justify-center transition-all duration-150 outline outline-2 ${etSelectedIcon === icon ? 'outline-orange-500 bg-orange-500/20 text-orange-400' : 'outline-transparent bg-white/5 text-slate-400 hover:outline-orange-500/40 hover:text-white hover:bg-white/10'}">
+            <i class="fa-solid ${icon} text-sm"></i>
+        </button>`).join('');
+}
+
+function selectEtIcon(icon) {
+    etSelectedIcon = icon;
+    initEtIconPicker();
+}
+
+function initEtColorPicker() {
+    const picker = document.getElementById('et-color-picker');
+    if (!picker) return;
+    const colors = ['#06b6d4','#a855f7','#ec4899','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#f97316','#14b8a6','#84cc16','#e11d48'];
+    picker.innerHTML = colors.map(c => `
+        <button onclick="selectEtColor('${c}')"
+            class="aspect-square rounded-xl transition-all ${etSelectedColor === c ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900' : 'hover:brightness-125'}"
+            style="background:${c};"></button>`).join('');
+}
+
+function selectEtColor(color) {
+    etSelectedColor = color;
+    initEtColorPicker();
+}
+
+function startEditEventType(id) {
+    const t = getEventTypes().find(x => x.id === id);
+    if (!t) return;
+    editingEventTypeId = id;
+    etSelectedIcon = t.icon;
+    etSelectedColor = t.color;
+    const input = document.getElementById('et-name-input');
+    if (input) input.value = t.name;
+    document.getElementById('et-form-label').textContent = 'Modifier le type';
+    document.getElementById('et-save-icon').className = 'fa-solid fa-check';
+    document.getElementById('et-cancel-btn').classList.remove('hidden');
+    initEtIconPicker();
+    initEtColorPicker();
+}
+
+function cancelEditEventType() {
+    editingEventTypeId = null;
+    etSelectedIcon = 'fa-tag';
+    etSelectedColor = '#06b6d4';
+    const input = document.getElementById('et-name-input');
+    if (input) input.value = '';
+    document.getElementById('et-form-label').textContent = 'Nouveau type';
+    document.getElementById('et-save-icon').className = 'fa-solid fa-plus';
+    document.getElementById('et-cancel-btn').classList.add('hidden');
+    initEtIconPicker();
+    initEtColorPicker();
+}
+
+function saveEventType() {
+    const input = document.getElementById('et-name-input');
+    const name = input ? input.value.trim() : '';
+    if (!name) return;
+    if (editingEventTypeId) {
+        const t = getEventTypes().find(x => x.id === editingEventTypeId);
+        if (t) { t.name = name; t.icon = etSelectedIcon; t.color = etSelectedColor; }
+    } else {
+        const ids = getEventTypes().map(t => t.id);
+        const newId = ids.length > 0 ? Math.max(...ids) + 1 : 1;
+        state.eventTypes.push({ id: newId, name, icon: etSelectedIcon, color: etSelectedColor });
+    }
+    saveState();
+    cancelEditEventType();
+    renderEventTypesList();
+    renderEventTypeDropdown();
+}
+
+function deleteEventType(id) {
+    state.eventTypes = state.eventTypes.filter(t => t.id !== id);
+    if (selectedEventTypeId === id) selectedEventTypeId = getEventTypes()[0]?.id || 1;
+    saveState();
+    renderEventTypesList();
+    renderEventTypeDropdown();
+}
+
+function initEtDrag() {
+    const list = document.getElementById('event-types-list');
+    if (!list) return;
+    let dragTarget = null;
+    list.addEventListener('dragstart', e => {
+        const item = e.target.closest('[data-et-id]');
+        if (!item) return;
+        dragTarget = item;
+        item.classList.add('opacity-40');
+    });
+    list.addEventListener('dragend', () => {
+        if (!dragTarget) return;
+        dragTarget.classList.remove('opacity-40');
+        dragTarget = null;
+        const newOrder = [];
+        list.querySelectorAll('[data-et-id]').forEach(el => {
+            const t = state.eventTypes.find(x => x.id === parseInt(el.dataset.etId));
+            if (t) newOrder.push(t);
+        });
+        state.eventTypes = newOrder;
+        saveState();
+    });
+    list.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (!dragTarget) return;
+        const after = [...list.querySelectorAll('[data-et-id]:not(.opacity-40)')].reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = e.clientY - box.top - box.height / 2;
+            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        after ? list.insertBefore(dragTarget, after) : list.appendChild(dragTarget);
+    });
+}
+
+// ===== DROPDOWN TYPE DANS LA MODAL =====
+
+function toggleEventTypeSelector() {
+    const dd = document.getElementById('et-selector-dropdown');
+    if (!dd) return;
+    if (dd.classList.contains('hidden')) {
+        renderEventTypeDropdown();
+        dd.classList.remove('hidden');
+    } else {
+        dd.classList.add('hidden');
+    }
+}
+
+function renderEventTypeDropdown() {
+    const list = document.getElementById('et-selector-list');
+    if (!list) return;
+    list.innerHTML = getEventTypes().map(t => `
+        <button onclick="selectEventType(${t.id})"
+            class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-all ${selectedEventTypeId === t.id ? 'bg-slate-800/50' : ''}">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${t.color}33;">
+                <i class="fa-solid ${t.icon} text-xs" style="color:${t.color};"></i>
+            </div>
+            <span class="text-xs font-bold text-white flex-1 text-left">${escapeHtml(t.name)}</span>
+            ${selectedEventTypeId === t.id ? '<i class="fa-solid fa-check text-orange-400 text-xs"></i>' : ''}
+        </button>`).join('');
+}
+
+function selectEventType(id) {
+    selectedEventTypeId = id;
+    const t = getEventType(id);
+    document.getElementById('chronos-type-input').value = id;
+    const iconEl = document.getElementById('et-selector-icon');
+    const nameEl = document.getElementById('et-selector-name');
+    if (iconEl) {
+        iconEl.style.background = t.color + '33';
+        iconEl.innerHTML = `<i class="fa-solid ${t.icon} text-xs" style="color:${t.color};"></i>`;
+    }
+    if (nameEl) nameEl.textContent = t.name;
+    const dd = document.getElementById('et-selector-dropdown');
+    if (dd) dd.classList.add('hidden');
+}
+
+// Fermer le dropdown type si clic ailleurs
+document.addEventListener('click', e => {
+    const dd = document.getElementById('et-selector-dropdown');
+    const btn = document.getElementById('et-selector-btn');
+    if (dd && btn && !dd.contains(e.target) && !btn.contains(e.target)) {
+        dd.classList.add('hidden');
+    }
+});
+
+function toggleChronosReminderFields() {
+    const el = document.getElementById('chronos-reminder-fields');
+    if (el) el.classList.toggle('hidden', !document.getElementById('chronos-reminder-check').checked);
+}
+
+function toggleChronosRecurFields() {
+    const el = document.getElementById('chronos-recur-fields');
+    if (el) el.classList.toggle('hidden', !document.getElementById('chronos-recur-check').checked);
+}
 
 function openChronosAdd() {
     chronosEditingId = null;
     document.getElementById('chronos-name-input').value = '';
     document.getElementById('chronos-date-input').value = '';
     document.getElementById('chronos-tasks-input').value = '';
+    document.getElementById('chronos-reminder-check').checked = false;
+    document.getElementById('chronos-reminder-fields').classList.add('hidden');
+    document.getElementById('chronos-reminder-value').value = 30;
+    document.getElementById('chronos-reminder-unit').value = 'minutes';
+    document.getElementById('chronos-recur-check').checked = false;
+    document.getElementById('chronos-recur-fields').classList.add('hidden');
+    document.getElementById('chronos-recur-value').value = 1;
+    document.getElementById('chronos-recur-unit').value = 'days';
     document.getElementById('chronos-modal-title').textContent = 'Nouvel événement';
-    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-plus text-white text-sm';
-    document.getElementById('chronos-submit-label').innerHTML = '<i class="fa-solid fa-plus"></i> Créer l\'événement';
+    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-calendar-plus text-orange-400 text-sm';
+    document.getElementById('chronos-submit-label').innerHTML = '<i class="fa-solid fa-plus"></i> Créer';
+    // Reset type selector
+    selectedEventTypeId = getEventTypes()[0]?.id || 1;
+    selectEventType(selectedEventTypeId);
     openModal('modal-chronos-add');
 }
 
@@ -3351,26 +3665,62 @@ function openChronosEdit(id) {
     chronosEditingId = id;
 
     document.getElementById('chronos-name-input').value = ev.name;
+    document.getElementById('chronos-type-input').value = ev.type || getEventTypes()[0]?.id || 1;
+    selectedEventTypeId = parseInt(ev.type) || getEventTypes()[0]?.id || 1;
+    selectEventType(selectedEventTypeId);
     const d = new Date(ev.deadline);
-    // format datetime-local : YYYY-MM-DDTHH:MM
     const pad = n => String(n).padStart(2, '0');
     document.getElementById('chronos-date-input').value =
-        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     document.getElementById('chronos-tasks-input').value = ev.tasks.map(t => t.text).join('\n');
+
+    // Rappel
+    const hasReminder = !!(ev.reminder);
+    document.getElementById('chronos-reminder-check').checked = hasReminder;
+    document.getElementById('chronos-reminder-fields').classList.toggle('hidden', !hasReminder);
+    if (ev.reminder) {
+        document.getElementById('chronos-reminder-value').value = ev.reminder.value;
+        document.getElementById('chronos-reminder-unit').value = ev.reminder.unit;
+    }
+
+    // Récurrence
+    const hasRecur = !!(ev.recurrence);
+    document.getElementById('chronos-recur-check').checked = hasRecur;
+    document.getElementById('chronos-recur-fields').classList.toggle('hidden', !hasRecur);
+    if (ev.recurrence) {
+        document.getElementById('chronos-recur-value').value = ev.recurrence.value;
+        document.getElementById('chronos-recur-unit').value = ev.recurrence.unit;
+    }
+
     document.getElementById('chronos-modal-title').textContent = 'Modifier l\'événement';
-    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-pen text-white text-sm';
+    document.getElementById('chronos-modal-icon').className = 'fa-solid fa-pen text-orange-400 text-sm';
     document.getElementById('chronos-submit-label').innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer';
     openModal('modal-chronos-add');
 }
 
 function submitChronosEvent() {
-    const name = document.getElementById('chronos-name-input').value.trim();
+    const name    = document.getElementById('chronos-name-input').value.trim();
     const dateVal = document.getElementById('chronos-date-input').value;
+    const type = parseInt(document.getElementById('chronos-type-input').value) || selectedEventTypeId;
     const tasksRaw = document.getElementById('chronos-tasks-input').value;
 
     if (!name || !dateVal) { fx('modal-chronos-add', 'animate-shake'); return; }
     const deadline = new Date(dateVal).getTime();
     if (deadline <= Date.now() && !chronosEditingId) { fx('modal-chronos-add', 'animate-shake'); return; }
+
+    // Rappel
+    const reminderEnabled = document.getElementById('chronos-reminder-check').checked;
+    const reminder = reminderEnabled ? {
+        value: parseInt(document.getElementById('chronos-reminder-value').value) || 30,
+        unit:  document.getElementById('chronos-reminder-unit').value
+    } : null;
+
+    // Récurrence
+    const recurEnabled = document.getElementById('chronos-recur-check').checked;
+    const recurrence = recurEnabled ? {
+        value: parseInt(document.getElementById('chronos-recur-value').value) || 1,
+        unit:  document.getElementById('chronos-recur-unit').value
+    } : null;
 
     if (!state.chronosEvents) state.chronosEvents = [];
 
@@ -3378,8 +3728,10 @@ function submitChronosEvent() {
         const ev = state.chronosEvents.find(e => e.id === chronosEditingId);
         if (ev) {
             ev.name = name;
+            ev.type = type;
             ev.deadline = deadline;
-            // Conserver les tâches existantes avec leur état done, ajouter les nouvelles
+            ev.reminder = reminder;
+            ev.recurrence = recurrence;
             const newTexts = tasksRaw.split('\n').map(t => t.trim()).filter(Boolean);
             ev.tasks = newTexts.map(text => {
                 const existing = ev.tasks.find(t => t.text === text);
@@ -3389,13 +3741,23 @@ function submitChronosEvent() {
     } else {
         const tasks = tasksRaw.split('\n').map(t => t.trim()).filter(Boolean)
             .map(t => ({ id: Date.now() + Math.random(), text: t, done: false }));
-        state.chronosEvents.push({ id: Date.now(), name, deadline, tasks, archived: false, completedAt: null, rewardClaimed: false });
+        state.chronosEvents.push({
+            id: Date.now(), name, type, deadline, tasks,
+            archived: false, completedAt: null, rewardClaimed: false,
+            reminder, recurrence, reminderFired: false
+        });
     }
     state.chronosEventsCreated = (state.chronosEventsCreated || 0) + 1;
+
+    // Planifier le rappel si activé
+    if (reminder && !chronosEditingId) {
+        scheduleChronosReminder(state.chronosEvents[state.chronosEvents.length - 1]);
+    }
 
     saveState();
     closeModal('modal-chronos-add');
     renderChronos();
+    syncRemindersToSW();
 }
 
 function addChronosEvent() { submitChronosEvent(); } // compat
@@ -3475,6 +3837,149 @@ function formatCountdown(ms) {
     return { label, urgent };
 }
 
+function computeNextRecurrence(deadline, recurrence) {
+    const { value, unit } = recurrence;
+    const d = new Date(deadline);
+    switch (unit) {
+        case 'minutes': d.setMinutes(d.getMinutes() + value); break;
+        case 'hours':   d.setHours(d.getHours() + value); break;
+        case 'days':    d.setDate(d.getDate() + value); break;
+        case 'months':  d.setMonth(d.getMonth() + value); break;
+        case 'years':   d.setFullYear(d.getFullYear() + value); break;
+    }
+    return d.getTime();
+}
+
+function scheduleChronosReminder(ev) {
+    if (!ev.reminder || ev.reminderFired) return;
+    const unitMs = { minutes: 60000, hours: 3600000, days: 86400000 };
+    const offsetMs = ev.reminder.value * (unitMs[ev.reminder.unit] || 60000);
+    const fireAt = ev.deadline - offsetMs;
+    const delay = fireAt - Date.now();
+    if (delay <= 0) return;
+    // Fallback in-tab setTimeout (si l'onglet reste ouvert)
+    setTimeout(() => {
+        const current = state.chronosEvents.find(e => e.id === ev.id);
+        if (!current || current.archived || current.reminderFired) return;
+        current.reminderFired = true;
+        saveState();
+        showChronosReminderAlert(current);
+    }, delay);
+}
+
+// Envoie tous les rappels actifs au Service Worker
+function syncRemindersToSW() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.ready.then(reg => {
+        if (!reg.active) return;
+        const reminders = (state.chronosEvents || [])
+            .filter(e => !e.archived && e.reminder && !e.reminderFired)
+            .map(e => {
+                const unitMs = { minutes: 60000, hours: 3600000, days: 86400000 };
+                const offsetMs = e.reminder.value * (unitMs[e.reminder.unit] || 60000);
+                const t = getEventType(e.type);
+                return {
+                    id: e.id,
+                    name: e.name,
+                    fireAt: e.deadline - offsetMs,
+                    body: new Date(e.deadline).toLocaleDateString('fr-FR', {
+                        weekday: 'long', day: 'numeric', month: 'long',
+                        hour: '2-digit', minute: '2-digit'
+                    }),
+                    icon: '/assets/favicon.ico'
+                };
+            })
+            .filter(r => r.fireAt > Date.now());
+        reg.active.postMessage({ type: 'SCHEDULE_REMINDERS', reminders });
+    });
+}
+
+function showChronosReminderAlert(ev) {
+    const t = getEventType(ev.type);
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[300] glass px-5 py-4 rounded-2xl border border-orange-500/40 bg-orange-500/10 max-w-sm w-full mx-4 shadow-2xl';
+    toast.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${t.color}33;">
+                <i class="fa-solid ${t.icon} text-sm" style="color:${t.color};"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="font-black text-white text-sm mb-0.5">Rappel — ${escapeHtml(ev.name)}</div>
+                <div class="text-xs text-orange-300">${new Date(ev.deadline).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+            <button onclick="this.closest('.fixed').remove()" class="text-slate-500 hover:text-white text-lg leading-none flex-shrink-0">&times;</button>
+        </div>`;
+    document.body.appendChild(toast);
+    if (Notification.permission === 'granted') {
+        new Notification(`Rappel : ${ev.name}`, {
+            body: new Date(ev.deadline).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }),
+            icon: 'assets/favicon.ico'
+        });
+    }
+    setTimeout(() => toast.remove(), 10000);
+}
+
+function renderChronosFilterBar() {
+    const bar = document.getElementById('chronos-filter-bar');
+    if (!bar) return;
+
+    const types = getEventTypes();
+    const activeFilter = String(state.activeEventType || 'all');
+
+    // Reset si le type actif n'a plus d'events actifs
+    if (activeFilter !== 'all') {
+        const hasActive = state.chronosEvents.some(e => !e.archived && String(e.type) === activeFilter);
+        if (!hasActive) state.activeEventType = 'all';
+    }
+
+    const currentFilter = String(state.activeEventType || 'all');
+    const all = { id: 'all', name: 'Tous', icon: 'fa-calendar-days', color: '#f97316' };
+    const allActive = state.chronosEvents.filter(e => !e.archived).length;
+
+    const items = [all, ...types].filter(t => {
+        if (t.id === 'all') return true;
+        if (String(t.id) === currentFilter) return true;
+        return state.chronosEvents.some(e => !e.archived && String(e.type) === String(t.id));
+    });
+
+    bar.innerHTML = items.map(t => {
+        const isActive = currentFilter === String(t.id);
+        const count = t.id === 'all'
+            ? allActive
+            : state.chronosEvents.filter(e => !e.archived && String(e.type) === String(t.id)).length;
+        const bg = isActive ? `background: linear-gradient(135deg, ${t.color}dd, ${t.color}99);` : '';
+        return `
+            <button onclick="filterChronosByType('${t.id}')"
+                class="flex-shrink-0 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase transition-all flex items-center gap-2 ${isActive ? 'text-white shadow-xl scale-105' : 'glass text-slate-400 hover:scale-105'}"
+                style="${bg}">
+                <i class="fa-solid ${t.icon} text-sm"></i>
+                <span>${escapeHtml(t.name)}</span>
+                <span class="opacity-60 font-mono text-[9px]">${count}</span>
+            </button>`;
+    }).join('');
+
+    initChronosFilterDrag();
+}
+
+function filterChronosByType(typeId) {
+    state.activeEventType = typeId;
+    renderChronos();
+}
+
+function initChronosFilterDrag() {
+    const bar = document.getElementById('chronos-filter-bar');
+    if (!bar) return;
+    let isDown = false, startX, scrollLeft;
+    bar.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - bar.offsetLeft; scrollLeft = bar.scrollLeft; });
+    bar.addEventListener('mouseleave', () => isDown = false);
+    bar.addEventListener('mouseup', () => isDown = false);
+    bar.addEventListener('mousemove', e => {
+        if (!isDown) return;
+        e.preventDefault();
+        bar.scrollLeft = scrollLeft - (e.pageX - bar.offsetLeft - startX) * 2;
+    });
+}
+
 function renderChronos() {
     if (!state.chronosEvents) state.chronosEvents = [];
 
@@ -3491,11 +3996,32 @@ function renderChronos() {
                 state.xp += Math.round(bonus * getForgeXpBonus());
                 showChronosBonus(bonus);
             }
+            // Récurrence : créer le prochain événement
+            if (ev.recurrence) {
+                const next = computeNextRecurrence(ev.deadline, ev.recurrence);
+                if (next > Date.now()) {
+                    state.chronosEvents.push({
+                        id: Date.now() + Math.random(),
+                        name: ev.name,
+                        type: ev.type || 'general',
+                        deadline: next,
+                        tasks: ev.tasks.map(t => ({ ...t, done: false })),
+                        archived: false, completedAt: null, rewardClaimed: false,
+                        reminder: ev.reminder, recurrence: ev.recurrence, reminderFired: false
+                    });
+                    if (ev.reminder) scheduleChronosReminder(state.chronosEvents[state.chronosEvents.length - 1]);
+                }
+            }
             saveState();
         }
     });
 
-    const active = state.chronosEvents.filter(e => !e.archived).sort((a, b) => a.deadline - b.deadline);
+    renderChronosFilterBar();
+
+    const activeFilter = String(state.activeEventType || 'all');
+    const active = state.chronosEvents
+        .filter(e => !e.archived && (activeFilter === 'all' || String(e.type) === String(activeFilter)))
+        .sort((a, b) => a.deadline - b.deadline);
     const archived = state.chronosEvents.filter(e => e.archived).sort((a, b) => b.deadline - a.deadline);
 
     // Count + coins display
@@ -3537,7 +4063,7 @@ function renderChronos() {
                     : '<i class="fa-solid fa-hourglass-half text-primary"></i>';
 
             return `
-            <div class="relative rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.01]"
+            <div class="relative rounded-2xl overflow-hidden bg-slate-900/80 transition-all duration-300 hover:scale-[1.01]"
                 style="background: rgba(15,23,42,0.7); border: 1px solid ${borderColor}; box-shadow: 0 0 30px ${glowColor}, 0 4px 20px rgba(0,0,0,0.3); backdrop-filter: blur(20px);">
 
                 <!-- Top accent line -->
@@ -3550,7 +4076,12 @@ function renderChronos() {
                             <div class="flex-shrink-0 mt-0.5">${statusIcon}</div>
                             <div class="min-w-0">
                                 <h3 class="font-bold text-white text-sm leading-tight truncate">${escapeHtml(ev.name)}</h3>
-                                <div class="text-[10px] text-slate-500 mt-0.5">
+                                <div class="text-[10px] text-slate-500 mt-0.5 flex items-center gap-2">
+                                    ${(() => { const t = getEventType(ev.type); return `<span><i class="fa-solid ${t.icon} text-[9px]" style="color:${t.color}"></i> ${escapeHtml(t.name)}</span>`; })()}
+                                    ${ev.recurrence ? `<span class="text-orange-500/70"><i class="fa-solid fa-rotate text-[8px]"></i> Récurrent</span>` : ''}
+                                    ${ev.reminder ? `<span class="text-blue-400/70"><i class="fa-solid fa-bell text-[8px]"></i> Rappel</span>` : ''}
+                                </div>
+                                <div class="text-[10px] text-slate-600 mt-0.5">
                                     <i class="fa-regular fa-calendar mr-1"></i>
                                     ${new Date(ev.deadline).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                 </div>
@@ -3584,7 +4115,7 @@ function renderChronos() {
                                 <span class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
                             </div>
                         </div>
-                        <div class="h-1 bg-slate-900 rounded-full overflow-hidden">
+                        <div class="h-1 bg-slate-600 rounded-full overflow-hidden">
                             <div class="h-full rounded-full transition-all duration-700"
                                 style="width:${pct}%; background: linear-gradient(90deg, var(--c-primary), #a855f7)"></div>
                         </div>
@@ -3637,15 +4168,27 @@ function renderChronos() {
     if (chronosCountdownInterval) clearInterval(chronosCountdownInterval);
     if (active.length > 0) {
         chronosCountdownInterval = setInterval(() => {
+            let needsRerender = false;
             document.querySelectorAll('.chronos-countdown').forEach(el => {
                 const deadline = parseInt(el.dataset.deadline);
-                const { label, urgent } = formatCountdown(deadline - Date.now());
+                const remaining = deadline - Date.now();
+                if (remaining <= 0) {
+                    // L'event vient d'expirer → re-render complet (archivage + récurrence)
+                    needsRerender = true;
+                    return;
+                }
+                const { label, urgent } = formatCountdown(remaining);
                 const color = urgent === 2 ? '#f87171' : urgent === 1 ? '#fb923c' : 'var(--c-primary)';
                 el.textContent = label;
                 el.style.color = color;
                 el.style.background = color + '18';
                 el.style.borderColor = color + '30';
             });
+            if (needsRerender) {
+                clearInterval(chronosCountdownInterval);
+                chronosCountdownInterval = null;
+                renderChronos();
+            }
         }, 1000);
     }
 }
