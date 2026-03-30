@@ -502,30 +502,6 @@ button:active {
 }
 
 
-/* Peace Type Dropdown */
-#peace-type-list {
-    scrollbar-width: thin;
-    scrollbar-color: var(--c-primary) rgba(15, 23, 42, 0.5);
-}
-
-#peace-type-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-#peace-type-list::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
-    border-radius: 10px;
-}
-
-#peace-type-list::-webkit-scrollbar-thumb {
-    background: var(--c-primary);
-    border-radius: 10px;
-}
-
-#peace-type-list::-webkit-scrollbar-thumb:hover {
-    background: #0891b2;
-}
-
 /* Z-index hierarchy */
 /* 1 - Base elements */
 /* 10 - Input areas */
@@ -582,24 +558,11 @@ button:active {
     z-index: 10;
 }
 
-#peace-type-dropdown {
-    top: -4.5rem;
-    width: 15rem;
-    background: #0f172a;
-}
-
 /* Dropdowns - Absolute positioned (like category selector) */
 #cat-selector-dropdown,
-#daily-cat-selector-dropdown,
-#peace-type-dropdown {
+#daily-cat-selector-dropdown {
     z-index: 10000 !important;
     position: absolute !important;
-}
-
-#peace-type-dropdown {
-    animation: slideUp 0.2s ease-out;
-    position: fixed !important;
-    z-index: 10000 !important;
 }
 
 @keyframes slideUp {
@@ -612,25 +575,6 @@ button:active {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-#peace-type-list::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
-    border-radius: 10px;
-}
-
-#peace-type-list::-webkit-scrollbar-thumb {
-    background: var(--c-primary);
-    border-radius: 10px;
-}
-
-#peace-type-list::-webkit-scrollbar-thumb:hover {
-    background: #0891b2;
-}
-
-#peace-list {
-    position: relative;
-    z-index: 1;
 }
 
 /* Modals */
@@ -652,152 +596,6 @@ button:active {
     overflow: visible !important;
 }
 
-
-/* Input areas */
-@keyframes burnFear {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-        transform: translateY(-20px) scale(1.05);
-        filter: brightness(1.5) hue-rotate(30deg);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translateY(-100px) scale(0.5);
-        filter: brightness(0) hue-rotate(60deg);
-    }
-}
-
-@keyframes burnWord {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1) rotate(0deg);
-        filter: brightness(1);
-    }
-
-    25% {
-        filter: brightness(1.8) hue-rotate(20deg);
-    }
-
-    50% {
-        transform: translateY(-30px) scale(1.1) rotate(10deg);
-        filter: brightness(1.5) hue-rotate(40deg);
-    }
-
-    75% {
-        opacity: 0.5;
-        transform: translateY(-60px) scale(0.8) rotate(-5deg);
-        filter: brightness(0.8) hue-rotate(60deg);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translateY(-120px) scale(0) rotate(20deg);
-        filter: brightness(0) hue-rotate(90deg);
-    }
-}
-
-@keyframes fireParticle {
-    0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(calc(var(--vx) * 100px), calc(var(--vy) * 100px)) scale(0);
-    }
-}
-
-.peace-word {
-    animation: slideInBag 0.5s ease-out forwards;
-}
-
-@keyframes slideInBag {
-    0% {
-        opacity: 0;
-        transform: translateX(-20px) scale(0.8);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
-}
-
-@keyframes flyToBag {
-    0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
-    }
-
-    50% {
-        opacity: 0.8;
-        filter: brightness(1.5);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(var(--deltaX), var(--deltaY)) scale(0.3);
-        filter: brightness(0.5);
-    }
-}
-
-@keyframes burnBag {
-    0% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-    }
-
-    50% {
-        opacity: 0.8;
-        filter: brightness(1.8) hue-rotate(30deg);
-        transform: scale(1.05) rotate(-5deg);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(0.5) rotate(10deg);
-        filter: brightness(0) hue-rotate(90deg);
-    }
-}
-
-@keyframes flameBurst {
-    0% {
-        opacity: 1;
-        transform: scale(0) translateY(0);
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(1) translateY(-80px);
-    }
-}
-
-@keyframes bagReappear {
-    0% {
-        opacity: 0;
-        transform: scale(0.5);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
 
 @keyframes streakPulse {
 
@@ -823,28 +621,6 @@ button:active {
     background: radial-gradient(circle, #fbbf24, #f97316, #dc2626);
     box-shadow: 0 0 10px #ff6b35, 0 0 20px #ff4500;
     animation: fireParticle 1.5s ease-out forwards;
-}
-
-/* Peace Page Animations */
-
-@media (max-width: 1023px) {
-
-    /* 4.5rem nav + 1.5rem marge de sécurité = 6rem */
-    body {
-        padding-bottom: 6rem;
-    }
-
-    /* Sur téléphones avec encoche, on ajoute l'inset en plus */
-    @supports (padding-bottom: env(safe-area-inset-bottom)) {
-        body {
-            padding-bottom: calc(6rem + env(safe-area-inset-bottom));
-        }
-    }
-
-    /* Container principal du contenu */
-    #main-content {
-        padding-bottom: 6rem;
-    }
 }
 
 /* Page Content */
@@ -876,31 +652,6 @@ button:active {
 
 .bottom-nav-btn:not(.active) {
     color: #64748b;
-}
-
-/* Peace Animation Modal (mobile) */
-#peace-anim-modal {
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-#peace-anim-modal.visible {
-    opacity: 1;
-}
-
-/* Peace page mobile tweaks */
-@media (max-width: 1023px) {
-    #peace-list .glass {
-        border-radius: 0.75rem;
-    }
-
-    /* Padding bas sur les listes dynamiques pour ne pas passer sous la nav */
-    #quest-list,
-    #peace-list,
-    #notes-list,
-    #achievements-list {
-        padding-bottom: 2rem;
-    }
 }
 
 /* Slider ascension */
@@ -1196,6 +947,32 @@ html.light .modal button[onclick*="closeModal"]:hover {
     color: #1e293b !important;
 }
 
-html.light #peace-type-dropdown {
-    background-color: #ffffff !important;
+html.light .chat-bubble .rounded-br-sm p {
+    color: white !important;
+}
+
+/* ===== LUMINA ===== */
+@keyframes luminaPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(236,72,153,0.3), 0 0 20px rgba(236,72,153,0.15); transform: scale(1); }
+    50%       { box-shadow: 0 0 0 10px rgba(236,72,153,0), 0 0 35px rgba(236,72,153,0.25); transform: scale(1.04); }
+}
+@keyframes luminaTyping {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30%            { transform: translateY(-4px); opacity: 1; }
+}
+.lumina-orb {
+    animation: luminaPulse 3s ease-in-out infinite;
+}
+.lumina-dot {
+    animation: luminaTyping 1.2s ease-in-out infinite;
+}
+.lumina-dot:nth-child(2) { animation-delay: 0.2s; }
+.lumina-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.chat-bubble {
+    animation: bubbleIn 0.3s ease-out both;
 }

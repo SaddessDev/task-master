@@ -86,7 +86,6 @@ let editingDaily = null; // Daily en cours d'édition
 let _editingNoteId = null; // Note en cours d'édition
 let reassignmentData = null; // Données de réassignation des objectifs
 let currentPage = 'dashboard'; // Page actuelle
-let peaceFears = []; // Peurs dans le sac d'apaisement
 let achievements = []; // Achievements chargés depuis le JSON
 
 // ===== UTILITAIRES =====
@@ -2420,16 +2419,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }, 1000);
 
-    // Re-synchroniser les boutons peace si on change de résolution
-    let peaceResizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(peaceResizeTimer);
-        peaceResizeTimer = setTimeout(() => {
-            const burnD = document.getElementById('peace-burn-btn-desktop');
-            const burnVisible = burnD && !burnD.classList.contains('hidden');
-            setPeaceBtnState(burnVisible ? 'burn' : (peaceFears.length > 0 ? 'send' : 'empty'));
-        }, 150);
-    });
+    // Resize listener supprimé (Lumina supprimé)
 });
 
 
@@ -2451,7 +2441,7 @@ function navigateTo(page) {
 
     const pageTitles = {
         dashboard: 'Objectifs',
-        peace: 'Apaisement',
+        peace: 'Apaisement', // supprimé
         notes: 'Notes',
         achievements: 'Succès',
         chronos: 'Événements',
@@ -2482,7 +2472,7 @@ function navigateTo(page) {
     // Mettre à jour la bottom nav + sidebar avec la couleur de la page
     const pageColors = {
         dashboard: '#06b6d4',
-        peace: '#ec4899',
+        peace: '#ec4899', // supprimé
         notes: '#8b5cf6',
         achievements: '#fbbf24',
         chronos: '#f97316',
@@ -2522,492 +2512,6 @@ function navigateTo(page) {
         activeBnBtn.style.color = color;
     }
 }
-
-// ===== SAC D'APAISEMENT =====
-
-function addPeaceFear() {
-    const input = document.getElementById('peace-input');
-    const typeEl = document.getElementById('peace-type-value');
-    const type = typeEl ? typeEl.value : 'anxiety';
-    const text = input.value.trim();
-
-    if (!text) {
-        alert('Veuillez écrire votre peur ou angoisse');
-        return;
-    }
-
-    const fear = {
-        id: Date.now(),
-        text: text,
-        type: type,
-        timestamp: new Date().toISOString()
-    };
-
-    peaceFears.push(fear);
-    state.peaceFearAdded++;
-    input.value = '';
-
-    renderPeaceFears();
-    updatePeaceBag();
-    saveState();
-    checkAchievements();
-}
-
-function togglePeaceTypeSelector() {
-    const dropdown = document.getElementById('peace-type-dropdown');
-    const btn = document.getElementById('peace-type-btn');
-    const isHidden = dropdown.classList.contains('hidden');
-
-    if (isHidden) {
-        renderPeaceTypeList();
-        dropdown.classList.remove('hidden');
-
-        // Position dropdown above button
-        const rect = btn.getBoundingClientRect();
-
-        document.addEventListener('click', closePeaceTypeDropdownOnClickOutside);
-    } else {
-        dropdown.classList.add('hidden');
-        document.removeEventListener('click', closePeaceTypeDropdownOnClickOutside);
-    }
-}
-
-function closePeaceTypeDropdownOnClickOutside(e) {
-    const dropdown = document.getElementById('peace-type-dropdown');
-    const btn = document.getElementById('peace-type-btn');
-
-    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-        dropdown.classList.add('hidden');
-        document.removeEventListener('click', closePeaceTypeDropdownOnClickOutside);
-    }
-}
-
-function renderPeaceTypeList() {
-    const typeList = document.getElementById('peace-type-list');
-    const types = [
-        { value: 'anxiety', label: 'Anxiété', icon: 'fa-heart', color: '#ec4899' },
-        { value: 'fear', label: 'Peur', icon: 'fa-face-flushed', color: '#ef4444' },
-        { value: 'stress', label: 'Stress', icon: 'fa-bolt', color: '#eab308' },
-        { value: 'sadness', label: 'Tristesse', icon: 'fa-cloud-rain', color: '#a855f7' },
-        { value: 'anger', label: 'Colère', icon: 'fa-fire', color: '#f97316' },
-        { value: 'doubt', label: 'Doute', icon: 'fa-question', color: '#64748b' },
-        { value: 'other', label: 'Autre', icon: 'fa-ellipsis', color: '#06b6d4' }
-    ];
-
-    typeList.innerHTML = types.map(type => `
-        <button onclick="selectPeaceType('${type.value}', '${type.label}', '${type.icon}', '${type.color}')" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-800/50 transition-all text-left group">
-            <div class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style="background: ${type.color}33;">
-                <i class="fa-solid ${type.icon} text-md" style="color: ${type.color};"></i>
-            </div>
-            <span class="text-md font-semibold text-slate-300 group-hover:text-white transition-colors">${type.label}</span>
-        </button>
-    `).join('');
-}
-
-function selectPeaceType(value, label, icon, color) {
-    document.getElementById('peace-type-value').value = value;
-    document.getElementById('peace-type-name').textContent = label;
-    document.getElementById('peace-type-icon').style.background = color + '33';
-    document.getElementById('peace-type-icon').innerHTML = `<i class="fa-solid ${icon} text-xs" style="color: ${color};"></i>`;
-    document.getElementById('peace-type-dropdown').classList.add('hidden');
-}
-
-function renderPeaceFears() {
-    const container = document.getElementById('peace-list');
-    container.innerHTML = '';
-
-    peaceFears.forEach(fear => {
-        const typeLabels = {
-            'anxiety': 'Anxiété',
-            'fear': 'Peur',
-            'stress': 'Stress',
-            'sadness': 'Tristesse',
-            'anger': 'Colère',
-            'doubt': 'Doute',
-            'other': 'Autre'
-        };
-
-        const typeColors = {
-            'anxiety': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-            'fear': 'bg-red-500/10 text-red-400 border-red-500/30',
-            'stress': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-            'sadness': 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-            'anger': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-            'doubt': 'bg-slate-500/10 text-slate-400 border-slate-500/30',
-            'other': 'bg-pink-500/10 text-pink-400 border-pink-500/30'
-        };
-
-        const div = document.createElement('div');
-        div.className = 'glass p-3 rounded-xl border border-white/10 group hover:border-pink-500/30 transition-all';
-        div.innerHTML = `
-            <div class="flex items-center justify-between select-none gap-2">
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-white truncate mb-1">${escapeHtml(fear.text)}</p>
-                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${typeColors[fear.type]}">
-                        ${typeLabels[fear.type]}
-                    </span>
-                </div>
-                <button onclick="removePeaceFear(${fear.id})" class="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0 p-1.5 hover:bg-red-500/10 rounded-lg lg:opacity-0 lg:group-hover:opacity-100">
-                    <i class="fa-solid fa-trash-alt text-sm"></i>
-                </button>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-function removePeaceFear(id) {
-    peaceFears = peaceFears.filter(f => f.id !== id);
-    renderPeaceFears();
-    updatePeaceBag();
-}
-
-// 'send' = afficher envoyer, cacher brûler
-// 'burn' = cacher envoyer, afficher brûler
-// 'empty' = envoyer désactivé, brûler caché
-function setPeaceBtnState(mode) {
-    const sendM = document.getElementById('peace-send-btn');
-    const burnM = document.getElementById('peace-burn-btn');
-    const sendD = document.getElementById('peace-send-btn-desktop');
-    const burnD = document.getElementById('peace-burn-btn-desktop');
-
-    if (mode === 'send') {
-        [sendM, sendD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = false; } });
-        [burnM, burnD].forEach(b => { if (b) b.classList.add('hidden'); });
-    } else if (mode === 'burn') {
-        [sendM, sendD].forEach(b => { if (b) b.classList.add('hidden'); });
-        [burnM, burnD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = false; } });
-    } else { // 'empty'
-        [sendM, sendD].forEach(b => { if (b) { b.classList.remove('hidden'); b.disabled = true; } });
-        [burnM, burnD].forEach(b => { if (b) b.classList.add('hidden'); });
-    }
-}
-
-function updatePeaceBag() {
-    const count = peaceFears.length;
-    const countLabel = pluralize(count, 'peur', 'peurs');
-
-    ['peace-count', 'peace-count-desktop'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = `${count} ${countLabel}`;
-    });
-
-    const cloudContainer = document.getElementById('peace-words-cloud');
-
-    if (count === 0) {
-        if (cloudContainer) cloudContainer.innerHTML = '';
-        setPeaceBtnState('empty');
-    } else {
-        if (cloudContainer) {
-            cloudContainer.innerHTML = peaceFears.map((fear, index) => {
-                const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
-                const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-                const randomRotation = Math.random() * 20 - 10;
-                const randomOpacity = 0.6 + Math.random() * 0.4;
-                return `
-                    <div class="peace-cloud-word ${randomSize} font-bold px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/40 to-rose-500/40 text-pink-200 border border-pink-500/50 whitespace-nowrap cursor-default transition-all hover:from-pink-500/60 hover:to-rose-500/60" 
-                         style="transform: rotate(${randomRotation}deg); opacity: ${randomOpacity}; animation-delay: ${index * 0.05}s;">
-                        ${escapeHtml(fear.text.substring(0, 20))}${fear.text.length > 20 ? '...' : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        // Ne pas écraser l'état 'burn' si le sac est déjà en attente de brûlage
-        const burnD = document.getElementById('peace-burn-btn-desktop');
-        if (!burnD || burnD.classList.contains('hidden')) {
-            setPeaceBtnState('send');
-        }
-    }
-}
-
-function sendFearsToSac() {
-    if (peaceFears.length === 0) return;
-
-    const isMobile = window.innerWidth < 1024;
-
-    // Message dans les deux versions
-    ['peace-message', 'peace-message-desktop'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<i class="fa-solid fa-heart text-pink-500 mr-2"></i>Vos peurs sont en sécurité...';
-    });
-
-    if (isMobile) {
-        // --- MOBILE: ouvrir la modal d'animation ---
-        const modal = document.getElementById('peace-anim-modal');
-        const animCloud = document.getElementById('peace-anim-cloud');
-        const animBag = document.getElementById('peace-anim-bag-container');
-        const animMsg = document.getElementById('peace-anim-message');
-
-        // Peupler le nuage dans la modal
-        animCloud.innerHTML = peaceFears.map((fear, index) => {
-            const sizes = ['text-xs', 'text-sm', 'text-base'];
-            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-            const randomRotation = Math.random() * 20 - 10;
-            return `
-                <div class="peace-cloud-word ${randomSize} font-bold px-3 py-1 rounded-full bg-gradient-to-r from-pink-500/40 to-rose-500/40 text-pink-200 border border-pink-500/50 whitespace-nowrap"
-                     style="transform: rotate(${randomRotation}deg); animation-delay: ${index * 0.05}s;">
-                    ${escapeHtml(fear.text.substring(0, 20))}${fear.text.length > 20 ? '...' : ''}
-                </div>
-            `;
-        }).join('');
-
-        animMsg.textContent = '';
-        animMsg.style.opacity = '0';
-
-        // Afficher la modal
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => { modal.style.opacity = '1'; });
-
-        // Lancer l'animation après un court délai
-        setTimeout(() => {
-            const cloudWords = animCloud.querySelectorAll('.peace-cloud-word');
-            const bagRect = animBag.getBoundingClientRect();
-            const bagCenterX = bagRect.left + bagRect.width / 2;
-            const bagCenterY = bagRect.top + bagRect.height / 2;
-
-            cloudWords.forEach((word, index) => {
-                setTimeout(() => {
-                    const wordRect = word.getBoundingClientRect();
-                    const deltaX = bagCenterX - (wordRect.left + wordRect.width / 2);
-                    const deltaY = bagCenterY - (wordRect.top + wordRect.height / 2);
-                    word.style.animation = `flyToBag 0.9s ease-in forwards`;
-                    word.style.setProperty('--deltaX', deltaX + 'px');
-                    word.style.setProperty('--deltaY', deltaY + 'px');
-                }, index * 80);
-            });
-
-            const totalDuration = peaceFears.length * 80 + 900;
-
-            setTimeout(() => {
-                // Message de confirmation
-                animMsg.textContent = '✨ Vos peurs sont en sécurité';
-                animMsg.style.opacity = '1';
-
-                // Basculer les boutons
-                setPeaceBtnState('burn');
-
-                // Fermer la modal après un délai
-                setTimeout(() => {
-                    modal.style.opacity = '0';
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                        animCloud.innerHTML = '';
-                    }, 400);
-                }, 1200);
-            }, totalDuration);
-        }, 200);
-
-    } else {
-        // --- DESKTOP: animation originale nuage → sac ---
-        const bagContainer = document.getElementById('peace-bag-container');
-        if (bagContainer) {
-            const cloudWords = document.querySelectorAll('.peace-cloud-word');
-            cloudWords.forEach((word, index) => {
-                setTimeout(() => {
-                    const bagRect = bagContainer.getBoundingClientRect();
-                    const bagCenterX = bagRect.left + bagRect.width / 2;
-                    const bagCenterY = bagRect.top + bagRect.height / 2;
-                    const wordRect = word.getBoundingClientRect();
-                    const deltaX = bagCenterX - (wordRect.left + wordRect.width / 2);
-                    const deltaY = bagCenterY - (wordRect.top + wordRect.height / 2);
-                    word.style.animation = `flyToBag 1s ease-in forwards`;
-                    word.style.setProperty('--deltaX', deltaX + 'px');
-                    word.style.setProperty('--deltaY', deltaY + 'px');
-                }, index * 80);
-            });
-        }
-
-        setTimeout(() => {
-            const cloudContainer = document.getElementById('peace-words-cloud');
-            if (cloudContainer) cloudContainer.innerHTML = '';
-            const bagWords = document.getElementById('peace-bag-words');
-            if (bagWords) bagWords.innerHTML = '';
-
-            setPeaceBtnState('burn');
-        }, peaceFears.length * 80 + 1000);
-    }
-}
-
-function burnFears() {
-    if (peaceFears.length === 0) return;
-
-    const isMobile = window.innerWidth < 1024;
-
-    if (isMobile) {
-        // --- MOBILE: ouvrir la modal pour l'animation de brûlage ---
-        const modal = document.getElementById('peace-anim-modal');
-        const animBag = document.getElementById('peace-anim-bag-container');
-        const animBagImage = document.getElementById('peace-anim-bag-image');
-        const animMsg = document.getElementById('peace-anim-message');
-        const animCloud = document.getElementById('peace-anim-cloud');
-
-        animCloud.innerHTML = '';
-        animMsg.textContent = '';
-        animMsg.style.opacity = '0';
-
-        modal.style.display = 'flex';
-        requestAnimationFrame(() => { modal.style.opacity = '1'; });
-
-        setTimeout(() => {
-            const bagRect = animBag.getBoundingClientRect();
-            const bagCenterX = bagRect.left + bagRect.width / 2;
-            const bagCenterY = bagRect.top + bagRect.height / 2;
-
-            for (let wave = 0; wave < 3; wave++) {
-                setTimeout(() => createFireParticlesFromPoint(bagCenterX, bagCenterY), wave * 300);
-            }
-
-            const flameOverlay = document.createElement('div');
-            flameOverlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
-            flameOverlay.innerHTML = `
-                <div class="relative w-32 h-32 flex items-center justify-center">
-                    <i class="fa-solid fa-fire text-6xl text-orange-500 absolute" style="animation: flameBurst 1.5s ease-out forwards;"></i>
-                    <i class="fa-solid fa-fire text-5xl text-red-600 absolute" style="animation: flameBurst 1.5s ease-out 0.2s forwards;"></i>
-                    <i class="fa-solid fa-fire text-4xl text-yellow-500 absolute" style="animation: flameBurst 1.5s ease-out 0.4s forwards;"></i>
-                </div>
-            `;
-            animBag.appendChild(flameOverlay);
-
-            if (animBagImage) setTimeout(() => { animBagImage.style.animation = 'burnBag 1s ease-out forwards'; }, 300);
-
-            setTimeout(() => {
-                state.peaceFearsBurned += peaceFears.length;
-                peaceFears = [];
-                updatePeaceBag();
-                renderPeaceFears();
-
-                if (animBagImage) {
-                    animBagImage.style.animation = '';
-                    animBagImage.style.opacity = '1';
-                    animBagImage.style.transform = 'scale(1) rotate(0deg)';
-                    animBagImage.style.animation = 'bagReappear 0.8s ease-out forwards';
-                }
-
-                // Réinitialiser les boutons
-                setPeaceBtnState('empty');
-
-                animMsg.textContent = '🌟 Vous êtes libéré !';
-                animMsg.style.opacity = '1';
-
-                flameOverlay.remove();
-                saveState();
-                checkAchievements();
-
-                // Fermer la modal
-                setTimeout(() => {
-                    modal.style.opacity = '0';
-                    setTimeout(() => { modal.style.display = 'none'; }, 400);
-                }, 1400);
-            }, 1500);
-        }, 200);
-
-    } else {
-        // --- DESKTOP: animation originale ---
-        const bagContainer = document.getElementById('peace-bag-container');
-        const bagImage = document.getElementById('peace-bag-image-desktop');
-
-        const bagRect = bagContainer.getBoundingClientRect();
-        const bagCenterX = bagRect.left + bagRect.width / 2;
-        const bagCenterY = bagRect.top + bagRect.height / 2;
-
-        for (let wave = 0; wave < 3; wave++) {
-            setTimeout(() => createFireParticlesFromPoint(bagCenterX, bagCenterY), wave * 300);
-        }
-
-        const flameOverlay = document.createElement('div');
-        flameOverlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
-        flameOverlay.innerHTML = `
-            <div class="relative w-32 h-32 flex items-center justify-center">
-                <i class="fa-solid fa-fire text-6xl text-orange-500 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out forwards;"></i>
-                <i class="fa-solid fa-fire text-5xl text-red-600 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out 0.2s forwards;"></i>
-                <i class="fa-solid fa-fire text-4xl text-yellow-500 absolute animate-pulse" style="animation: flameBurst 1.5s ease-out 0.4s forwards;"></i>
-            </div>
-        `;
-        bagContainer.appendChild(flameOverlay);
-
-        if (bagImage) setTimeout(() => { bagImage.style.animation = 'burnBag 1s ease-out forwards'; }, 300);
-
-        setTimeout(() => {
-            state.peaceFearsBurned += peaceFears.length;
-            peaceFears = [];
-            updatePeaceBag();
-            renderPeaceFears();
-
-            if (bagImage) {
-                bagImage.style.animation = '';
-                bagImage.style.opacity = '1';
-                bagImage.style.transform = 'scale(1) rotate(0deg)';
-                bagImage.style.animation = 'bagReappear 0.8s ease-out forwards';
-            }
-
-            setPeaceBtnState('empty');
-
-            ['peace-message', 'peace-message-desktop'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.innerHTML = '<i class="fa-solid fa-fire text-orange-500 mr-2"></i>Vous êtes libéré! 🌟';
-                    setTimeout(() => { el.innerHTML = ''; }, 3000);
-                }
-            });
-
-            flameOverlay.remove();
-            saveState();
-            checkAchievements();
-        }, 1500);
-    }
-}
-
-
-
-
-function createFireParticles(element) {
-    const rect = element.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
-    for (let i = 0; i < 8; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'fire-particle';
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-
-        const angle = (Math.PI * 2 * i) / 8;
-        const velocity = 3 + Math.random() * 3;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 2;
-
-        particle.style.setProperty('--vx', vx);
-        particle.style.setProperty('--vy', vy);
-
-        document.body.appendChild(particle);
-
-        setTimeout(() => particle.remove(), 1500);
-    }
-}
-
-function createFireParticlesFromPoint(x, y) {
-    for (let i = 0; i < 12; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'fire-particle';
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-
-        const angle = (Math.PI * 2 * i) / 12;
-        const velocity = 4 + Math.random() * 4;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 3;
-
-        particle.style.setProperty('--vx', vx);
-        particle.style.setProperty('--vy', vy);
-
-        document.body.appendChild(particle);
-
-        setTimeout(() => particle.remove(), 1500);
-    }
-}
-
-
-// ===== NOTES PERSONNELLES =====
 
 // ===== NOTES PERSONNELLES =====
 
@@ -3209,188 +2713,225 @@ async function loadAchievements() {
         const data = await response.json();
         achievements = data.achievements;
         checkAchievements();
+        updateAchievementBadge();
     } catch (error) {
         console.error('Erreur lors du chargement des achievements:', error);
     }
 }
 
+function getConditionValue(conditionType) {
+    switch (conditionType) {
+        case 'quests_created':     return state.questsCreated || 0;
+        case 'quests_completed':   return state.questsCompleted || 0;
+        case 'dailies_created':    return state.dailiesCreated || 0;
+        case 'streak':             return state.streak || 0;
+        case 'notes_created':      return state.notes.length || 0;
+        case 'rebirths':           return state.rebirths || 0;
+        case 'daily_completions':  return state.dailyCompletions || 0;
+        case 'chronos_created':    return state.chronosEventsCreated || 0;
+        case 'total_coins_earned': return state.totalCoinsEarned || 0;
+        case 'chronos_completed':  return state.chronosEventsCompleted || 0;
+        case 'forge_builds':       return state.forgeBuilds || 0;
+        case 'forge_max_level':    return state.forgeMaxLevel || 0;
+        default:                   return 0;
+    }
+}
+
+function getActiveStageIndex(achievementId) {
+    const claimed = state.claimedAchievementStages || {};
+    return claimed[achievementId] !== undefined ? claimed[achievementId] + 1 : 0;
+}
+
+function isStageClaimable(achievement, stageIdx) {
+    const stage = achievement.stages[stageIdx];
+    if (!stage) return false;
+    const claimed = state.claimedAchievementStages || {};
+    if (claimed[achievement.id] !== undefined && claimed[achievement.id] >= stageIdx) return false;
+    if (stage.special === 'forge_all_max') {
+        return FORGE_MODULES.length > 0 && FORGE_MODULES.every(m => getForgeState(m.id).level >= m.levels.length);
+    }
+    return getConditionValue(achievement.condition_type) >= stage.value;
+}
+
 function checkAchievements() {
+    if (!achievements || achievements.length === 0) return;
+    let changed = false;
     achievements.forEach(achievement => {
-        // Vérifier si l'achievement est déjà débloqué
-        if (state.unlockedAchievements.includes(achievement.id)) {
-            return;
-        }
-
-        // Vérifier les conditions
-        let isUnlocked = false;
-
-        switch (achievement.condition.type) {
-            case 'quests_created':
-                isUnlocked = state.questsCreated >= achievement.condition.value;
-                break;
-            case 'quests_completed':
-                isUnlocked = state.questsCompleted >= achievement.condition.value;
-                break;
-            case 'dailies_created':
-                isUnlocked = state.dailiesCreated >= achievement.condition.value;
-                break;
-            case 'streak':
-                isUnlocked = state.streak >= achievement.condition.value;
-                break;
-            case 'peace_fears_added':
-                isUnlocked = state.peaceFearAdded >= achievement.condition.value;
-                break;
-            case 'notes_created':
-                isUnlocked = state.notes.length >= achievement.condition.value;
-                break;
-            case 'rebirths':
-                isUnlocked = state.rebirths >= achievement.condition.value;
-                break;
-            case 'daily_completions':
-                isUnlocked = (state.dailyCompletions || 0) >= achievement.condition.value;
-                break;
-            case 'chronos_created':
-                isUnlocked = (state.chronosEventsCreated || 0) >= achievement.condition.value;
-                break;
-            case 'total_coins_earned':
-                isUnlocked = (state.totalCoinsEarned || 0) >= achievement.condition.value;
-                break;
-            case 'chronos_completed':
-                isUnlocked = (state.chronosEventsCompleted || 0) >= achievement.condition.value;
-                break;
-            case 'forge_builds':
-                isUnlocked = (state.forgeBuilds || 0) >= achievement.condition.value;
-                break;
-            case 'forge_max_level':
-                isUnlocked = (state.forgeMaxLevel || 0) >= achievement.condition.value;
-                break;
-            case 'forge_all_max': {
-                const allMax = FORGE_MODULES.length > 0 && FORGE_MODULES.every(m => getForgeState(m.id).level >= m.levels.length);
-                isUnlocked = allMax;
-                break;
+        const activeIdx = getActiveStageIndex(achievement.id);
+        if (activeIdx >= achievement.stages.length) return;
+        if (isStageClaimable(achievement, activeIdx)) {
+            if (!state.pendingAchievementRewards) state.pendingAchievementRewards = [];
+            const key = `${achievement.id}_${activeIdx}`;
+            if (!state.pendingAchievementRewards.includes(key)) {
+                state.pendingAchievementRewards.push(key);
+                changed = true;
+                showAchievementNotification(achievement, activeIdx);
             }
-            case 'all_achievements':
-                // Vérifier si tous les autres achievements sont débloqués
-                const otherAchievements = achievements.filter(a => a.id !== achievement.id);
-                isUnlocked = otherAchievements.every(a => state.unlockedAchievements.includes(a.id));
-                break;
         }
+    });
+    if (changed) saveState();
+    updateAchievementBadge();
+}
 
-        if (isUnlocked) {
-            unlockAchievement(achievement);
+function updateAchievementBadge() {
+    const count = (state.pendingAchievementRewards || []).length;
+    ['achievements-badge-sidebar', 'achievements-badge-mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (count > 0) {
+            el.textContent = count > 9 ? '9+' : count;
+            el.classList.remove('hidden');
+        } else {
+            el.classList.add('hidden');
         }
     });
 }
 
-function unlockAchievement(achievement) {
-    state.unlockedAchievements.push(achievement.id);
-    saveState();
+function claimAchievementReward(achievementId, stageIdx) {
+    const achievement = achievements.find(a => a.id === achievementId);
+    if (!achievement) return;
+    const stage = achievement.stages[stageIdx];
+    if (!stage || !isStageClaimable(achievement, stageIdx)) return;
 
-    // Afficher une notification
-    showAchievementNotification(achievement);
+    if (!state.claimedAchievementStages) state.claimedAchievementStages = {};
+    state.claimedAchievementStages[achievementId] = stageIdx;
+
+    if (!state.pendingAchievementRewards) state.pendingAchievementRewards = [];
+    state.pendingAchievementRewards = state.pendingAchievementRewards.filter(k => k !== `${achievementId}_${stageIdx}`);
+
+    earnCoins(stage.reward);
+    saveState();
+    checkAchievements();
+    renderAchievements();
+    updateCoinsDisplay();
+
+    // Feedback
+    const el = document.createElement('div');
+    el.className = 'fixed top-4 right-4 glass px-5 py-3 rounded-xl select-none border z-50 flex items-center gap-3';
+    el.style.cssText = `border-color:${achievement.color}55; background:${achievement.color}18;`;
+    el.innerHTML = `
+        <i class="fa-solid fa-coins text-yellow-400 text-lg"></i>
+        <div>
+            <p class="text-white font-black text-sm">+${stage.reward.toLocaleString()} crédits</p>
+            <p class="text-xs text-slate-400">${stage.name}</p>
+        </div>`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
 }
 
-function showAchievementNotification(achievement) {
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 left-4 glass p-4 rounded-xl select-none border border-yellow-500/30 bg-yellow-500/10 z-50 animate-bounce max-w-sm';
-    notification.innerHTML = `
+function showAchievementNotification(achievement, stageIdx) {
+    const stage = achievement.stages[stageIdx];
+    const n = document.createElement('div');
+    n.className = 'fixed top-4 left-4 glass p-4 rounded-xl select-none border border-yellow-500/30 bg-yellow-500/10 z-50 max-w-sm cursor-pointer';
+    n.innerHTML = `
         <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${achievement.color}33;">
-                <i class="fa-solid ${achievement.icon} text-lg" style="color: ${achievement.color};"></i>
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${achievement.color}33;">
+                <i class="fa-solid ${achievement.icon} text-lg" style="color:${achievement.color};"></i>
             </div>
-            <div>
-                <p class="font-bold text-white text-sm">🏆 ${achievement.name}</p>
-                <p class="text-xs text-slate-300">${achievement.description}</p>
+            <div class="flex-1">
+                <p class="font-black text-white text-sm">🏆 ${stage.name}</p>
+                <p class="text-xs text-slate-300">${stage.description}</p>
+                <p class="text-xs text-yellow-400 font-bold mt-0.5">+${stage.reward.toLocaleString()} crédits à réclamer</p>
             </div>
-        </div>
-    `;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.remove();
-    }, 5000);
+        </div>`;
+    n.onclick = () => { n.remove(); navigateTo('achievements'); };
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 6000);
 }
 
 function renderAchievements() {
     const container = document.getElementById('achievements-list');
     if (!container) return;
-
     container.innerHTML = '';
 
-    if (achievements.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-slate-400"><p class="text-sm">Chargement des achievements...</p></div>';
+    if (!achievements || achievements.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-slate-400"><p class="text-sm">Chargement...</p></div>';
         return;
     }
 
-    const difficultyIcons = {
-        1: { icon: 'fa-leaf', color: '#10b981' },
-        2: { icon: 'fa-fire', color: '#f97316' },
-        3: { icon: 'fa-bolt', color: '#eab308' },
-        4: { icon: 'fa-skull', color: '#ef4444' },
-        5: { icon: 'fa-crown', color: '#a855f7' }
-    };
+    // Stats header
+    let totalStages = 0, completedStages = 0, pendingClaim = 0;
+    achievements.forEach(ach => {
+        totalStages += ach.stages.length;
+        const claimed = (state.claimedAchievementStages || {})[ach.id];
+        if (claimed !== undefined) completedStages += claimed + 1;
+        const activeIdx = getActiveStageIndex(ach.id);
+        if (activeIdx < ach.stages.length && isStageClaimable(ach, activeIdx)) pendingClaim++;
+    });
 
-    const buildCard = (achievement) => {
-        const isUnlocked = state.unlockedAchievements.includes(achievement.id);
-        const shouldObscure = achievement.obscuration && !isUnlocked;
-        const displayDescription = shouldObscure ? '????' : achievement.description;
-        const diffIcon = difficultyIcons[achievement.difficulty] || difficultyIcons[1];
+    const statsEl = document.createElement('div');
+    statsEl.className = 'col-span-full mb-4 flex flex-wrap gap-3';
+    statsEl.innerHTML = `
+        <div class="glass px-4 py-2 rounded-xl border border-yellow-500/20 flex items-center gap-2">
+            <i class="fa-solid fa-trophy text-yellow-500 text-sm"></i>
+            <span class="text-sm font-black text-white">${completedStages}<span class="text-slate-500 font-normal">/${totalStages}</span></span>
+            <span class="text-xs text-slate-400">paliers complétés</span>
+        </div>
+        ${pendingClaim > 0 ? `
+        <div class="glass px-4 py-2 rounded-xl border border-green-500/30 bg-green-500/10 flex items-center gap-2 animate-pulse">
+            <i class="fa-solid fa-gift text-green-400 text-sm"></i>
+            <span class="text-sm font-black text-green-400">${pendingClaim} récompense${pendingClaim > 1 ? 's' : ''} à réclamer</span>
+        </div>` : ''}`;
+    container.appendChild(statsEl);
 
-        const div = document.createElement('div');
-        div.className = `glass p-4 rounded-xl border transition-all ${isUnlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-white/10 opacity-50'}`;
-        div.innerHTML = `
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: ${isUnlocked ? achievement.color + '33' : 'rgba(30,41,59,0.6)'};">
-                    <i class="fa-solid ${isUnlocked ? achievement.icon : 'fa-lock'} text-lg" style="color: ${isUnlocked ? achievement.color : '#475569'};"></i>
+    achievements.forEach(achievement => {
+        const activeIdx = getActiveStageIndex(achievement.id);
+        const isFinished = activeIdx >= achievement.stages.length;
+        const claimable = !isFinished && isStageClaimable(achievement, activeIdx);
+        const currentValue = getConditionValue(achievement.condition_type);
+        const displayStageIdx = isFinished ? achievement.stages.length - 1 : activeIdx;
+        const displayStage = achievement.stages[displayStageIdx];
+        const prevValue = activeIdx > 0 ? achievement.stages[activeIdx - 1].value : 0;
+        const targetValue = displayStage.value;
+        const progressPct = isFinished ? 100 : (targetValue > prevValue
+            ? Math.min(100, Math.round(((Math.min(currentValue, targetValue) - prevValue) / (targetValue - prevValue)) * 100))
+            : 100);
+
+        const card = document.createElement('div');
+        card.className = `glass p-4 rounded-xl border transition-all ${
+            claimable ? 'border-yellow-500/50 bg-yellow-500/5' :
+            isFinished ? 'border-white/20' : 'border-white/10'}`;
+
+        card.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative" style="background:${achievement.color}22; border:1px solid ${achievement.color}44;">
+                    <i class="fa-solid ${achievement.icon} text-lg" style="color:${achievement.color};"></i>
+                    ${isFinished ? `<div class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-500 flex items-center justify-center"><i class="fa-solid fa-check text-[8px] text-black"></i></div>` : ''}
                 </div>
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="fa-solid ${diffIcon.icon} text-xs" style="color: ${diffIcon.color};"></i>
-                        <h3 class="text-sm font-bold text-white">${achievement.name}</h3>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-0.5">
+                        <p class="text-xs font-black uppercase tracking-wider" style="color:${achievement.color};">${achievement.name}</p>
+                        <span class="text-[10px] text-slate-500 flex-shrink-0">${Math.min(activeIdx, achievement.stages.length)}/${achievement.stages.length}</span>
                     </div>
-                    <p class="text-xs text-slate-400">${displayDescription}</p>
+                    <p class="text-sm font-bold text-white mb-0.5">${displayStage.name}</p>
+                    <p class="text-xs text-slate-400 mb-2">${displayStage.description}</p>
+                    <div class="mb-2">
+                        ${!isFinished ? `<div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                            <span>${currentValue.toLocaleString()} / ${targetValue.toLocaleString()}</span>
+                            <span>${progressPct}%</span>
+                        </div>` : ''}
+                        <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500" style="width:${progressPct}%; background:${achievement.color};"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1 text-yellow-400">
+                            <i class="fa-solid fa-coins text-xs"></i>
+                            <span class="text-xs font-bold">${displayStage.reward.toLocaleString()}</span>
+                        </div>
+                        ${claimable
+                            ? `<button onclick="claimAchievementReward('${achievement.id}', ${activeIdx})"
+                                class="bg-gradient-to-r from-yellow-500 to-amber-400 text-black px-4 py-1.5 rounded-lg font-black text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-gift text-xs"></i> Réclamer
+                               </button>`
+                            : isFinished
+                            ? `<span class="text-xs text-slate-500 flex items-center gap-1"><i class="fa-solid fa-check-double"></i> Complété</span>`
+                            : `<span class="text-xs text-slate-600">Palier ${activeIdx + 1}/${achievement.stages.length}</span>`}
+                    </div>
                 </div>
-                ${isUnlocked ? '<i class="fa-solid fa-check text-yellow-500 text-lg flex-shrink-0"></i>' : ''}
-            </div>
-        `;
-        return div;
-    };
-
-    // ── Section : Débloqués ──
-    const unlocked = achievements.filter(a => state.unlockedAchievements.includes(a.id));
-
-    if (unlocked.length > 0) {
-        const sectionTitle = document.createElement('div');
-        sectionTitle.className = 'col-span-full mb-1';
-        sectionTitle.innerHTML = `
-            <div class="flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-trophy text-yellow-500 text-base"></i>
-                <span class="text-sm font-black uppercase tracking-widest text-white">Succès débloqués</span>
-                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">${unlocked.length}</span>
-            </div>
-            <div class="h-px bg-yellow-500/20"></div>
-        `;
-        container.appendChild(sectionTitle);
-        unlocked.forEach(a => container.appendChild(buildCard(a)));
-    }
-
-    // ── Section : Non débloqués ──
-    const locked = achievements.filter(a => !state.unlockedAchievements.includes(a.id));
-
-    if (locked.length > 0) {
-        const sectionTitle = document.createElement('div');
-        sectionTitle.className = 'col-span-full mt-6 mb-1';
-        sectionTitle.innerHTML = `
-            <div class="flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-lock text-slate-500 text-base"></i>
-                <span class="text-sm font-black uppercase tracking-widest text-slate-400">Succès non débloqués</span>
-                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/5 text-slate-500 border border-white/10">${locked.length}</span>
-            </div>
-            <div class="h-px bg-white/5"></div>
-        `;
-        container.appendChild(sectionTitle);
-        locked.forEach(a => container.appendChild(buildCard(a)));
-    }
+            </div>`;
+        container.appendChild(card);
+    });
 }
 
 

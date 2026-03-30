@@ -12,6 +12,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="assets/favicon.ico" />
+    <script src="database.js" defer></script>
+    <script src="animations.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
 
 <body class="px-0 py-4 md:py-6">
@@ -36,11 +39,7 @@
                     <i class="fa-solid fa-list-check text-lg"></i>
                     <span>Objectifs</span>
                 </a>
-                <a onclick="navigateTo('peace')"
-                    class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
-                    <i class="fa-solid fa-heart text-lg"></i>
-                    <span>Sac d'apaisement</span>
-                </a>
+
                 <a onclick="navigateTo('notes')"
                     class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
                     <i class="fa-solid fa-sticky-note text-lg"></i>
@@ -63,6 +62,7 @@
                     class="cursor-pointer sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold text-sm transition-all hover:bg-slate-800/50 hover:text-white">
                     <i class="fa-solid fa-trophy text-lg"></i>
                     <span>Succès</span>
+                    <span id="achievements-badge-sidebar" class="hidden ml-auto w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center"></span>
                 </a>
                 <div class="border-t border-white/10 mt-2 pt-3">
                     <button onclick="toggleTheme()" id="theme-toggle-btn"
@@ -252,141 +252,7 @@
                 </div>
             </div>
 
-            <!-- Peace Page -->
-            <div id="peace-page" class="page-content hidden">
-                <header class="flex flex-wrap select-none justify-between items-center gap-4 mb-6 lg:mb-10">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 flex items-center justify-center transition-transform">
-                            <i class="fa-solid fa-heart text-3xl text-pink-500"></i>
-                        </div>
-                        <div>
-                            <h1 class="font-gaming text-xl font-black tracking-widest uppercase">Sac d'<span
-                                    class="text-pink-500">Apaisement</span></h1>
-                            <p class="text-[10px] text-slate-500 font-bold tracking-widest">Libérez-vous de vos
-                                angoisses</p>
-                        </div>
-                    </div>
-                </header>
-
-                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                    <main class="xl:col-span-8 space-y-4">
-                        <!-- Input Section -->
-                        <div class="glass p-4 xl:p-6 rounded-[2rem] border-white/10">
-                            <h2 class="font-gaming text-sm font-black uppercase text-white mb-3">Ajouter une peur</h2>
-
-                            <div class="space-y-2">
-                                <textarea id="peace-input" placeholder="Écrivez ce qui vous angoisse..."
-                                    class="w-full bg-slate-800/50 select-none border border-white/10 rounded-xl px-3 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 resize-none text-sm"
-                                    rows="2"></textarea>
-
-                                <div class="flex gap-2">
-                                    <div class="relative flex-1">
-                                        <input type="hidden" id="peace-type-value" value="anxiety">
-                                        <button id="peace-type-btn" onclick="togglePeaceTypeSelector()"
-                                            class="w-full glass py-4 px-3 select-none rounded-xl flex items-center justify-between cursor-pointer hover:bg-slate-800/50 transition-all border border-white/10 hover:border-pink-500/30">
-                                            <div class="flex items-center gap-2">
-                                                <div id="peace-type-icon"
-                                                    class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
-                                                    style="background: #ec489920;">
-                                                    <i class="fa-solid fa-heart text-xs" style="color: #ec4899;"></i>
-                                                </div>
-                                                <span id="peace-type-name"
-                                                    class="text-xs font-black uppercase text-white">Anxiété</span>
-                                            </div>
-                                            <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
-                                        </button>
-                                        <div id="peace-type-dropdown"
-                                            class="glass rounded-xl border border-white/10 shadow-2xl hidden"
-                                            style="position: fixed; z-index: 10000;">
-                                            <div id="peace-type-list" class="p-2 max-h-48 overflow-y-auto"></div>
-                                        </div>
-                                    </div>
-                                    <button onclick="addPeaceFear()"
-                                        class="bg-gradient-to-r from-pink-600 to-rose-600 select-none text-white px-4 py-2 rounded-xl font-bold text-sm uppercase active:scale-95 transition-transform whitespace-nowrap">
-                                        <i class="fa-solid fa-plus mr-1"></i>Ajouter
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bag Section (mobile only) -->
-                        <div class="xl:hidden glass p-3 rounded-2xl border-white/5 relative overflow-visible">
-                            <div class="flex items-center gap-3">
-                                <!-- Bag image compact -->
-                                <div id="peace-bag-container-mobile"
-                                    class="relative flex-shrink-0 flex items-center justify-center w-14 h-14">
-                                    <img src="assets/bag.png" id="peace-bag-image" class="w-12 h-auto">
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2 mb-1.5">
-                                        <h2 class="font-gaming text-xs font-black uppercase text-pink-500">Votre Sac
-                                        </h2>
-                                        <p id="peace-count"
-                                            class="text-[9px] bg-pink-500/10 text-pink-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-pink-500/30">
-                                            0 peur</p>
-                                    </div>
-                                    <div id="peace-message" class="text-[10px] text-slate-400 mb-1.5 truncate"></div>
-                                    <div class="flex gap-1.5">
-                                        <button id="peace-send-btn" onclick="sendFearsToSac()" disabled
-                                            class="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                                            <i class="fa-solid fa-arrow-down mr-1"></i>Envoyer
-                                        </button>
-                                        <button id="peace-burn-btn" onclick="burnFears()" disabled
-                                            class="flex-1 bg-gradient-to-r from-orange-600 to-red-600 text-white px-2 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
-                                            <i class="fa-solid fa-fire mr-1"></i>Brûler
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Fears List -->
-                        <div id="peace-list" class="space-y-2"></div>
-                    </main>
-
-                    <!-- Bag Section (desktop only) -->
-                    <aside class="hidden xl:block xl:col-span-4 space-y-6">
-                        <div
-                            class="glass p-8 rounded-[2.5rem] select-none border-white/5 text-center transition-all relative overflow-visible">
-                            <div
-                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent opacity-50">
-                            </div>
-
-                            <div id="peace-cloud" class="relative h-48 mb-8 flex items-center justify-center">
-                                <div id="peace-words-cloud"
-                                    class="relative w-full h-full flex flex-wrap content-center justify-center gap-2 p-4">
-                                </div>
-                            </div>
-
-                            <div id="peace-bag-container" class="relative h-80 mb-6 flex items-center justify-center">
-                                <img src="assets/bag.png" id="peace-bag-image-desktop" class="w-32 h-auto">
-                                <div id="peace-bag-words"
-                                    class="absolute w-32 h-64 flex flex-wrap content-start gap-1 overflow-hidden p-2">
-                                </div>
-                            </div>
-
-                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-pink-500">
-                                Votre Sac</h2>
-                            <p id="peace-count-desktop"
-                                class="text-[11px] bg-pink-500/10 text-pink-500 px-4 py-1.5 rounded-full font-bold uppercase tracking-widest mb-4 inline-block border border-pink-500/30">
-                                0 peur</p>
-                            <div id="peace-message-desktop" class="text-sm text-slate-400 mb-4 h-6"></div>
-
-                            <div class="space-y-2">
-                                <button id="peace-send-btn-desktop" onclick="sendFearsToSac()" disabled
-                                    class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                                    <i class="fa-solid fa-arrow-down mr-2"></i>Envoyer au sac
-                                </button>
-                                <button id="peace-burn-btn-desktop" onclick="burnFears()" disabled
-                                    class="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-6 py-3 rounded-xl shadow-lg font-bold text-sm uppercase transition-all disabled:opacity-40 disabled:cursor-not-allowed hidden">
-                                    <i class="fa-solid fa-fire mr-2"></i>Brûler ses angoisses
-                                </button>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-            </div>
-
+            <!-- Peace Page supprimée -->
             <!-- Notes Page -->
             <div id="notes-page" class="page-content hidden">
                 <header class="flex select-none select-none flex-wrap justify-between items-center gap-4 mb-6 lg:mb-10">
@@ -437,58 +303,30 @@
 
                     <!-- Achievements Stats -->
                     <aside class="xl:col-span-4 space-y-6">
-                        <div
-                            class="glass p-8 select-none rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
-                            <div
-                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50">
-                            </div>
+                        <div class="glass p-8 select-none rounded-[2.5rem] border-white/5 text-center transition-all relative overflow-hidden">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
 
-                            <div
-                                class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-900 to-yellow-800 rounded-full flex items-center justify-center border-2 border-yellow-500/30 shadow-lg">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-900 to-yellow-800 rounded-full flex items-center justify-center border-2 border-yellow-500/30 shadow-lg">
                                 <i class="fa-solid fa-award text-4xl text-yellow-500"></i>
                             </div>
 
-                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-yellow-500">
-                                Vos succès</h2>
+                            <h2 class="font-gaming text-2xl font-black uppercase tracking-tighter mb-2 text-yellow-500">Vos succès</h2>
 
                             <div class="space-y-4 text-left">
                                 <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                    <p class="text-xs text-slate-400 mb-2">
-                                        <i class="fa-solid fa-star text-yellow-500 mr-2"></i>
-                                        <strong>Conseil :</strong> Débloquez des succès en complétant des objectifs, en
-                                        maintenant des streaks et en utilisant les différents outils.
-                                    </p>
-                                </div>
-
-                                <!-- Légende des difficultés -->
-                                <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
-                                    <p class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Difficulté
-                                    </p>
-                                    <div class="space-y-2">
-                                        <div class="flex items-center gap-3">
-                                            <i class="fa-solid fa-leaf text-sm w-4 text-center"
-                                                style="color: #10b981;"></i>
-                                            <span class="text-xs text-slate-400">Facile</span>
+                                    <p class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Comment ça marche</p>
+                                    <div class="space-y-2.5">
+                                        <div class="flex items-start gap-2">
+                                            <i class="fa-solid fa-chart-line text-yellow-500 text-xs mt-0.5 w-4 text-center"></i>
+                                            <span class="text-xs text-slate-400">Chaque succès a plusieurs paliers à franchir.</span>
                                         </div>
-                                        <div class="flex items-center gap-3">
-                                            <i class="fa-solid fa-fire text-sm w-4 text-center"
-                                                style="color: #f97316;"></i>
-                                            <span class="text-xs text-slate-400">Moyen</span>
+                                        <div class="flex items-start gap-2">
+                                            <i class="fa-solid fa-gift text-green-400 text-xs mt-0.5 w-4 text-center"></i>
+                                            <span class="text-xs text-slate-400">Réclamez votre récompense en crédits à chaque palier atteint.</span>
                                         </div>
-                                        <div class="flex items-center gap-3">
-                                            <i class="fa-solid fa-bolt text-sm w-4 text-center"
-                                                style="color: #eab308;"></i>
-                                            <span class="text-xs text-slate-400">Difficile</span>
-                                        </div>
-                                        <div class="flex items-center gap-3">
-                                            <i class="fa-solid fa-skull text-sm w-4 text-center"
-                                                style="color: #ef4444;"></i>
-                                            <span class="text-xs text-slate-400">Très difficile</span>
-                                        </div>
-                                        <div class="flex items-center gap-3">
-                                            <i class="fa-solid fa-crown text-sm w-4 text-center"
-                                                style="color: #a855f7;"></i>
-                                            <span class="text-xs text-slate-400">Extrême</span>
+                                        <div class="flex items-start gap-2">
+                                            <i class="fa-solid fa-arrow-right text-primary text-xs mt-0.5 w-4 text-center"></i>
+                                            <span class="text-xs text-slate-400">Le palier suivant se débloque automatiquement après réclamation.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -913,29 +751,6 @@
         </div>
     </div>
 
-    <!-- Peace Animation Modal (mobile only) -->
-    <div id="peace-anim-modal" class="fixed inset-0 z-[200] hidden flex-col items-center justify-center xl:hidden"
-        style="background: rgba(2,6,23,0.97); backdrop-filter: blur(24px);">
-        <div class="w-full max-w-sm mx-auto px-6 flex flex-col items-center gap-6 py-10">
-            <!-- Words cloud -->
-            <div id="peace-anim-cloud"
-                class="relative w-full min-h-[140px] flex flex-wrap content-center justify-center gap-2 p-4"></div>
-            <!-- Bag -->
-            <div id="peace-anim-bag-container" class="relative flex items-center justify-center w-40 h-40">
-                <img src="assets/bag.png" id="peace-anim-bag-image" class="w-28 h-auto">
-            </div>
-            <!-- Message -->
-            <p id="peace-anim-message"
-                class="font-gaming text-sm font-black uppercase text-pink-400 tracking-widest text-center opacity-0 transition-opacity duration-500">
-            </p>
-        </div>
-    </div>
-
-    <script src="database.js"></script>
-    <script src="animations.js"></script>
-    <script src="app.js"></script>
-
-    <!-- Bottom Navigation (mobile only) -->
     <nav id="bottom-nav" class="xl:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/10">
         <div class="flex items-center py-2 px-1 overflow-x-auto no-scrollbar">
             <button onclick="navigateTo('dashboard')" id="bn-dashboard"
@@ -943,11 +758,6 @@
                 style="color: #06b6d4;">
                 <i class="fa-solid fa-list-check text-xl"></i>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Objectifs</span>
-            </button>
-            <button onclick="navigateTo('peace')" id="bn-peace"
-                class="bottom-nav-btn flex-shrink-0 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-slate-500 min-w-[20vw]">
-                <i class="fa-solid fa-heart text-xl"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wide">Sac</span>
             </button>
             <button onclick="navigateTo('notes')" id="bn-notes"
                 class="bottom-nav-btn flex-shrink-0 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-slate-500 min-w-[20vw]">
@@ -965,8 +775,11 @@
                 <span class="text-[10px] font-bold uppercase tracking-wide">Forge</span>
             </button>
             <button onclick="navigateTo('achievements')" id="bn-achievements"
-                class="bottom-nav-btn flex-shrink-0 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-slate-500 min-w-[20vw]">
-                <i class="fa-solid fa-trophy text-xl"></i>
+                class="bottom-nav-btn flex-shrink-0 flex flex-col items-center gap-1 py-2 rounded-xl transition-all text-slate-500 min-w-[20vw] relative">
+                <span class="relative">
+                    <i class="fa-solid fa-trophy text-xl"></i>
+                    <span id="achievements-badge-mobile" class="hidden absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center"></span>
+                </span>
                 <span class="text-[10px] font-bold uppercase tracking-wide">Succès</span>
             </button>
         </div>

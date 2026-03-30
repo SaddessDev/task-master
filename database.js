@@ -28,11 +28,12 @@ const DB = {
             streakRequirement: 3,
             notes: [],
             unlockedAchievements: [],
+            claimedAchievementStages: {},
+            pendingAchievementRewards: [],
             questsCreated: 0,
             questsCompleted: 0,
             dailiesCreated: 0,
             peaceFearsBurned: 0,
-            peaceFearAdded: 0,
             dailyCompletions: 0,
             categories: [
                 { id: 1, name: 'Général', icon: 'fa-tag', color: '#06b6d4' },
