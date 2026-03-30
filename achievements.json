@@ -142,7 +142,7 @@
       "condition_type": "forge_max_level",
       "stages": [
         { "name": "Niveau maximum",           "description": "Amener un module au niveau 5",          "value": 5, "reward": 500  },
-        { "name": "Forgeron de l'Ascension",  "description": "Amener tous les modules au niveau max", "value": 99, "reward": 2000, "special": "forge_all_max" }
+        { "name": "Forgeron de l'Ascension",  "description": "Amener tous les modules au niveau max", "value": 32, "reward": 1500, "special": "forge_all_max" }
       ]
     }
   ]
