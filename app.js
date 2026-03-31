@@ -2878,11 +2878,18 @@ function renderAchievements() {
         const activeIdx = getActiveStageIndex(achievement.id);
         const isFinished = activeIdx >= achievement.stages.length;
         const claimable = !isFinished && isStageClaimable(achievement, activeIdx);
-        const currentValue = getConditionValue(achievement.condition_type);
         const displayStageIdx = isFinished ? achievement.stages.length - 1 : activeIdx;
         const displayStage = achievement.stages[displayStageIdx];
-        const prevValue = activeIdx > 0 ? achievement.stages[activeIdx - 1].value : 0;
-        const targetValue = displayStage.value;
+
+        // Pour forge_all_max : progression = somme des niveaux actuels / total niveaux possibles
+        const isForgeAllMax = displayStage.special === 'forge_all_max';
+        const currentValue = isForgeAllMax
+            ? FORGE_MODULES.reduce((sum, m) => sum + getForgeState(m.id).level, 0)
+            : getConditionValue(achievement.condition_type);
+        const prevValue = isForgeAllMax ? 0 : (activeIdx > 0 ? achievement.stages[activeIdx - 1].value : 0);
+        const targetValue = isForgeAllMax
+            ? FORGE_MODULES.reduce((sum, m) => sum + m.levels.length, 0)
+            : displayStage.value;
         const progressPct = isFinished ? 100 : (targetValue > prevValue
             ? Math.min(100, Math.round(((Math.min(currentValue, targetValue) - prevValue) / (targetValue - prevValue)) * 100))
             : 100);
