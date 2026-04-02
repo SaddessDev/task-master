@@ -765,24 +765,29 @@ input[type="datetime-local"] {
     animation: coinGainFloat 0.9s ease-out forwards;
 }
 
+.coin-loss-label {
+    position: fixed;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 15px;
+    color: #f87171;
+    text-shadow: 0 0 12px #ef444488;
+    pointer-events: none;
+    z-index: 9999;
+    animation: coinLossFloat 0.9s ease-out forwards;
+}
+
 @keyframes coinGainFloat {
-    0% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-        scale: 0.8;
-    }
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0);     scale: 0.8; }
+    20%  { opacity: 1; transform: translateX(-50%) translateY(-8px);  scale: 1.1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-40px); scale: 0.9; }
+}
 
-    20% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-8px);
-        scale: 1.1;
-    }
-
-    100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-40px);
-        scale: 0.9;
-    }
+@keyframes coinLossFloat {
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0);    scale: 0.8; }
+    20%  { opacity: 1; transform: translateX(-50%) translateY(6px);  scale: 1.1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(30px); scale: 0.9; }
 }
 
 /* ===== FORGE BUILDING SPIN ===== */

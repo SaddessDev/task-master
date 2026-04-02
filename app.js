@@ -165,6 +165,14 @@ function createCoinParticles(amount, targetElement) {
         label.style.top = (centerY - 10) + 'px';
         document.body.appendChild(label);
         setTimeout(() => label.remove(), 900);
+    } else if (amount < 0) {
+        const label = document.createElement('div');
+        label.className = 'coin-loss-label';
+        label.textContent = `${Math.floor(amount)}`;
+        label.style.left = centerX + 'px';
+        label.style.top = (centerY - 10) + 'px';
+        document.body.appendChild(label);
+        setTimeout(() => label.remove(), 900);
     }
 }
 
@@ -1083,8 +1091,11 @@ function toggleQuest(id) {
         delete q.completedAt;
         delete q.reward;
         state.xp = Math.max(0, state.xp - refund);
+        const oldCoinsQ = state.coins;
         state.coins = Math.max(0, state.coins - refund);
         state.questsCompleted = Math.max(0, state.questsCompleted - 1);
+        createCoinParticles(-refund, 'coin-display');
+        animateNumberIncrement('coins', oldCoinsQ, state.coins);
     }
 
     saveState();
@@ -1229,10 +1240,13 @@ function buyAscensionSlider() {
     const gain = paliers * ASC_RATE;
     const cost = Math.floor(paliers * 10 * (1 - getForgeAscDiscount()));
     if (state.coins >= cost) {
+        const oldCoinsA = state.coins;
         state.coins -= cost;
         state.ascensionPoints += gain;
         state.lastAscensionPurchase = Date.now();
         fx('shop-card', 'flash-win');
+        createCoinParticles(-cost, 'coins');
+        animateNumberIncrement('coins', oldCoinsA, state.coins);
         saveState();
         render();
     } else {
@@ -2120,6 +2134,7 @@ function buildModule(id) {
         return;
     }
 
+    const oldCoinsF = state.coins;
     state.coins -= levelData.cost;
     fs.building = {
         startedAt: Date.now(),
@@ -2128,6 +2143,8 @@ function buildModule(id) {
     };
     saveState();
     updateCoinsDisplay();
+    createCoinParticles(-levelData.cost, 'forge-coins-display');
+    animateNumberIncrement('forge-coins-display', oldCoinsF, state.coins);
     renderForge();
 }
 
@@ -3345,12 +3362,62 @@ function toggleChronosTask(eventId, taskId) {
         const refund = task.reward ?? reward;
         delete task.reward;
         state.xp = Math.max(0, state.xp - Math.round(refund * getForgeXpBonus()));
+        const oldCoinsC = state.coins;
         state.coins = Math.max(0, state.coins - refund);
+        createCoinParticles(-refund, 'chronos-coins-display');
+        animateNumberIncrement('chronos-coins-display', oldCoinsC, state.coins);
     }
 
     saveState();
-    renderChronos();
+    updateChronosTaskUI(eventId);
     checkAchievements();
+}
+
+function updateChronosTaskUI(eventId) {
+    const ev = state.chronosEvents.find(e => e.id === eventId);
+    if (!ev) return;
+
+    const done = ev.tasks.filter(t => t.done).length;
+    const total = ev.tasks.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    // Mettre à jour la barre de progression sans recréer le DOM
+    const bar = document.querySelector(`.progress-bar-anim[data-event-id="${eventId}"]`);
+    if (bar) {
+        const current = parseFloat(bar.style.width) || 0;
+        bar.style.width = current + '%';
+        bar.getBoundingClientRect();
+        requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+    }
+
+    // Mettre à jour le texte du compteur de sous-tâches
+    const pctEl = document.querySelector(`[data-pct-event="${eventId}"]`);
+    if (pctEl) pctEl.textContent = pct + '%';
+    const countEl = document.querySelector(`[data-count-event="${eventId}"]`);
+    if (countEl) countEl.textContent = `${done}/${total} sous-tâches`;
+
+    // Mettre à jour l'état visuel de chaque tâche
+    ev.tasks.forEach(task => {
+        const taskEl = document.querySelector(`[data-task-id="${task.id}"]`);
+        if (!taskEl) return;
+        const check = taskEl.querySelector('[data-task-check]');
+        const label = taskEl.querySelector('[data-task-label]');
+        if (task.done) {
+            taskEl.classList.add('opacity-40');
+            if (check) check.innerHTML = '<i class="fa-solid fa-check text-green-400" style="font-size:8px"></i>';
+            if (check) check.className = check.className.replace('border border-white/15 group-hover:border-primary/40', 'bg-green-500/30 border border-green-500/50');
+            if (label) { label.classList.add('line-through', 'text-slate-600'); label.classList.remove('text-slate-300'); }
+        } else {
+            taskEl.classList.remove('opacity-40');
+            if (check) check.innerHTML = '';
+            if (check) check.className = check.className.replace('bg-green-500/30 border border-green-500/50', 'border border-white/15 group-hover:border-primary/40');
+            if (label) { label.classList.remove('line-through', 'text-slate-600'); label.classList.add('text-slate-300'); }
+        }
+    });
+
+    // Si tout est complété ou si l'état global change, faire un render complet
+    const allDone = total > 0 && done === total;
+    if (allDone || ev.rewardClaimed) renderChronos();
 }
 
 function deleteChronosEvent(id) {
@@ -3528,8 +3595,28 @@ function initChronosFilterDrag() {
     });
 }
 
+function animateProgressBars(prevWidths = {}) {
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.progress-bar-anim[data-progress]').forEach(bar => {
+            const id = bar.dataset.eventId;
+            const from = prevWidths[id] ?? 0;
+            const to = parseFloat(bar.dataset.progress);
+            bar.style.width = from + '%';
+            // Force reflow then animate to target
+            bar.getBoundingClientRect();
+            requestAnimationFrame(() => { bar.style.width = to + '%'; });
+        });
+    });
+}
+
 function renderChronos() {
     if (!state.chronosEvents) state.chronosEvents = [];
+
+    // Capturer les largeurs actuelles avant de recréer le DOM
+    const prevWidths = {};
+    document.querySelectorAll('.progress-bar-anim[data-event-id]').forEach(bar => {
+        prevWidths[bar.dataset.eventId] = parseFloat(bar.style.width) || 0;
+    });
 
     // Archiver les événements expirés
     state.chronosEvents.forEach(ev => {
@@ -3656,28 +3743,30 @@ function renderChronos() {
                     <!-- Progress -->
                     <div class="mb-3">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">${done}/${total} sous-tâches</span>
+                            <span data-count-event="${ev.id}" class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">${done}/${total} sous-tâches</span>
                             <div class="flex items-center gap-2">
                                 ${getMultiplier() > 1 ? `<span class="text-[9px] font-bold text-purple-400"><i class="fa-solid fa-star" style="font-size:7px"></i> x${getMultiplier().toFixed(1)}</span>` : ''}
                                 ${getForgeState('nexus').level > 0 ? `<span class="text-[9px] font-bold" style="color:#a855f7"><i class="fa-solid fa-hammer" style="font-size:7px"></i> x${getForgeCoinsMultiplier().toFixed(1)}</span>` : ''}
-                                <span class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
+                                <span data-pct-event="${ev.id}" class="text-[9px] font-bold" style="color:${countdownColor}">${pct}%</span>
                             </div>
                         </div>
                         <div class="h-1 bg-slate-600 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full transition-all duration-700"
-                                style="width:${pct}%; background: linear-gradient(90deg, var(--c-primary), #a855f7)"></div>
+                            <div class="h-full rounded-full transition-all duration-700 progress-bar-anim"
+                                style="width:0%; background: linear-gradient(90deg, var(--c-primary), #a855f7)"
+                                data-progress="${pct}" data-event-id="${ev.id}"></div>
                         </div>
                     </div>
                     <!-- Tasks -->
                     <div class="space-y-1.5">
                         ${ev.tasks.map(task => `
                         <div onclick="toggleChronosTask(${ev.id}, ${task.id})"
+                            data-task-id="${task.id}"
                             class="group flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all hover:bg-white/5 ${task.done ? 'opacity-40' : ''}">
-                            <div class="w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center transition-all
+                            <div data-task-check class="w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center transition-all
                                 ${task.done ? 'bg-green-500/30 border border-green-500/50' : 'border border-white/15 group-hover:border-primary/40'}">
                                 ${task.done ? '<i class="fa-solid fa-check text-green-400" style="font-size:8px"></i>' : ''}
                             </div>
-                            <span class="text-xs flex-1 ${task.done ? 'line-through text-slate-600' : 'text-slate-300'}">${escapeHtml(task.text)}</span>
+                            <span data-task-label class="text-xs flex-1 ${task.done ? 'line-through text-slate-600' : 'text-slate-300'}">${escapeHtml(task.text)}</span>
                             ${!task.done ? `<span class="text-[9px] text-slate-700 group-hover:text-yellow-500/70 transition-colors font-gaming">+${Math.round(10 * getMultiplier() * getForgeCoinsMultiplier())} ${getCreditIcon('xs', 'inline opacity-60')}</span>` : ''}
                         </div>`).join('')}
                         ${!ev.rewardClaimed ? `
@@ -3739,4 +3828,5 @@ function renderChronos() {
             }
         }, 1000);
     }
+    animateProgressBars(prevWidths);
 }
