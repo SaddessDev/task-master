@@ -944,15 +944,16 @@ function renderShop() {
         return;
     }
 
-    // Taux : ASC_RATE ASC par 10 crédits
-    // Le slider représente des paliers de 10 crédits
-    const maxPaliers = Math.floor(state.coins / 10);
+    // Taux : ASC_RATE ASC par palier, coût par palier = 10 * (1 - discount)
+    const discount = getForgeAscDiscount();
+    const costPerPalier = Math.max(1, Math.floor(10 * (1 - discount)));
+    const maxPaliers = Math.floor(state.coins / costPerPalier);
     const remaining = REBIRTH_THRESHOLD - state.ascensionPoints;
     const maxPaliersForRemaining = Math.ceil(remaining / ASC_RATE);
     const maxBuy = Math.max(1, Math.min(maxPaliers, maxPaliersForRemaining));
     const initialVal = Math.max(1, Math.min(10, maxBuy));
     const initialAsc = initialVal * ASC_RATE;
-    const initialCost = initialVal * 10;
+    const initialCost = initialVal * costPerPalier;
 
     container.innerHTML = `
         <div class="mb-6 glass p-6 rounded-2xl border border-white/10">
@@ -1000,15 +1001,15 @@ function renderShop() {
                         class="w-full h-2 rounded-full appearance-none cursor-pointer accent-cyan-500"
                         oninput="updateAscSlider(this.value)">
                     <div class="flex justify-between mt-1">
-                        <span class="text-[9px] text-slate-600">${ASC_RATE} ASC</span>
-                        <span class="text-[9px] text-slate-600">${maxBuy * ASC_RATE} ASC</span>
+                        <span class="text-[9px] text-slate-600">${ASC_RATE} ASC · ${costPerPalier} ${getCreditIcon('xs', 'inline')}</span>
+                        <span class="text-[9px] text-slate-600">${maxBuy * ASC_RATE} ASC · ${maxBuy * costPerPalier} ${getCreditIcon('xs', 'inline')}</span>
                     </div>
                 </div>
 
                 <div class="bg-slate-900/60 rounded-2xl p-5 mb-6 grid grid-cols-3 gap-4 text-center">
                     <div>
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Coût :</div>
-                        <div id="slider-cost" class="font-gaming inline-flex justify-center items-center gap-1 text-base text-yellow-400">${initialCost} ${getCreditIcon('sm')}</div>
+                        <div id="slider-cost" class="font-gaming inline-flex justify-center items-center gap-1 text-base text-yellow-400">${initialCost} ${getCreditIcon('sm')}${discount > 0 ? ` <span class="text-[9px] text-green-400">-${Math.round(discount * 100)}%</span>` : ''}</div>
                     </div>
                     <div>
                         <div class="text-[9px] text-slate-500 uppercase font-bold mb-1">Crédits restant :</div>
@@ -1026,7 +1027,7 @@ function renderShop() {
         <div class="mt-6 glass p-5 rounded-2xl border border-white/10 text-center">
             <i class="fa-solid fa-lightbulb text-yellow-500 text-xl mb-2"></i>
             <p class="text-xs text-slate-400">
-                <span class="font-bold text-white">Taux :</span> 10 crédits = ${ASC_RATE} point${ASC_RATE > 1 ? 's' : ''} d'Ascension &nbsp;·&nbsp; Objectif : ${REBIRTH_THRESHOLD} ASC pour la Renaissance
+                <span class="font-bold text-white">Taux :</span> ${costPerPalier} crédits = ${ASC_RATE} point${ASC_RATE > 1 ? 's' : ''} d'Ascension${discount > 0 ? ` <span class="text-green-400 font-bold">(-${Math.round(discount * 100)}% Forge)</span>` : ''} &nbsp;·&nbsp; Objectif : ${REBIRTH_THRESHOLD} ASC pour la Renaissance
             </p>
         </div>
     `;
@@ -1204,7 +1205,8 @@ function updateAscSlider(val) {
     const paliers = parseInt(val);
     const asc = paliers * ASC_RATE;
     const discount = getForgeAscDiscount();
-    const cost = Math.floor(paliers * 10 * (1 - discount));
+    const costPerPalier = Math.max(1, Math.floor(10 * (1 - discount)));
+    const cost = paliers * costPerPalier;
     document.getElementById('slider-asc-val').textContent = `+${asc} ASC`;
     document.getElementById('slider-cost').innerHTML = `${cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>${discount > 0 ? ` <span class="text-[9px] text-green-400">-${Math.round(discount * 100)}%</span>` : ''}`;
     document.getElementById('slider-remaining').innerHTML = `${Math.floor(state.coins) - cost} <span class="text-[9px]">${getCreditIcon('sm')}</span>`;
@@ -1238,7 +1240,8 @@ function buyAscensionSlider() {
     if (!slider) return;
     const paliers = parseInt(slider.value);
     const gain = paliers * ASC_RATE;
-    const cost = Math.floor(paliers * 10 * (1 - getForgeAscDiscount()));
+    const costPerPalier = Math.max(1, Math.floor(10 * (1 - getForgeAscDiscount())));
+    const cost = paliers * costPerPalier;
     if (state.coins >= cost) {
         const oldCoinsA = state.coins;
         state.coins -= cost;
